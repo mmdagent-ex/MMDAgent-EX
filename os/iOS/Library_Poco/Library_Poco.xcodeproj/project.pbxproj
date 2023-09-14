@@ -1,0 +1,353 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		102E24981F78D42100955A5A /* dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 102E24971F78D42100955A5A /* dummy.m */; };
+		102E24A61F78D44900955A5A /* libPocoXML.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 102E249A1F78D44900955A5A /* libPocoXML.a */; };
+		102E24A71F78D44900955A5A /* libPocoNet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 102E249B1F78D44900955A5A /* libPocoNet.a */; };
+		102E24A81F78D44900955A5A /* libPocoNetSSL.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 102E249C1F78D44900955A5A /* libPocoNetSSL.a */; };
+		102E24A91F78D44900955A5A /* libPocoFoundation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 102E249D1F78D44900955A5A /* libPocoFoundation.a */; };
+		102E24AA1F78D44900955A5A /* libPocoCrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 102E249E1F78D44900955A5A /* libPocoCrypto.a */; };
+		102E24AB1F78D44900955A5A /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 102E249F1F78D44900955A5A /* libssl.a */; };
+		102E24AC1F78D44900955A5A /* libPocoUtil.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 102E24A01F78D44900955A5A /* libPocoUtil.a */; };
+		102E24AD1F78D44900955A5A /* libPocoData.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 102E24A11F78D44900955A5A /* libPocoData.a */; };
+		102E24AE1F78D44900955A5A /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 102E24A21F78D44900955A5A /* libcrypto.a */; };
+		102E24AF1F78D44900955A5A /* libPocoDataSQLite.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 102E24A31F78D44900955A5A /* libPocoDataSQLite.a */; };
+		102E24B01F78D44900955A5A /* libPocoJSON.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 102E24A41F78D44900955A5A /* libPocoJSON.a */; };
+		102E24B11F78D44900955A5A /* libPocoZip.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 102E24A51F78D44900955A5A /* libPocoZip.a */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		102E24971F78D42100955A5A /* dummy.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = dummy.m; path = iOS/dummy.m; sourceTree = "<group>"; };
+		102E249A1F78D44900955A5A /* libPocoXML.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPocoXML.a; path = iOS/lib/libPocoXML.a; sourceTree = "<group>"; };
+		102E249B1F78D44900955A5A /* libPocoNet.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPocoNet.a; path = iOS/lib/libPocoNet.a; sourceTree = "<group>"; };
+		102E249C1F78D44900955A5A /* libPocoNetSSL.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPocoNetSSL.a; path = iOS/lib/libPocoNetSSL.a; sourceTree = "<group>"; };
+		102E249D1F78D44900955A5A /* libPocoFoundation.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPocoFoundation.a; path = iOS/lib/libPocoFoundation.a; sourceTree = "<group>"; };
+		102E249E1F78D44900955A5A /* libPocoCrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPocoCrypto.a; path = iOS/lib/libPocoCrypto.a; sourceTree = "<group>"; };
+		102E249F1F78D44900955A5A /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = iOS/lib/libssl.a; sourceTree = "<group>"; };
+		102E24A01F78D44900955A5A /* libPocoUtil.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPocoUtil.a; path = iOS/lib/libPocoUtil.a; sourceTree = "<group>"; };
+		102E24A11F78D44900955A5A /* libPocoData.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPocoData.a; path = iOS/lib/libPocoData.a; sourceTree = "<group>"; };
+		102E24A21F78D44900955A5A /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = iOS/lib/libcrypto.a; sourceTree = "<group>"; };
+		102E24A31F78D44900955A5A /* libPocoDataSQLite.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPocoDataSQLite.a; path = iOS/lib/libPocoDataSQLite.a; sourceTree = "<group>"; };
+		102E24A41F78D44900955A5A /* libPocoJSON.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPocoJSON.a; path = iOS/lib/libPocoJSON.a; sourceTree = "<group>"; };
+		102E24A51F78D44900955A5A /* libPocoZip.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPocoZip.a; path = iOS/lib/libPocoZip.a; sourceTree = "<group>"; };
+		807AB5331C5B4839008C4A04 /* libLibrary_Poco.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libLibrary_Poco.a; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		807AB5301C5B4839008C4A04 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				102E24A61F78D44900955A5A /* libPocoXML.a in Frameworks */,
+				102E24A71F78D44900955A5A /* libPocoNet.a in Frameworks */,
+				102E24A81F78D44900955A5A /* libPocoNetSSL.a in Frameworks */,
+				102E24A91F78D44900955A5A /* libPocoFoundation.a in Frameworks */,
+				102E24AA1F78D44900955A5A /* libPocoCrypto.a in Frameworks */,
+				102E24AB1F78D44900955A5A /* libssl.a in Frameworks */,
+				102E24AC1F78D44900955A5A /* libPocoUtil.a in Frameworks */,
+				102E24AD1F78D44900955A5A /* libPocoData.a in Frameworks */,
+				102E24AE1F78D44900955A5A /* libcrypto.a in Frameworks */,
+				102E24AF1F78D44900955A5A /* libPocoDataSQLite.a in Frameworks */,
+				102E24B01F78D44900955A5A /* libPocoJSON.a in Frameworks */,
+				102E24B11F78D44900955A5A /* libPocoZip.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		102E24991F78D44900955A5A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				102E24A21F78D44900955A5A /* libcrypto.a */,
+				102E249B1F78D44900955A5A /* libPocoNet.a */,
+				102E249E1F78D44900955A5A /* libPocoCrypto.a */,
+				102E24A11F78D44900955A5A /* libPocoData.a */,
+				102E24A31F78D44900955A5A /* libPocoDataSQLite.a */,
+				102E249D1F78D44900955A5A /* libPocoFoundation.a */,
+				102E24A41F78D44900955A5A /* libPocoJSON.a */,
+				102E249C1F78D44900955A5A /* libPocoNetSSL.a */,
+				102E24A01F78D44900955A5A /* libPocoUtil.a */,
+				102E249A1F78D44900955A5A /* libPocoXML.a */,
+				102E24A51F78D44900955A5A /* libPocoZip.a */,
+				102E249F1F78D44900955A5A /* libssl.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		807AB52A1C5B4839008C4A04 = {
+			isa = PBXGroup;
+			children = (
+				102E24971F78D42100955A5A /* dummy.m */,
+				807AB5341C5B4839008C4A04 /* Products */,
+				102E24991F78D44900955A5A /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		807AB5341C5B4839008C4A04 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				807AB5331C5B4839008C4A04 /* libLibrary_Poco.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		807AB5321C5B4839008C4A04 /* Library_Poco */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 807AB53C1C5B4839008C4A04 /* Build configuration list for PBXNativeTarget "Library_Poco" */;
+			buildPhases = (
+				807AB52F1C5B4839008C4A04 /* Sources */,
+				807AB5301C5B4839008C4A04 /* Frameworks */,
+				80D963101C74DD5E00F73A39 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Library_Poco;
+			productName = Library_Poco;
+			productReference = 807AB5331C5B4839008C4A04 /* libLibrary_Poco.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		807AB52B1C5B4839008C4A04 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0820;
+				ORGANIZATIONNAME = "";
+				TargetAttributes = {
+					807AB5321C5B4839008C4A04 = {
+						CreatedOnToolsVersion = 7.2;
+						DevelopmentTeam = ER7BUZVGH2;
+					};
+				};
+			};
+			buildConfigurationList = 807AB52E1C5B4839008C4A04 /* Build configuration list for PBXProject "Library_Poco" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				English,
+				en,
+			);
+			mainGroup = 807AB52A1C5B4839008C4A04;
+			productRefGroup = 807AB5341C5B4839008C4A04 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				807AB5321C5B4839008C4A04 /* Library_Poco */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		80D963101C74DD5E00F73A39 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		807AB52F1C5B4839008C4A04 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				102E24981F78D42100955A5A /* dummy.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		807AB53A1C5B4839008C4A04 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		807AB53B1C5B4839008C4A04 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		807AB53D1C5B4839008C4A04 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/iOS/lib",
+				);
+				OTHER_CFLAGS = (
+					"-DPOCO_CONFIG=iPhone",
+					"-DFoundation_EXPORTS",
+					"-DPOCO_STATIC",
+					"-DPCRE_STATIC",
+					"-DPOCO_NO_AUTOMATIC_LIBS",
+					"-DPOCO_NO_FPENVIRONMENT",
+					"-DPOCO_NO_STAT64",
+					"-DPOCO_NO_SHAREDLIBS",
+					"-DPOCO_NO_NET_IFTYPES",
+					"-DTARGET_OS_IPHONE",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/src/Net/include $(SRCROOT)/src/Foundation/include";
+				VALID_ARCHS = arm64;
+				WARNING_CFLAGS = "";
+			};
+			name = Debug;
+		};
+		807AB53E1C5B4839008C4A04 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/iOS/lib",
+				);
+				OTHER_CFLAGS = (
+					"-DPOCO_CONFIG=iPhone",
+					"-DFoundation_EXPORTS",
+					"-DPOCO_STATIC",
+					"-DPCRE_STATIC",
+					"-DPOCO_NO_AUTOMATIC_LIBS",
+					"-DPOCO_NO_FPENVIRONMENT",
+					"-DPOCO_NO_STAT64",
+					"-DPOCO_NO_SHAREDLIBS",
+					"-DPOCO_NO_NET_IFTYPES",
+					"-DTARGET_OS_IPHONE",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/src/Net/include $(SRCROOT)/src/Foundation/include";
+				VALID_ARCHS = arm64;
+				WARNING_CFLAGS = "";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		807AB52E1C5B4839008C4A04 /* Build configuration list for PBXProject "Library_Poco" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				807AB53A1C5B4839008C4A04 /* Debug */,
+				807AB53B1C5B4839008C4A04 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		807AB53C1C5B4839008C4A04 /* Build configuration list for PBXNativeTarget "Library_Poco" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				807AB53D1C5B4839008C4A04 /* Debug */,
+				807AB53E1C5B4839008C4A04 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 807AB52B1C5B4839008C4A04 /* Project object */;
+}

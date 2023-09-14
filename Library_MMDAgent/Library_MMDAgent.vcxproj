@@ -1,0 +1,178 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\include\BoneController.h" />
+    <ClInclude Include="src\include\BoneFaceControl.h" />
+    <ClInclude Include="src\include\Button.h" />
+    <ClInclude Include="src\include\Caption.h" />
+    <ClInclude Include="src\include\ContentManager.h" />
+    <ClInclude Include="src\include\ContentManagerThreadWeb.h" />
+    <ClInclude Include="src\include\ContentManagerThreadZip.h" />
+    <ClInclude Include="src\include\ContentUpload.h" />
+    <ClInclude Include="src\include\FileBrowser.h" />
+    <ClInclude Include="src\include\FreeTypeGL.h" />
+    <ClInclude Include="src\include\InfoText.h" />
+    <ClInclude Include="src\include\KeyHandler.h" />
+    <ClInclude Include="src\include\KeyValue.h" />
+    <ClInclude Include="src\include\LipSync.h" />
+    <ClInclude Include="src\include\LogText.h" />
+    <ClInclude Include="src\include\Menu.h" />
+    <ClInclude Include="src\include\Message.h" />
+    <ClInclude Include="src\include\MMDAgent.h" />
+    <ClInclude Include="src\include\MMDAgent_utils.h" />
+    <ClInclude Include="src\include\MotionStocker.h" />
+    <ClInclude Include="src\include\Option.h" />
+    <ClInclude Include="src\include\Plugin.h" />
+    <ClInclude Include="src\include\PMDFaceInterface.h" />
+    <ClInclude Include="src\include\PMDObject.h" />
+    <ClInclude Include="src\include\Prompt.h" />
+    <ClInclude Include="src\include\Render.h" />
+    <ClInclude Include="src\include\RenderOffScreen.h" />
+    <ClInclude Include="src\include\ScreenWindow.h" />
+    <ClInclude Include="src\include\ShapeMap.h" />
+    <ClInclude Include="src\include\Slider.h" />
+    <ClInclude Include="src\include\Stage.h" />
+    <ClInclude Include="src\include\Tabbar.h" />
+    <ClInclude Include="src\include\ThreadedLoading.h" />
+    <ClInclude Include="src\include\TileTexture.h" />
+    <ClInclude Include="src\include\Timer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\lib\BoneController.cpp" />
+    <ClCompile Include="src\lib\BoneFaceControl.cpp" />
+    <ClCompile Include="src\lib\Button.cpp" />
+    <ClCompile Include="src\lib\Caption.cpp" />
+    <ClCompile Include="src\lib\ContentManager.cpp" />
+    <ClCompile Include="src\lib\ContentManagerThreadWeb.cpp" />
+    <ClCompile Include="src\lib\ContentManagerThreadZip.cpp" />
+    <ClCompile Include="src\lib\ContentUpload.cpp" />
+    <ClCompile Include="src\lib\FileBrowser.cpp" />
+    <ClCompile Include="src\lib\FreeTypeGL.cpp" />
+    <ClCompile Include="src\lib\InfoText.cpp" />
+    <ClCompile Include="src\lib\KeyHandler.cpp" />
+    <ClCompile Include="src\lib\KeyValue.cpp" />
+    <ClCompile Include="src\lib\LipSync.cpp" />
+    <ClCompile Include="src\lib\LogText.cpp" />
+    <ClCompile Include="src\lib\Menu.cpp" />
+    <ClCompile Include="src\lib\Message.cpp" />
+    <ClCompile Include="src\lib\MMDAgent.cpp" />
+    <ClCompile Include="src\lib\MMDAgent_utils.cpp" />
+    <ClCompile Include="src\lib\MotionStocker.cpp" />
+    <ClCompile Include="src\lib\Option.cpp" />
+    <ClCompile Include="src\lib\Plugin.cpp" />
+    <ClCompile Include="src\lib\PMDFaceInterface.cpp" />
+    <ClCompile Include="src\lib\PMDObject.cpp" />
+    <ClCompile Include="src\lib\Prompt.cpp" />
+    <ClCompile Include="src\lib\Render.cpp" />
+    <ClCompile Include="src\lib\RenderOffScreen.cpp" />
+    <ClCompile Include="src\lib\ScreenWindow.cpp" />
+    <ClCompile Include="src\lib\ShapeMap.cpp" />
+    <ClCompile Include="src\lib\Slider.cpp" />
+    <ClCompile Include="src\lib\Stage.cpp" />
+    <ClCompile Include="src\lib\Tabbar.cpp" />
+    <ClCompile Include="src\lib\ThreadedLoading.cpp" />
+    <ClCompile Include="src\lib\TileTexture.cpp" />
+    <ClCompile Include="src\lib\Timer.cpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{C3E620FB-6164-479F-BA00-86EF6953A6AE}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Library_MMDAgent</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+    <EnableASAN>false</EnableASAN>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(ProjectName)\lib\</OutDir>
+    <TargetName>MMDAgent</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(ProjectName)\lib\</OutDir>
+    <TargetName>MMDAgent_D</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_DEBUG;_LIB;MMDAGENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\Library_Bullet_Physics\include;..\Library_MMDFiles\include;..\Library_glew\include;src\include;..\Library_GLFW\include;..\Library_FreeType\include;..\Library_UTF8-CPP\include;..\Library_zlib\include;..\Library_Poco\include;..\Library_Poco\win32\include</AdditionalIncludeDirectories>
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <OutputFile>lib\MMDAgent_D.lib</OutputFile>
+    </Lib>
+    <PreBuildEvent>
+      <Command>copy src\include\*.h include</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>..\Library_Bullet_Physics\include;..\Library_MMDFiles\include;..\Library_glew\include;src\include;..\Library_GLFW\include;..\Library_FreeType\include;..\Library_UTF8-CPP\include;..\Library_zlib\include;..\Library_Poco\include;..\Library_Poco\win32\include</AdditionalIncludeDirectories>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;NDEBUG;_LIB;MMDAGENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <OutputFile>lib\MMDAgent.lib</OutputFile>
+    </Lib>
+    <PreBuildEvent>
+      <Command>copy src\include\*.h include</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

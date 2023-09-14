@@ -1,0 +1,144 @@
+diff --git a/libjulius/include/julius/recog.h b/libjulius/include/julius/recog.h
+index 43f996f..458a193 100644
+--- a/libjulius/include/julius/recog.h
++++ b/libjulius/include/julius/recog.h
+@@ -444,6 +444,14 @@ typedef struct __adin__ {
+ 
+   char current_input_name[MAXPATHLEN]; ///< File or device name of current input
+ 
++  SP16 vad_speech[MAXSPEECHLEN];
++  void *vad;
++  int vad_speechlen;
++  int vad_frameshiftinms;
++  int vad_framesize;
++  int vad_lastresult[5];
++  int vad_lastp;
++
+ } ADIn;
+ 
+ /**
+diff --git a/libjulius/src/adin-cut.c b/libjulius/src/adin-cut.c
+index 6bcd9f6..193f2cb 100644
+--- a/libjulius/src/adin-cut.c
++++ b/libjulius/src/adin-cut.c
+@@ -110,6 +110,9 @@
+ #include <pthread.h>
+ #endif
+ 
++/* FVAD */
++#include <fvad.h>
++
+ /// Define this if you want to output a debug message for threading
+ #undef THREAD_DEBUG
+ /// Enable some fixes relating adinnet+module
+@@ -139,6 +142,7 @@ adin_setup_param(ADIn *adin, Jconf *jconf)
+ {
+   float samples_in_msec;
+   int freq;
++  int i;
+ 
+   if (jconf->input.sfreq <= 0) {
+     jlog("ERROR: adin_setup_param: going to set smpfreq to %d\n", jconf->input.sfreq);
+@@ -205,6 +209,16 @@ adin_setup_param(ADIn *adin, Jconf *jconf)
+ 
+   adin->rehash = FALSE;
+ 
++  /* FVAD */
++  adin->vad = fvad_new();
++  fvad_set_sample_rate(adin->vad, jconf->input.sfreq);
++  fvad_set_mode(adin->vad, 0);
++  adin->vad_speechlen = 0;
++  adin->vad_frameshiftinms = 20;
++  adin->vad_framesize = jconf->input.sfreq * adin->vad_frameshiftinms / 1000;
++  for (i = 0; i < 5; i++) adin->vad_lastresult[i] = 0;
++  adin->vad_lastp = 0;
++
+   return TRUE;
+ 
+ }
+@@ -230,6 +244,55 @@ adin_purge(ADIn *a, int from)
+   a->bp = a->current_len - from;
+ }
+ 
++/* FVAD */
++static int
++fvad_proceed(ADIn *a, SP16 *speech, int samplenum)
++{
++  int i, j, k;
++  int ret, result;
++  float sum;
++
++  if (a->vad_speechlen + samplenum > MAXSPEECHLEN) {
++    /* buffer overflow */
++    samplenum = MAXSPEECHLEN - a->vad_speechlen;
++  }
++  /* append incoming data to buffer */
++  for (i = 0; i < samplenum; i++) {
++    a->vad_speech[a->vad_speechlen + i] = speech[i];
++  }
++  a->vad_speechlen += samplenum;
++  /* process per 10ms */
++  for (i = 0; i + a->vad_framesize < a->vad_speechlen; i += a->vad_framesize) {
++    ret = fvad_process(a->vad, &(a->vad_speech[i]), a->vad_framesize);
++    if (ret < 0) {
++      /* error */
++      printf("error\n");
++      break;
++    }
++    //printf("fvad: %d: %d\n", vad_count * vad_frameshiftinms, ret);
++    a->vad_lastresult[a->vad_lastp] = ret;
++    if (++a->vad_lastp >= 5) a->vad_lastp -= 5;
++  }
++  sum = 0.0f;
++  for (i = 0; i < 5; i++) sum += (float)a->vad_lastresult[i];
++  sum /= 5.0f;
++  //printf("fvad: %.1f\n", sum);
++  if (sum >= 0.5f)
++    result = 1;
++  else
++    result = 0;
++
++  /* flush processed samples */
++  k = 0;
++  for (j = i; j < a->vad_speechlen; j++) {
++    a->vad_speech[k] = a->vad_speech[j];
++    k++;
++  }
++  a->vad_speechlen = k;
++
++  return result;
++}
++
+ /** 
+  * <EN>
+  * @brief  Main A/D-in and sound detection function
+@@ -314,6 +377,9 @@ adin_cut(int (*ad_process)(SP16 *, int, Recog *), int (*ad_check)(Recog *), Reco
+   boolean transfer_online_local;	/* local repository of transfer_online */
+   int zc;		/* count of zero cross */
+ 
++  /* FVAD */
++  int fvad_result;
++  
+   a = recog->adin;
+ 
+   /*
+@@ -567,9 +633,8 @@ adin_cut(int (*ad_process)(SP16 *, int, Recog *), int (*ad_check)(Recog *), Reco
+ 	/* store the new data to cycle buffer and update the count */
+ 	/* return zero-cross num in the cycle buffer */
+ 	zc = count_zc_e(&(a->zc), &(a->buffer[i]), wstep);
+-	
+-	if (zc > a->noise_zerocross) { /* now triggering */
+-	  
++	fvad_result = fvad_proceed(a, &(a->buffer[i]), wstep);
++	if (zc > a->noise_zerocross && fvad_result == 1) { /* now triggering */
+ 	  if (a->is_valid_data == FALSE) {
+ 	    /*****************************************************/
+ 	    /* process off, trigger on: detect speech triggering */
+@@ -1411,6 +1476,7 @@ adin_free_param(Recog *recog)
+ #ifdef HAVE_PTHREAD
+   if (a->speech) free(a->speech);
+ #endif
++  fvad_free(a->vad);
+ }
+ 
+ /* end of file */
