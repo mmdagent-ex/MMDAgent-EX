@@ -116,12 +116,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Plugin_Remote", "Plugin_Rem
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Library_RE2", "Library_RE2\Library_RE2.vcxproj", "{B3557918-8E24-4868-A46A-19EE53C0D0BC}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Plugin_ErrorBlock", "Plugin_ErrorBlock\Plugin_ErrorBlock.vcxproj", "{E965B74C-764B-4DA1-9F9B-C87E7529932E}"
-	ProjectSection(ProjectDependencies) = postProject
-		{8530307F-1E2C-4C3C-A275-122B11AA55A1} = {8530307F-1E2C-4C3C-A275-122B11AA55A1}
-		{C3E620FB-6164-479F-BA00-86EF6953A6AE} = {C3E620FB-6164-479F-BA00-86EF6953A6AE}
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Plugin_Network", "Plugin_Network\Plugin_Network.vcxproj", "{B0F6C203-1DEA-497C-8994-119D70A75D91}"
 	ProjectSection(ProjectDependencies) = postProject
 		{8530307F-1E2C-4C3C-A275-122B11AA55A1} = {8530307F-1E2C-4C3C-A275-122B11AA55A1}
