@@ -1,0 +1,56 @@
+apply plugin: 'com.android.application'
+import org.apache.tools.ant.taskdefs.condition.Os
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "25.0.2"
+    defaultConfig {
+        applicationId "com.example.mmdagent"
+        minSdkVersion 21
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    sourceSets.main.jni.srcDirs = [] // avoid using NdkCompile task with gradle
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:23.4.0'
+    testCompile 'junit:junit:4.12'
+}
+
+task buildNative(type:Exec) {
+    def ndkDir = android.ndkDirectory == null ? "" : android.ndkDirectory.getAbsolutePath()
+    def jOption = '-j'+Runtime.runtime.availableProcessors()
+    if(Os.isFamily(Os.FAMILY_WINDOWS)){
+        commandLine("$ndkDir/ndk-build.cmd", jOption, '-C', file('src/main').absolutePath, 'NDK_APP_LIBS_OUT=jniLibs', 'NDK_DEBUG=0');
+    }else{
+        commandLine("$ndkDir/ndk-build", jOption, '-C', file('src/main').absolutePath, 'NDK_APP_LIBS_OUT=jniLibs', 'NDK_DEBUG=0');
+    }
+}
+
+tasks.withType(JavaCompile) {
+    compileTask -> compileTask.dependsOn 'buildNative'
+}
+
+task cleanNative(type:Exec){
+    def ndkDir = android.ndkDirectory == null ? "" : android.ndkDirectory.getAbsolutePath()
+    if(Os.isFamily(Os.FAMILY_WINDOWS)){
+        commandLine("$ndkDir/ndk-build.cmd", 'clean', '-C', file('src/main').absolutePath, "NDK_APP_LIBS_OUT=jnilibs");
+    }else{
+        commandLine("$ndkDir/ndk-build", 'clean', '-C', file('src/main').absolutePath, "NDK_APP_LIBS_OUT=jnilibs");
+    }
+}
+
+clean.dependsOn 'cleanNative'

@@ -1,0 +1,1 @@
+"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe" /consoleloggerparameters:ErrorsOnly /nologo /verbosity:quiet /p:Configuration=Release MMDAgent_vs2017.sln

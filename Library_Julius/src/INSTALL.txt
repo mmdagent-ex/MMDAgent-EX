@@ -1,0 +1,146 @@
+How to build Julius
+=====================
+
+This document describes how to build Julius on several platform.
+See each section for details.
+
+Performance-optimized compiler flags will be set for several platforms
+by default. If the build fails or the compiled binaries would not run,
+or you want to set your own compile flags, give the configure script
+your own compiler flags via "CFLAGS" environment value like this
+(change "-O3" below as you like)
+
+    % make distclean
+    % CFLAGS='-O3' ./configure --host=arm-linux-gnueabihf
+    % make
+
+After build, compiled binaries of Julius and tools will be placed in
+their respective directories.  You can run "make install" will install
+binaries into system directries:
+
+  ${prefix}/bin      executables
+  ${prefix}/lib      libraries
+  ${prefix}/include  headers
+
+"${prefix}" will be "/usr/local" by default.  You can change it by
+specifying "--prefix=..." to configure script.
+
+  % ./configure --prefix=/opt
+
+-----------------------------------------------
+Linux  (tested on Ubuntu-14.04 and later)
+
+  % sudo apt-get install build-essential zlib1g-dev libsdl2-dev
+  % sudo apt-get libasound2-dev (or libpulse-dev, whichever you want to enable)
+  % ./configure
+  % make
+  % (optional) make install
+
+If you want to explicitly choose an audio interface, use `--with-mictype=xxx`.
+
+  % ./configure --with-mictype=pulseaudio
+  % make
+  % (optional) make install
+
+(4.6 and later) For CUDA support, compile with nvcc:
+
+  % CC=/usr/local/cuda-x.x/bin/nvcc CFLAGS=-O3 ./configure
+
+where "/usr/local/cuda-x.x/" is the location of the CUDA sdk toolkit.
+ (tested on Ubuntu-16.04 and CUDA-9.0, but later should work)
+
+
+-----------------------------------------------
+Visual Studio 2017 / Windows:
+
+Before build, prepare libSDL2 development files:
+
+- Download libSDL2 Development Libraries for Windows from official site.
+    Direct link: https://www.libsdl.org/release/SDL2-devel-2.0.12-VC.zip
+- Unpack the zip and place the whole content under the "msvc/SDL2" folder.
+
+The content of "msvc/SDL2" should look like:
+   msvc
+     +- SDL2
+          +- include
+          +- lib
+               +- x64
+               +- x86
+
+build:
+  1. Open msvc/Julius.sln
+  2. Choose build type to "Release"
+  3. Build the solution
+
+Compiled binaries will be stored in "msvc/Release" folder.
+
+Note that "SDL2.dll" is needed to run "adintool-gui.exe".
+Copy "SDL2/lib/x86/SDL2.dll" to the same place of adintool-gui.exe,
+into "Release" folder.
+
+-----------------------------------------------
+Mingw on Ubuntu (tested on 16.04)
+
+  % sudo apt-get install mingw-w64 mingw-w64-tools
+  % sudo apt-get install libz-mingw-w64-dev
+  % ./configure --host=x86_64-w64-mingw32 --disable-sdlmain
+  % make
+
+"adintool-gui" may not be built or run correctly.
+If you want Windows binary, try mingw support in cygwin.
+
+-----------------------------------------------
+Cygwin
+
+  Required packages:
+
+    gcc-core
+    make
+    zlib-devel
+    libSDL2-devel
+    pkg-config
+    perl
+
+  On cygwin terminal, do
+
+    % ./configure
+    % make
+    % (optional) make install
+
+(tested on cygwin-x86 setup-v2.5.2, 08/31/2016)
+
+-----------------------------------------------
+Mingw on cygwin
+
+  Required packages (also cygwin packages above are required)
+
+    mingw64-i686-gcc-core
+    mingw64-i686-zlib
+    mingw64-i686-SDL2
+    mingw64-i686-pkg-config
+
+  On cygwin terminal, do
+
+    % ./configure --host=i686-w64-mingw32 --disable-sdlmain
+    % make
+
+  If "adintool-gui.exe" fails or not run, try without "--disable-sdlmain".
+
+(tested on cygwin-x86 setup-v2.5.2, 08/31/2016)
+
+-----------------------------------------------
+Cross-compiling for ARM:
+
+    % ./configure --host=arm-linux-gnueabihf
+    % make
+
+Note that "-mfpu=neon -mfloat-abi=softfp" is enabled by default for
+better performance.  You can replace it with your flags by specifying
+your own compiler flags via "CFLAGS" environment value, like this:
+
+    % CFLAGS='-O3' ./configure --host=arm-linux-gnueabihf
+    % make
+
+(tested on cross-compilation on Ubuntu)
+
+-----------------------------------------------

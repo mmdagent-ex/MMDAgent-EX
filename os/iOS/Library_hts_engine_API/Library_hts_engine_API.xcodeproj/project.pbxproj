@@ -1,0 +1,343 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		8012A9E91C7201B200835A56 /* HTS_audio.c in Sources */ = {isa = PBXBuildFile; fileRef = 8012A9D71C71FE1300835A56 /* HTS_audio.c */; };
+		8012A9EA1C7201B200835A56 /* HTS_engine.c in Sources */ = {isa = PBXBuildFile; fileRef = 8012A9D81C71FE1300835A56 /* HTS_engine.c */; };
+		8012A9EB1C7201B200835A56 /* HTS_gstream.c in Sources */ = {isa = PBXBuildFile; fileRef = 8012A9D91C71FE1300835A56 /* HTS_gstream.c */; };
+		8012A9EC1C7201B200835A56 /* HTS_label.c in Sources */ = {isa = PBXBuildFile; fileRef = 8012A9DB1C71FE1300835A56 /* HTS_label.c */; };
+		8012A9ED1C7201B200835A56 /* HTS_misc.c in Sources */ = {isa = PBXBuildFile; fileRef = 8012A9DC1C71FE1300835A56 /* HTS_misc.c */; };
+		8012A9EE1C7201B200835A56 /* HTS_model.c in Sources */ = {isa = PBXBuildFile; fileRef = 8012A9DD1C71FE1300835A56 /* HTS_model.c */; };
+		8012A9EF1C7201B200835A56 /* HTS_pstream.c in Sources */ = {isa = PBXBuildFile; fileRef = 8012A9DE1C71FE1300835A56 /* HTS_pstream.c */; };
+		8012A9F01C7201B200835A56 /* HTS_sstream.c in Sources */ = {isa = PBXBuildFile; fileRef = 8012A9DF1C71FE1300835A56 /* HTS_sstream.c */; };
+		8012A9F11C7201B200835A56 /* HTS_vocoder.c in Sources */ = {isa = PBXBuildFile; fileRef = 8012A9E01C71FE1300835A56 /* HTS_vocoder.c */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		8012A9AF1C71F9B600835A56 /* libLibrary_hts_engine_API.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libLibrary_hts_engine_API.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		8012A9BC1C71FE1300835A56 /* HTS_engine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HTS_engine.h; sourceTree = "<group>"; };
+		8012A9CA1C71FE1300835A56 /* compile */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = compile; sourceTree = "<group>"; };
+		8012A9CB1C71FE1300835A56 /* config.guess */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = config.guess; sourceTree = "<group>"; };
+		8012A9CC1C71FE1300835A56 /* config.sub */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = config.sub; sourceTree = "<group>"; };
+		8012A9CD1C71FE1300835A56 /* depcomp */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = depcomp; sourceTree = "<group>"; };
+		8012A9CE1C71FE1300835A56 /* install-sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "install-sh"; sourceTree = "<group>"; };
+		8012A9CF1C71FE1300835A56 /* missing */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = missing; sourceTree = "<group>"; };
+		8012A9D41C71FE1300835A56 /* HTS_engine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HTS_engine.h; sourceTree = "<group>"; };
+		8012A9D71C71FE1300835A56 /* HTS_audio.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = HTS_audio.c; sourceTree = "<group>"; };
+		8012A9D81C71FE1300835A56 /* HTS_engine.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = HTS_engine.c; sourceTree = "<group>"; };
+		8012A9D91C71FE1300835A56 /* HTS_gstream.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = HTS_gstream.c; sourceTree = "<group>"; };
+		8012A9DA1C71FE1300835A56 /* HTS_hidden.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HTS_hidden.h; sourceTree = "<group>"; };
+		8012A9DB1C71FE1300835A56 /* HTS_label.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = HTS_label.c; sourceTree = "<group>"; };
+		8012A9DC1C71FE1300835A56 /* HTS_misc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = HTS_misc.c; sourceTree = "<group>"; };
+		8012A9DD1C71FE1300835A56 /* HTS_model.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = HTS_model.c; sourceTree = "<group>"; };
+		8012A9DE1C71FE1300835A56 /* HTS_pstream.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = HTS_pstream.c; sourceTree = "<group>"; };
+		8012A9DF1C71FE1300835A56 /* HTS_sstream.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = HTS_sstream.c; sourceTree = "<group>"; };
+		8012A9E01C71FE1300835A56 /* HTS_vocoder.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = HTS_vocoder.c; sourceTree = "<group>"; };
+		8012A9E11C71FE1300835A56 /* Makefile.am */ = {isa = PBXFileReference; lastKnownFileType = text; path = Makefile.am; sourceTree = "<group>"; };
+		8012A9E21C71FE1300835A56 /* Makefile.in */ = {isa = PBXFileReference; lastKnownFileType = text; path = Makefile.in; sourceTree = "<group>"; };
+		8012A9E31C71FE1300835A56 /* Makefile.mak */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile.mak; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8012A9AC1C71F9B600835A56 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		8012A9A61C71F9B600835A56 = {
+			isa = PBXGroup;
+			children = (
+				8012A9BB1C71FE1300835A56 /* include */,
+				8012A9C01C71FE1300835A56 /* src */,
+				8012A9B01C71F9B600835A56 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		8012A9B01C71F9B600835A56 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8012A9AF1C71F9B600835A56 /* libLibrary_hts_engine_API.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		8012A9BB1C71FE1300835A56 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				8012A9BC1C71FE1300835A56 /* HTS_engine.h */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		8012A9C01C71FE1300835A56 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				8012A9C91C71FE1300835A56 /* config */,
+				8012A9D31C71FE1300835A56 /* include */,
+				8012A9D61C71FE1300835A56 /* lib */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		8012A9C91C71FE1300835A56 /* config */ = {
+			isa = PBXGroup;
+			children = (
+				8012A9CA1C71FE1300835A56 /* compile */,
+				8012A9CB1C71FE1300835A56 /* config.guess */,
+				8012A9CC1C71FE1300835A56 /* config.sub */,
+				8012A9CD1C71FE1300835A56 /* depcomp */,
+				8012A9CE1C71FE1300835A56 /* install-sh */,
+				8012A9CF1C71FE1300835A56 /* missing */,
+			);
+			path = config;
+			sourceTree = "<group>";
+		};
+		8012A9D31C71FE1300835A56 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				8012A9D41C71FE1300835A56 /* HTS_engine.h */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		8012A9D61C71FE1300835A56 /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				8012A9D71C71FE1300835A56 /* HTS_audio.c */,
+				8012A9D81C71FE1300835A56 /* HTS_engine.c */,
+				8012A9D91C71FE1300835A56 /* HTS_gstream.c */,
+				8012A9DA1C71FE1300835A56 /* HTS_hidden.h */,
+				8012A9DB1C71FE1300835A56 /* HTS_label.c */,
+				8012A9DC1C71FE1300835A56 /* HTS_misc.c */,
+				8012A9DD1C71FE1300835A56 /* HTS_model.c */,
+				8012A9DE1C71FE1300835A56 /* HTS_pstream.c */,
+				8012A9DF1C71FE1300835A56 /* HTS_sstream.c */,
+				8012A9E01C71FE1300835A56 /* HTS_vocoder.c */,
+				8012A9E11C71FE1300835A56 /* Makefile.am */,
+				8012A9E21C71FE1300835A56 /* Makefile.in */,
+				8012A9E31C71FE1300835A56 /* Makefile.mak */,
+			);
+			path = lib;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8012A9AE1C71F9B600835A56 /* Library_hts_engine_API */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8012A9B81C71F9B600835A56 /* Build configuration list for PBXNativeTarget "Library_hts_engine_API" */;
+			buildPhases = (
+				8012A9AB1C71F9B600835A56 /* Sources */,
+				8012A9AC1C71F9B600835A56 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Library_hts_engine_API;
+			productName = Library_hts_engine_API;
+			productReference = 8012A9AF1C71F9B600835A56 /* libLibrary_hts_engine_API.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		8012A9A71C71F9B600835A56 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0720;
+				ORGANIZATIONNAME = "";
+				TargetAttributes = {
+					8012A9AE1C71F9B600835A56 = {
+						CreatedOnToolsVersion = 7.2;
+						DevelopmentTeam = ER7BUZVGH2;
+					};
+				};
+			};
+			buildConfigurationList = 8012A9AA1C71F9B600835A56 /* Build configuration list for PBXProject "Library_hts_engine_API" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 8012A9A61C71F9B600835A56;
+			productRefGroup = 8012A9B01C71F9B600835A56 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8012A9AE1C71F9B600835A56 /* Library_hts_engine_API */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8012A9AB1C71F9B600835A56 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8012A9E91C7201B200835A56 /* HTS_audio.c in Sources */,
+				8012A9EA1C7201B200835A56 /* HTS_engine.c in Sources */,
+				8012A9EB1C7201B200835A56 /* HTS_gstream.c in Sources */,
+				8012A9EC1C7201B200835A56 /* HTS_label.c in Sources */,
+				8012A9ED1C7201B200835A56 /* HTS_misc.c in Sources */,
+				8012A9EE1C7201B200835A56 /* HTS_model.c in Sources */,
+				8012A9EF1C7201B200835A56 /* HTS_pstream.c in Sources */,
+				8012A9F01C7201B200835A56 /* HTS_sstream.c in Sources */,
+				8012A9F11C7201B200835A56 /* HTS_vocoder.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		8012A9B61C71F9B600835A56 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				VALID_ARCHS = arm64;
+			};
+			name = Debug;
+		};
+		8012A9B71C71F9B600835A56 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+				VALID_ARCHS = arm64;
+			};
+			name = Release;
+		};
+		8012A9B91C71F9B600835A56 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				OTHER_CFLAGS = (
+					"-DTARGET_OS_IPHONE",
+					"-DMMDAGENT",
+					"-DAUDIO_PLAY_PORTAUDIO",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/src/include $(SRCROOT)/../Library_PortAudio/include";
+			};
+			name = Debug;
+		};
+		8012A9BA1C71F9B600835A56 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				OTHER_CFLAGS = (
+					"-DTARGET_OS_IPHONE",
+					"-DMMDAGENT",
+					"-DAUDIO_PLAY_PORTAUDIO",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/src/include $(SRCROOT)/../Library_PortAudio/include";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		8012A9AA1C71F9B600835A56 /* Build configuration list for PBXProject "Library_hts_engine_API" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8012A9B61C71F9B600835A56 /* Debug */,
+				8012A9B71C71F9B600835A56 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8012A9B81C71F9B600835A56 /* Build configuration list for PBXNativeTarget "Library_hts_engine_API" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8012A9B91C71F9B600835A56 /* Debug */,
+				8012A9BA1C71F9B600835A56 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 8012A9A71C71F9B600835A56 /* Project object */;
+}

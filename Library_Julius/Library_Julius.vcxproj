@@ -1,0 +1,314 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\libjulius\include\julius\beam.h" />
+    <ClInclude Include="src\libjulius\include\julius\callback.h" />
+    <ClInclude Include="src\libjulius\include\julius\config-msvc-libjulius.h" />
+    <ClInclude Include="src\libjulius\include\julius\define.h" />
+    <ClInclude Include="src\libjulius\include\julius\extern.h" />
+    <ClInclude Include="src\libjulius\include\julius\global.h" />
+    <ClInclude Include="src\libjulius\include\julius\graph.h" />
+    <ClInclude Include="src\libjulius\include\julius\jconf.h" />
+    <ClInclude Include="src\libjulius\include\julius\jfunc.h" />
+    <ClInclude Include="src\libjulius\include\julius\julius.h" />
+    <ClInclude Include="src\libjulius\include\julius\juliuslib.h" />
+    <ClInclude Include="src\libjulius\include\julius\misc.h" />
+    <ClInclude Include="src\libjulius\include\julius\multi-gram.h" />
+    <ClInclude Include="src\libjulius\include\julius\plugin.h" />
+    <ClInclude Include="src\libjulius\include\julius\recog.h" />
+    <ClInclude Include="src\libjulius\include\julius\search.h" />
+    <ClInclude Include="src\libjulius\include\julius\trellis.h" />
+    <ClInclude Include="src\libjulius\include\julius\useropt.h" />
+    <ClInclude Include="src\libjulius\include\julius\wchmm.h" />
+    <ClInclude Include="src\libjulius\libfvad\libfvad\src\common.h" />
+    <ClInclude Include="src\libjulius\libfvad\libfvad\src\signal_processing\resample_by_2_internal.h" />
+    <ClInclude Include="src\libjulius\libfvad\libfvad\src\signal_processing\signal_processing_library.h" />
+    <ClInclude Include="src\libjulius\libfvad\libfvad\src\signal_processing\spl_inl.h" />
+    <ClInclude Include="src\libjulius\libfvad\libfvad\src\vad\vad_core.h" />
+    <ClInclude Include="src\libjulius\libfvad\libfvad\src\vad\vad_filterbank.h" />
+    <ClInclude Include="src\libjulius\libfvad\libfvad\src\vad\vad_gmm.h" />
+    <ClInclude Include="src\libjulius\libfvad\libfvad\src\vad\vad_sp.h" />
+    <ClInclude Include="src\libsent\include\sent\adin.h" />
+    <ClInclude Include="src\libsent\include\sent\config-msvc-libsent.h" />
+    <ClInclude Include="src\libsent\include\sent\dfa.h" />
+    <ClInclude Include="src\libsent\include\sent\hmm.h" />
+    <ClInclude Include="src\libsent\include\sent\hmm_calc.h" />
+    <ClInclude Include="src\libsent\include\sent\htk_defs.h" />
+    <ClInclude Include="src\libsent\include\sent\htk_hmm.h" />
+    <ClInclude Include="src\libsent\include\sent\htk_param.h" />
+    <ClInclude Include="src\libsent\include\sent\machines.h" />
+    <ClInclude Include="src\libsent\include\sent\mfcc.h" />
+    <ClInclude Include="src\libsent\include\sent\ngram2.h" />
+    <ClInclude Include="src\libsent\include\sent\ptree.h" />
+    <ClInclude Include="src\libsent\include\sent\speech.h" />
+    <ClInclude Include="src\libsent\include\sent\stddefs.h" />
+    <ClInclude Include="src\libsent\include\sent\tcpip.h" />
+    <ClInclude Include="src\libsent\include\sent\util.h" />
+    <ClInclude Include="src\libsent\include\sent\vocabulary.h" />
+    <ClInclude Include="src\libsent\src\adin\lpfcoef_2to1.h" />
+    <ClInclude Include="src\libsent\src\adin\lpfcoef_3to4.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\libjulius\libfvad\libfvad\src\fvad.c" />
+    <ClCompile Include="src\libjulius\libfvad\libfvad\src\signal_processing\division_operations.c" />
+    <ClCompile Include="src\libjulius\libfvad\libfvad\src\signal_processing\energy.c" />
+    <ClCompile Include="src\libjulius\libfvad\libfvad\src\signal_processing\get_scaling_square.c" />
+    <ClCompile Include="src\libjulius\libfvad\libfvad\src\signal_processing\resample_48khz.c" />
+    <ClCompile Include="src\libjulius\libfvad\libfvad\src\signal_processing\resample_by_2_internal.c" />
+    <ClCompile Include="src\libjulius\libfvad\libfvad\src\signal_processing\resample_fractional.c" />
+    <ClCompile Include="src\libjulius\libfvad\libfvad\src\signal_processing\spl_inl.c" />
+    <ClCompile Include="src\libjulius\libfvad\libfvad\src\vad\vad_core.c" />
+    <ClCompile Include="src\libjulius\libfvad\libfvad\src\vad\vad_filterbank.c" />
+    <ClCompile Include="src\libjulius\libfvad\libfvad\src\vad\vad_gmm.c" />
+    <ClCompile Include="src\libjulius\libfvad\libfvad\src\vad\vad_sp.c" />
+    <ClCompile Include="src\libjulius\src\adin-cut.c" />
+    <ClCompile Include="src\libjulius\src\backtrellis.c" />
+    <ClCompile Include="src\libjulius\src\beam.c" />
+    <ClCompile Include="src\libjulius\src\callback.c" />
+    <ClCompile Include="src\libjulius\src\confnet.c" />
+    <ClCompile Include="src\libjulius\src\default.c" />
+    <ClCompile Include="src\libjulius\src\dfa_decode.c" />
+    <ClCompile Include="src\libjulius\src\factoring_sub.c" />
+    <ClCompile Include="src\libjulius\src\gmm.c" />
+    <ClCompile Include="src\libjulius\src\gramlist.c" />
+    <ClCompile Include="src\libjulius\src\graphout.c" />
+    <ClCompile Include="src\libjulius\src\hmm_check.c" />
+    <ClCompile Include="src\libjulius\src\instance.c" />
+    <ClCompile Include="src\libjulius\src\jfunc.c" />
+    <ClCompile Include="src\libjulius\src\mbr.c" />
+    <ClCompile Include="src\libjulius\src\multi-gram.c" />
+    <ClCompile Include="src\libjulius\src\m_adin.c" />
+    <ClCompile Include="src\libjulius\src\m_chkparam.c" />
+    <ClCompile Include="src\libjulius\src\m_fusion.c" />
+    <ClCompile Include="src\libjulius\src\m_info.c" />
+    <ClCompile Include="src\libjulius\src\m_jconf.c" />
+    <ClCompile Include="src\libjulius\src\m_options.c" />
+    <ClCompile Include="src\libjulius\src\m_usage.c" />
+    <ClCompile Include="src\libjulius\src\ngram_decode.c" />
+    <ClCompile Include="src\libjulius\src\outprob_style.c" />
+    <ClCompile Include="src\libjulius\src\pass1.c" />
+    <ClCompile Include="src\libjulius\src\plugin.c" />
+    <ClCompile Include="src\libjulius\src\realtime-1stpass.c" />
+    <ClCompile Include="src\libjulius\src\recogmain.c" />
+    <ClCompile Include="src\libjulius\src\search_bestfirst_main.c" />
+    <ClCompile Include="src\libjulius\src\search_bestfirst_v1.c" />
+    <ClCompile Include="src\libjulius\src\search_bestfirst_v2.c" />
+    <ClCompile Include="src\libjulius\src\spsegment.c" />
+    <ClCompile Include="src\libjulius\src\useropt.c" />
+    <ClCompile Include="src\libjulius\src\version.c" />
+    <ClCompile Include="src\libjulius\src\wav2mfcc.c" />
+    <ClCompile Include="src\libjulius\src\wchmm.c" />
+    <ClCompile Include="src\libjulius\src\wchmm_check.c" />
+    <ClCompile Include="src\libjulius\src\word_align.c" />
+    <ClCompile Include="src\libsent\src\adin\adin_file.c" />
+    <ClCompile Include="src\libsent\src\adin\adin_portaudio.c" />
+    <ClCompile Include="src\libsent\src\adin\adin_tcpip.c" />
+    <ClCompile Include="src\libsent\src\adin\ds48to16.c" />
+    <ClCompile Include="src\libsent\src\adin\zc-e.c" />
+    <ClCompile Include="src\libsent\src\adin\zmean.c" />
+    <ClCompile Include="src\libsent\src\anlz\paramselect.c" />
+    <ClCompile Include="src\libsent\src\anlz\paramtypes.c" />
+    <ClCompile Include="src\libsent\src\anlz\param_malloc.c" />
+    <ClCompile Include="src\libsent\src\anlz\rdparam.c" />
+    <ClCompile Include="src\libsent\src\anlz\strip.c" />
+    <ClCompile Include="src\libsent\src\anlz\strip_mfcc.c" />
+    <ClCompile Include="src\libsent\src\anlz\vecin_net.c" />
+    <ClCompile Include="src\libsent\src\anlz\wrsamp.c" />
+    <ClCompile Include="src\libsent\src\anlz\wrwav.c" />
+    <ClCompile Include="src\libsent\src\dfa\cpair.c" />
+    <ClCompile Include="src\libsent\src\dfa\dfa_lookup.c" />
+    <ClCompile Include="src\libsent\src\dfa\dfa_malloc.c" />
+    <ClCompile Include="src\libsent\src\dfa\dfa_util.c" />
+    <ClCompile Include="src\libsent\src\dfa\init_dfa.c" />
+    <ClCompile Include="src\libsent\src\dfa\mkcpair.c" />
+    <ClCompile Include="src\libsent\src\dfa\mkterminfo.c" />
+    <ClCompile Include="src\libsent\src\dfa\rddfa.c" />
+    <ClCompile Include="src\libsent\src\hmminfo\cdhmm.c" />
+    <ClCompile Include="src\libsent\src\hmminfo\cdset.c" />
+    <ClCompile Include="src\libsent\src\hmminfo\check_hmmtype.c" />
+    <ClCompile Include="src\libsent\src\hmminfo\check_hmm_restriction.c" />
+    <ClCompile Include="src\libsent\src\hmminfo\chkhmmlist.c" />
+    <ClCompile Include="src\libsent\src\hmminfo\guess_cdHMM.c" />
+    <ClCompile Include="src\libsent\src\hmminfo\hmm_lookup.c" />
+    <ClCompile Include="src\libsent\src\hmminfo\init_phmm.c" />
+    <ClCompile Include="src\libsent\src\hmminfo\put_htkdata_info.c" />
+    <ClCompile Include="src\libsent\src\hmminfo\rdhmmdef.c" />
+    <ClCompile Include="src\libsent\src\hmminfo\rdhmmdef_data.c" />
+    <ClCompile Include="src\libsent\src\hmminfo\rdhmmdef_dens.c" />
+    <ClCompile Include="src\libsent\src\hmminfo\rdhmmdef_mpdf.c" />
+    <ClCompile Include="src\libsent\src\hmminfo\rdhmmdef_options.c" />
+    <ClCompile Include="src\libsent\src\hmminfo\rdhmmdef_regtree.c" />
+    <ClCompile Include="src\libsent\src\hmminfo\rdhmmdef_state.c" />
+    <ClCompile Include="src\libsent\src\hmminfo\rdhmmdef_streamweight.c" />
+    <ClCompile Include="src\libsent\src\hmminfo\rdhmmdef_tiedmix.c" />
+    <ClCompile Include="src\libsent\src\hmminfo\rdhmmdef_trans.c" />
+    <ClCompile Include="src\libsent\src\hmminfo\rdhmmdef_var.c" />
+    <ClCompile Include="src\libsent\src\hmminfo\rdhmmlist.c" />
+    <ClCompile Include="src\libsent\src\hmminfo\read_binhmm.c" />
+    <ClCompile Include="src\libsent\src\hmminfo\read_binhmmlist.c" />
+    <ClCompile Include="src\libsent\src\hmminfo\write_binhmm.c" />
+    <ClCompile Include="src\libsent\src\hmminfo\write_binhmmlist.c" />
+    <ClCompile Include="src\libsent\src\net\rdwt.c" />
+    <ClCompile Include="src\libsent\src\net\server-client.c" />
+    <ClCompile Include="src\libsent\src\ngram\init_ngram.c" />
+    <ClCompile Include="src\libsent\src\ngram\ngram_access.c" />
+    <ClCompile Include="src\libsent\src\ngram\ngram_compact_context.c" />
+    <ClCompile Include="src\libsent\src\ngram\ngram_lookup.c" />
+    <ClCompile Include="src\libsent\src\ngram\ngram_malloc.c" />
+    <ClCompile Include="src\libsent\src\ngram\ngram_read_arpa.c" />
+    <ClCompile Include="src\libsent\src\ngram\ngram_read_bin.c" />
+    <ClCompile Include="src\libsent\src\ngram\ngram_util.c" />
+    <ClCompile Include="src\libsent\src\ngram\ngram_write_bin.c" />
+    <ClCompile Include="src\libsent\src\phmm\addlog.c" />
+    <ClCompile Include="src\libsent\src\phmm\calc_dnn.c" />
+    <ClCompile Include="src\libsent\src\phmm\calc_dnn_avx.c" />
+    <ClCompile Include="src\libsent\src\phmm\calc_dnn_fma.c" />
+    <ClCompile Include="src\libsent\src\phmm\calc_dnn_neon.c" />
+    <ClCompile Include="src\libsent\src\phmm\calc_dnn_neonv2.c" />
+    <ClCompile Include="src\libsent\src\phmm\calc_dnn_sse.c" />
+    <ClCompile Include="src\libsent\src\phmm\calc_mix.c" />
+    <ClCompile Include="src\libsent\src\phmm\calc_tied_mix.c" />
+    <ClCompile Include="src\libsent\src\phmm\gms.c" />
+    <ClCompile Include="src\libsent\src\phmm\gms_gprune.c" />
+    <ClCompile Include="src\libsent\src\phmm\gprune_beam.c" />
+    <ClCompile Include="src\libsent\src\phmm\gprune_common.c" />
+    <ClCompile Include="src\libsent\src\phmm\gprune_heu.c" />
+    <ClCompile Include="src\libsent\src\phmm\gprune_none.c" />
+    <ClCompile Include="src\libsent\src\phmm\gprune_safe.c" />
+    <ClCompile Include="src\libsent\src\phmm\mkwhmm.c" />
+    <ClCompile Include="src\libsent\src\phmm\outprob.c" />
+    <ClCompile Include="src\libsent\src\phmm\outprob_init.c" />
+    <ClCompile Include="src\libsent\src\phmm\vsegment.c" />
+    <ClCompile Include="src\libsent\src\util\aptree.c" />
+    <ClCompile Include="src\libsent\src\util\confout.c" />
+    <ClCompile Include="src\libsent\src\util\endian.c" />
+    <ClCompile Include="src\libsent\src\util\gzfile.c" />
+    <ClCompile Include="src\libsent\src\util\jlog.c" />
+    <ClCompile Include="src\libsent\src\util\mybmalloc.c" />
+    <ClCompile Include="src\libsent\src\util\mymalloc.c" />
+    <ClCompile Include="src\libsent\src\util\mystrtok.c" />
+    <ClCompile Include="src\libsent\src\util\ptree.c" />
+    <ClCompile Include="src\libsent\src\util\qsort.c" />
+    <ClCompile Include="src\libsent\src\util\readfile.c" />
+    <ClCompile Include="src\libsent\src\util\strcasecmp.c" />
+    <ClCompile Include="src\libsent\src\voca\init_voca.c" />
+    <ClCompile Include="src\libsent\src\voca\voca_load_htkdict.c" />
+    <ClCompile Include="src\libsent\src\voca\voca_load_wordlist.c" />
+    <ClCompile Include="src\libsent\src\voca\voca_lookup.c" />
+    <ClCompile Include="src\libsent\src\voca\voca_malloc.c" />
+    <ClCompile Include="src\libsent\src\voca\voca_util.c" />
+    <ClCompile Include="src\libsent\src\wav2mfcc\mfcc-core.c" />
+    <ClCompile Include="src\libsent\src\wav2mfcc\para.c" />
+    <ClCompile Include="src\libsent\src\wav2mfcc\ss.c" />
+    <ClCompile Include="src\libsent\src\wav2mfcc\wav2mfcc-buffer.c" />
+    <ClCompile Include="src\libsent\src\wav2mfcc\wav2mfcc-pipe.c" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{D5A3950C-2206-4A9C-812A-6B19628A9BB2}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Library_Julius</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(ProjectName)\lib\</OutDir>
+    <TargetName>Julius</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(ProjectName)\lib\</OutDir>
+    <TargetName>Julius_D</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;MMDAGENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src\libjulius\include;src\libsent\include;..\Library_PortAudio\include;..\Library_zlib\include;libfvad\include</AdditionalIncludeDirectories>
+      <CompileAs>CompileAsC</CompileAs>
+      <DisableSpecificWarnings>4819</DisableSpecificWarnings>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <OutputFile>lib\Julius_D.lib</OutputFile>
+    </Lib>
+    <PreBuildEvent>
+      <Command>copy src\libjulius\include\julius\*.h include\julius;
+copy src\libsent\include\sent\*.h include\sent;
+</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARINGS;MMDAGENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src\libjulius\include;src\libsent\include;..\Library_PortAudio\include;..\Library_zlib\include;libfvad\include</AdditionalIncludeDirectories>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <CompileAs>CompileAsC</CompileAs>
+      <DisableSpecificWarnings>4819</DisableSpecificWarnings>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <OutputFile>lib\Julius.lib</OutputFile>
+    </Lib>
+    <PreBuildEvent>
+      <Command>copy src\libjulius\include\julius\*.h include\julius;
+copy src\libsent\include\sent\*.h include\sent;
+</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

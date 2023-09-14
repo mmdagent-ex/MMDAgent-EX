@@ -1,0 +1,53 @@
+apply plugin: 'com.android.application'
+import org.apache.tools.ant.taskdefs.condition.Os
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
+
+    defaultConfig {
+        applicationId "com.example.mmdagent"
+        minSdkVersion 15
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+    }
+    sourceSets.main.jni.srcDirs = [] // avoid using NdkCompile task with gradle
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:23.2.1'
+}
+
+task buildNative(type:Exec) {
+    def ndkDir = android.ndkDirectory == null ? "" : android.ndkDirectory.getAbsolutePath()
+    def jOption = '-j'+Runtime.runtime.availableProcessors()
+    if(Os.isFamily(Os.FAMILY_WINDOWS)){
+        commandLine("$ndkDir/ndk-build.cmd", jOption, '-C', file('src/main').absolutePath, 'NDK_APP_LIBS_OUT=jniLibs', 'NDK_DEBUG=0');
+    }else{
+        commandLine("$ndkDir/ndk-build", jOption, '-C', file('src/main').absolutePath, 'NDK_APP_LIBS_OUT=jniLibs', 'NDK_DEBUG=0');
+    }
+}
+
+tasks.withType(JavaCompile) {
+    compileTask -> compileTask.dependsOn 'buildNative'
+}
+
+task cleanNative(type:Exec){
+    def ndkDir = android.ndkDirectory == null ? "" : android.ndkDirectory.getAbsolutePath()
+    if(Os.isFamily(Os.FAMILY_WINDOWS)){
+        commandLine("$ndkDir/ndk-build.cmd", 'clean', '-C', file('src/main').absolutePath, "NDK_APP_LIBS_OUT=jnilibs");
+    }else{
+        commandLine("$ndkDir/ndk-build", 'clean', '-C', file('src/main').absolutePath, "NDK_APP_LIBS_OUT=jnilibs");
+    }
+}
+
+clean.dependsOn 'cleanNative'

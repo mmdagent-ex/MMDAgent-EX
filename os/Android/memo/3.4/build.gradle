@@ -1,0 +1,69 @@
+apply plugin: 'com.android.application'
+
+// load keystore properties from "keystore.properties" file at project root
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.1"
+    defaultConfig {
+        applicationId "org.lee_lab.pocketmmdagent"
+        minSdkVersion 23
+        targetSdkVersion 29
+        versionCode 202012041
+        versionName "2.0.0"
+        externalNativeBuild {
+            ndkBuild {
+                arguments '-j4'
+            }
+        }
+  	ndk {
+	    abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+	}
+    }
+    signingConfigs {
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    externalNativeBuild {
+        ndkBuild {
+            path 'src/main/jni/Android.mk'
+        }
+    }
+//    flavorDimensions "api"
+//    productFlavors {
+//        api26 {
+//            dimension "api"
+//            minSdkVersion 26
+//            versionCode 20000 + android.defaultConfig.versionCode
+//            versionNameSuffix "-minApi26"
+//	}
+//	api21 {
+//            dimension "api"
+//            minSdkVersion 21
+//            versionCode 10000 + android.defaultConfig.versionCode
+//            versionNameSuffix "-minApi21"
+//	}
+//    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+}

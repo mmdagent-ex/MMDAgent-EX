@@ -1,0 +1,194 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{EA06AAA8-D306-4D8B-8DF4-A31FA9C6DC42}</ProjectGuid>
+    <RootNamespace>Library_Flite_plus_hts_engine</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(ProjectName)\lib\</OutDir>
+    <TargetName>Flite_plus_hts_engine</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(ProjectName)\lib\</OutDir>
+    <TargetName>Flite_plus_hts_engine_D</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>src\include;src\flite\include;src\flite\lib;src\flite\lang\cmu_us_kal;src\flite\lang\cmulex;src\flite\lang\usenglish;src\flite\src\hrg;src\flite\src\lexicon;src\flite\src\regex;src\flite\src\stats;src\flite\src\synth;src\flite\src\utils;..\Library_hts_engine_API\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;FLITE_PLUS_HTS_ENGINE;NO_UNION_INITIALIZATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <OutputFile>lib\Flite_plus_hts_engine_D.lib</OutputFile>
+    </Lib>
+    <PreBuildEvent>
+      <Command>copy src\flite\include\*.h include
+copy src\include\*.h include
+</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>src\include;src\flite\include;src\flite\lib;src\flite\lang\cmu_us_kal;src\flite\lang\cmulex;src\flite\lang\usenglish;src\flite\src\hrg;src\flite\src\lexicon;src\flite\src\regex;src\flite\src\stats;src\flite\src\synth;src\flite\src\utils;..\Library_hts_engine_API\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;FLITE_PLUS_HTS_ENGINE;NO_UNION_INITIALIZATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <OutputFile>lib\Flite_plus_hts_engine.lib</OutputFile>
+    </Lib>
+    <PreBuildEvent>
+      <Command>copy src\flite\include\*.h include
+copy src\include\*.h include
+</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\flite\lang\cmulex\cmu_lex.c" />
+    <ClCompile Include="src\flite\lang\cmulex\cmu_lex_data.c" />
+    <ClCompile Include="src\flite\lang\cmulex\cmu_lex_entries.c" />
+    <ClCompile Include="src\flite\lang\cmulex\cmu_lts_model.c" />
+    <ClCompile Include="src\flite\lang\cmulex\cmu_lts_rules.c" />
+    <ClCompile Include="src\flite\lang\cmulex\cmu_postlex.c" />
+    <ClCompile Include="src\flite\lang\cmu_us_kal\cmu_us_kal.c" />
+    <ClCompile Include="src\flite\lang\usenglish\usenglish.c" />
+    <ClCompile Include="src\flite\lang\usenglish\us_aswd.c" />
+    <ClCompile Include="src\flite\lang\usenglish\us_expand.c" />
+    <ClCompile Include="src\flite\lang\usenglish\us_ffeatures.c" />
+    <ClCompile Include="src\flite\lang\usenglish\us_gpos.c" />
+    <ClCompile Include="src\flite\lang\usenglish\us_int_accent_cart.c" />
+    <ClCompile Include="src\flite\lang\usenglish\us_int_tone_cart.c" />
+    <ClCompile Include="src\flite\lang\usenglish\us_nums_cart.c" />
+    <ClCompile Include="src\flite\lang\usenglish\us_phoneset.c" />
+    <ClCompile Include="src\flite\lang\usenglish\us_phrasing_cart.c" />
+    <ClCompile Include="src\flite\lang\usenglish\us_pos_cart.c" />
+    <ClCompile Include="src\flite\lang\usenglish\us_text.c" />
+    <ClCompile Include="src\flite\src\hrg\cst_ffeature.c" />
+    <ClCompile Include="src\flite\src\hrg\cst_item.c" />
+    <ClCompile Include="src\flite\src\hrg\cst_relation.c" />
+    <ClCompile Include="src\flite\src\hrg\cst_utterance.c" />
+    <ClCompile Include="src\flite\src\lexicon\cst_lexicon.c" />
+    <ClCompile Include="src\flite\src\lexicon\cst_lts.c" />
+    <ClCompile Include="src\flite\src\regex\cst_regex.c" />
+    <ClCompile Include="src\flite\src\regex\regexp.c" />
+    <ClCompile Include="src\flite\src\stats\cst_cart.c" />
+    <ClCompile Include="src\flite\src\synth\cst_ffeatures.c" />
+    <ClCompile Include="src\flite\src\synth\cst_phoneset.c" />
+    <ClCompile Include="src\flite\src\synth\cst_synth.c" />
+    <ClCompile Include="src\flite\src\synth\cst_utt_utils.c" />
+    <ClCompile Include="src\flite\src\synth\cst_voice.c" />
+    <ClCompile Include="src\flite\src\synth\flite.c" />
+    <ClCompile Include="src\flite\src\utils\cst_alloc.c" />
+    <ClCompile Include="src\flite\src\utils\cst_error.c" />
+    <ClCompile Include="src\flite\src\utils\cst_features.c" />
+    <ClCompile Include="src\flite\src\utils\cst_string.c" />
+    <ClCompile Include="src\flite\src\utils\cst_tokenstream.c" />
+    <ClCompile Include="src\flite\src\utils\cst_val.c" />
+    <ClCompile Include="src\flite\src\utils\cst_val_const.c" />
+    <ClCompile Include="src\flite\src\utils\cst_val_user.c" />
+    <ClCompile Include="src\lib\flite_hts_engine.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\flite\include\cst_alloc.h" />
+    <ClInclude Include="src\flite\include\cst_args.h" />
+    <ClInclude Include="src\flite\include\cst_audio.h" />
+    <ClInclude Include="src\flite\include\cst_cart.h" />
+    <ClInclude Include="src\flite\include\cst_endian.h" />
+    <ClInclude Include="src\flite\include\cst_error.h" />
+    <ClInclude Include="src\flite\include\cst_features.h" />
+    <ClInclude Include="src\flite\include\cst_ffeatures.h" />
+    <ClInclude Include="src\flite\include\cst_file.h" />
+    <ClInclude Include="src\flite\include\cst_hrg.h" />
+    <ClInclude Include="src\flite\include\cst_item.h" />
+    <ClInclude Include="src\flite\include\cst_lexicon.h" />
+    <ClInclude Include="src\flite\include\cst_lts.h" />
+    <ClInclude Include="src\flite\include\cst_lts_rewrites.h" />
+    <ClInclude Include="src\flite\include\cst_math.h" />
+    <ClInclude Include="src\flite\include\cst_phoneset.h" />
+    <ClInclude Include="src\flite\include\cst_regex.h" />
+    <ClInclude Include="src\flite\include\cst_relation.h" />
+    <ClInclude Include="src\flite\include\cst_sigpr.h" />
+    <ClInclude Include="src\flite\include\cst_socket.h" />
+    <ClInclude Include="src\flite\include\cst_ss.h" />
+    <ClInclude Include="src\flite\include\cst_string.h" />
+    <ClInclude Include="src\flite\include\cst_sts.h" />
+    <ClInclude Include="src\flite\include\cst_synth.h" />
+    <ClInclude Include="src\flite\include\cst_tokenstream.h" />
+    <ClInclude Include="src\flite\include\cst_track.h" />
+    <ClInclude Include="src\flite\include\cst_utterance.h" />
+    <ClInclude Include="src\flite\include\cst_utt_utils.h" />
+    <ClInclude Include="src\flite\include\cst_val.h" />
+    <ClInclude Include="src\flite\include\cst_val_const.h" />
+    <ClInclude Include="src\flite\include\cst_val_defs.h" />
+    <ClInclude Include="src\flite\include\cst_viterbi.h" />
+    <ClInclude Include="src\flite\include\cst_voice.h" />
+    <ClInclude Include="src\flite\include\cst_wave.h" />
+    <ClInclude Include="src\flite\include\flite.h" />
+    <ClInclude Include="src\flite\lang\cmulex\cmu_lex.h" />
+    <ClInclude Include="src\flite\lang\cmulex\cmu_lts_model.h" />
+    <ClInclude Include="src\flite\lang\usenglish\usenglish.h" />
+    <ClInclude Include="src\flite\lang\usenglish\us_ffeatures.h" />
+    <ClInclude Include="src\flite\lang\usenglish\us_int_accent_cart.h" />
+    <ClInclude Include="src\flite\lang\usenglish\us_int_tone_cart.h" />
+    <ClInclude Include="src\flite\lang\usenglish\us_nums_cart.h" />
+    <ClInclude Include="src\flite\lang\usenglish\us_phrasing_cart.h" />
+    <ClInclude Include="src\flite\lang\usenglish\us_pos_cart.h" />
+    <ClInclude Include="src\flite\lang\usenglish\us_regexes.h" />
+    <ClInclude Include="src\flite\lang\usenglish\us_text.h" />
+    <ClInclude Include="src\flite\src\regex\cst_regex_defs.h" />
+    <ClInclude Include="src\include\flite_hts_engine.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
