@@ -1,0 +1,653 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		104BB9B521958CA3002BB51D /* rdkafka_transport.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB97C21958C9E002BB51D /* rdkafka_transport.c */; };
+		104BB9B621958CA3002BB51D /* rdbuf.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB97D21958C9E002BB51D /* rdbuf.c */; };
+		104BB9B721958CA3002BB51D /* rdkafka_cgrp.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB97E21958C9E002BB51D /* rdkafka_cgrp.c */; };
+		104BB9B821958CA3002BB51D /* rdavl.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB97F21958C9E002BB51D /* rdavl.c */; };
+		104BB9B921958CA3002BB51D /* rdkafka_broker.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB98021958C9E002BB51D /* rdkafka_broker.c */; };
+		104BB9BA21958CA3002BB51D /* rdkafka_assignor.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB98121958C9E002BB51D /* rdkafka_assignor.c */; };
+		104BB9BB21958CA3002BB51D /* rdkafka_buf.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB98221958C9E002BB51D /* rdkafka_buf.c */; };
+		104BB9BC21958CA3002BB51D /* rdgz.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB98321958C9F002BB51D /* rdgz.c */; };
+		104BB9BD21958CA3002BB51D /* crc32c.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB98421958C9F002BB51D /* crc32c.c */; };
+		104BB9BE21958CA3002BB51D /* rdkafka_msg.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB98521958C9F002BB51D /* rdkafka_msg.c */; };
+		104BB9BF21958CA3002BB51D /* rdkafka_msgset_reader.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB98621958C9F002BB51D /* rdkafka_msgset_reader.c */; };
+		104BB9C021958CA3002BB51D /* rdkafka_conf.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB98721958C9F002BB51D /* rdkafka_conf.c */; };
+		104BB9C121958CA3002BB51D /* rdcrc32.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB98821958C9F002BB51D /* rdcrc32.c */; };
+		104BB9C221958CA3002BB51D /* rdlist.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB98921958C9F002BB51D /* rdlist.c */; };
+		104BB9C321958CA3002BB51D /* rdkafka_sasl_plain.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB98A21958C9F002BB51D /* rdkafka_sasl_plain.c */; };
+		104BB9C421958CA3002BB51D /* tinycthread.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB98B21958C9F002BB51D /* tinycthread.c */; };
+		104BB9C521958CA3002BB51D /* rdkafka_range_assignor.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB98C21958C9F002BB51D /* rdkafka_range_assignor.c */; };
+		104BB9C621958CA3002BB51D /* xxhash.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB98D21958C9F002BB51D /* xxhash.c */; };
+		104BB9C721958CA3002BB51D /* snappy.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB98E21958C9F002BB51D /* snappy.c */; };
+		104BB9C821958CA3002BB51D /* rdkafka_roundrobin_assignor.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB98F21958C9F002BB51D /* rdkafka_roundrobin_assignor.c */; };
+		104BB9C921958CA3002BB51D /* rdkafka_partition.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB99021958C9F002BB51D /* rdkafka_partition.c */; };
+		104BB9CA21958CA3002BB51D /* rdkafka_subscription.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB99121958C9F002BB51D /* rdkafka_subscription.c */; };
+		104BB9CB21958CA3002BB51D /* rdkafka_sasl.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB99221958C9F002BB51D /* rdkafka_sasl.c */; };
+		104BB9CC21958CA3002BB51D /* lz4.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB99321958C9F002BB51D /* lz4.c */; };
+		104BB9CD21958CA3002BB51D /* rdregex.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB99421958CA0002BB51D /* rdregex.c */; };
+		104BB9CE21958CA3002BB51D /* rdkafka_header.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB99521958CA0002BB51D /* rdkafka_header.c */; };
+		104BB9CF21958CA3002BB51D /* rdrand.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB99621958CA0002BB51D /* rdrand.c */; };
+		104BB9D021958CA3002BB51D /* rdkafka_msgset_writer.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB99721958CA0002BB51D /* rdkafka_msgset_writer.c */; };
+		104BB9D121958CA3002BB51D /* rdkafka_offset.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB99821958CA0002BB51D /* rdkafka_offset.c */; };
+		104BB9D221958CA3002BB51D /* rdkafka_feature.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB99921958CA0002BB51D /* rdkafka_feature.c */; };
+		104BB9D321958CA3002BB51D /* rdkafka_metadata.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB99A21958CA0002BB51D /* rdkafka_metadata.c */; };
+		104BB9D421958CA3002BB51D /* rdkafka_topic.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB99B21958CA0002BB51D /* rdkafka_topic.c */; };
+		104BB9D521958CA3002BB51D /* rdstring.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB99C21958CA0002BB51D /* rdstring.c */; };
+		104BB9D621958CA3002BB51D /* rdaddr.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB99D21958CA0002BB51D /* rdaddr.c */; };
+		104BB9D721958CA3002BB51D /* rdports.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB99E21958CA0002BB51D /* rdports.c */; };
+		104BB9D821958CA3002BB51D /* rdkafka_request.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB99F21958CA0002BB51D /* rdkafka_request.c */; };
+		104BB9D921958CA3002BB51D /* rdlog.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB9A021958CA1002BB51D /* rdlog.c */; };
+		104BB9DA21958CA3002BB51D /* rdkafka_queue.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB9A121958CA1002BB51D /* rdkafka_queue.c */; };
+		104BB9DB21958CA3002BB51D /* rdunittest.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB9A221958CA1002BB51D /* rdunittest.c */; };
+		104BB9DC21958CA3002BB51D /* rdkafka_event.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB9A321958CA1002BB51D /* rdkafka_event.c */; };
+		104BB9DD21958CA3002BB51D /* lz4hc.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB9A421958CA1002BB51D /* lz4hc.c */; };
+		104BB9DE21958CA3002BB51D /* rdkafka_aux.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB9A521958CA1002BB51D /* rdkafka_aux.c */; };
+		104BB9DF21958CA3002BB51D /* lz4frame.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB9A621958CA1002BB51D /* lz4frame.c */; };
+		104BB9E021958CA3002BB51D /* rdkafka_background.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB9A721958CA1002BB51D /* rdkafka_background.c */; };
+		104BB9E121958CA3002BB51D /* rdkafka_sasl_scram.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB9A821958CA1002BB51D /* rdkafka_sasl_scram.c */; };
+		104BB9E221958CA3002BB51D /* tinycthread_extra.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB9A921958CA1002BB51D /* tinycthread_extra.c */; };
+		104BB9E321958CA3002BB51D /* rdkafka.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB9AA21958CA2002BB51D /* rdkafka.c */; };
+		104BB9E421958CA3002BB51D /* rdkafka_admin.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB9AB21958CA2002BB51D /* rdkafka_admin.c */; };
+		104BB9E521958CA3002BB51D /* rdkafka_idempotence.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB9AC21958CA2002BB51D /* rdkafka_idempotence.c */; };
+		104BB9E621958CA3002BB51D /* rdkafka_lz4.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB9AD21958CA2002BB51D /* rdkafka_lz4.c */; };
+		104BB9E721958CA3002BB51D /* rdkafka_op.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB9AE21958CA2002BB51D /* rdkafka_op.c */; };
+		104BB9E821958CA3002BB51D /* rdkafka_metadata_cache.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB9AF21958CA2002BB51D /* rdkafka_metadata_cache.c */; };
+		104BB9E921958CA3002BB51D /* rdkafka_pattern.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB9B021958CA2002BB51D /* rdkafka_pattern.c */; };
+		104BB9EA21958CA3002BB51D /* rdkafka_interceptor.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB9B121958CA2002BB51D /* rdkafka_interceptor.c */; };
+		104BB9EB21958CA3002BB51D /* rdkafka_timer.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB9B221958CA2002BB51D /* rdkafka_timer.c */; };
+		104BB9EC21958CA3002BB51D /* rdmurmur2.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB9B321958CA2002BB51D /* rdmurmur2.c */; };
+		104BB9ED21958CA3002BB51D /* regexp.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BB9B421958CA2002BB51D /* regexp.c */; };
+		104BBA3D21959143002BB51D /* rdvarint.c in Sources */ = {isa = PBXBuildFile; fileRef = 104BBA3C21959143002BB51D /* rdvarint.c */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		104BB97C21958C9E002BB51D /* rdkafka_transport.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_transport.c; path = src/rdkafka_transport.c; sourceTree = "<group>"; };
+		104BB97D21958C9E002BB51D /* rdbuf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdbuf.c; path = src/rdbuf.c; sourceTree = "<group>"; };
+		104BB97E21958C9E002BB51D /* rdkafka_cgrp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_cgrp.c; path = src/rdkafka_cgrp.c; sourceTree = "<group>"; };
+		104BB97F21958C9E002BB51D /* rdavl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdavl.c; path = src/rdavl.c; sourceTree = "<group>"; };
+		104BB98021958C9E002BB51D /* rdkafka_broker.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_broker.c; path = src/rdkafka_broker.c; sourceTree = "<group>"; };
+		104BB98121958C9E002BB51D /* rdkafka_assignor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_assignor.c; path = src/rdkafka_assignor.c; sourceTree = "<group>"; };
+		104BB98221958C9E002BB51D /* rdkafka_buf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_buf.c; path = src/rdkafka_buf.c; sourceTree = "<group>"; };
+		104BB98321958C9F002BB51D /* rdgz.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdgz.c; path = src/rdgz.c; sourceTree = "<group>"; };
+		104BB98421958C9F002BB51D /* crc32c.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = crc32c.c; path = src/crc32c.c; sourceTree = "<group>"; };
+		104BB98521958C9F002BB51D /* rdkafka_msg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_msg.c; path = src/rdkafka_msg.c; sourceTree = "<group>"; };
+		104BB98621958C9F002BB51D /* rdkafka_msgset_reader.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_msgset_reader.c; path = src/rdkafka_msgset_reader.c; sourceTree = "<group>"; };
+		104BB98721958C9F002BB51D /* rdkafka_conf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_conf.c; path = src/rdkafka_conf.c; sourceTree = "<group>"; };
+		104BB98821958C9F002BB51D /* rdcrc32.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdcrc32.c; path = src/rdcrc32.c; sourceTree = "<group>"; };
+		104BB98921958C9F002BB51D /* rdlist.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdlist.c; path = src/rdlist.c; sourceTree = "<group>"; };
+		104BB98A21958C9F002BB51D /* rdkafka_sasl_plain.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_sasl_plain.c; path = src/rdkafka_sasl_plain.c; sourceTree = "<group>"; };
+		104BB98B21958C9F002BB51D /* tinycthread.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tinycthread.c; path = src/tinycthread.c; sourceTree = "<group>"; };
+		104BB98C21958C9F002BB51D /* rdkafka_range_assignor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_range_assignor.c; path = src/rdkafka_range_assignor.c; sourceTree = "<group>"; };
+		104BB98D21958C9F002BB51D /* xxhash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = xxhash.c; path = src/xxhash.c; sourceTree = "<group>"; };
+		104BB98E21958C9F002BB51D /* snappy.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = snappy.c; path = src/snappy.c; sourceTree = "<group>"; };
+		104BB98F21958C9F002BB51D /* rdkafka_roundrobin_assignor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_roundrobin_assignor.c; path = src/rdkafka_roundrobin_assignor.c; sourceTree = "<group>"; };
+		104BB99021958C9F002BB51D /* rdkafka_partition.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_partition.c; path = src/rdkafka_partition.c; sourceTree = "<group>"; };
+		104BB99121958C9F002BB51D /* rdkafka_subscription.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_subscription.c; path = src/rdkafka_subscription.c; sourceTree = "<group>"; };
+		104BB99221958C9F002BB51D /* rdkafka_sasl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_sasl.c; path = src/rdkafka_sasl.c; sourceTree = "<group>"; };
+		104BB99321958C9F002BB51D /* lz4.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lz4.c; path = src/lz4.c; sourceTree = "<group>"; };
+		104BB99421958CA0002BB51D /* rdregex.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdregex.c; path = src/rdregex.c; sourceTree = "<group>"; };
+		104BB99521958CA0002BB51D /* rdkafka_header.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_header.c; path = src/rdkafka_header.c; sourceTree = "<group>"; };
+		104BB99621958CA0002BB51D /* rdrand.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdrand.c; path = src/rdrand.c; sourceTree = "<group>"; };
+		104BB99721958CA0002BB51D /* rdkafka_msgset_writer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_msgset_writer.c; path = src/rdkafka_msgset_writer.c; sourceTree = "<group>"; };
+		104BB99821958CA0002BB51D /* rdkafka_offset.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_offset.c; path = src/rdkafka_offset.c; sourceTree = "<group>"; };
+		104BB99921958CA0002BB51D /* rdkafka_feature.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_feature.c; path = src/rdkafka_feature.c; sourceTree = "<group>"; };
+		104BB99A21958CA0002BB51D /* rdkafka_metadata.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_metadata.c; path = src/rdkafka_metadata.c; sourceTree = "<group>"; };
+		104BB99B21958CA0002BB51D /* rdkafka_topic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_topic.c; path = src/rdkafka_topic.c; sourceTree = "<group>"; };
+		104BB99C21958CA0002BB51D /* rdstring.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdstring.c; path = src/rdstring.c; sourceTree = "<group>"; };
+		104BB99D21958CA0002BB51D /* rdaddr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdaddr.c; path = src/rdaddr.c; sourceTree = "<group>"; };
+		104BB99E21958CA0002BB51D /* rdports.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdports.c; path = src/rdports.c; sourceTree = "<group>"; };
+		104BB99F21958CA0002BB51D /* rdkafka_request.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_request.c; path = src/rdkafka_request.c; sourceTree = "<group>"; };
+		104BB9A021958CA1002BB51D /* rdlog.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdlog.c; path = src/rdlog.c; sourceTree = "<group>"; };
+		104BB9A121958CA1002BB51D /* rdkafka_queue.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_queue.c; path = src/rdkafka_queue.c; sourceTree = "<group>"; };
+		104BB9A221958CA1002BB51D /* rdunittest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdunittest.c; path = src/rdunittest.c; sourceTree = "<group>"; };
+		104BB9A321958CA1002BB51D /* rdkafka_event.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_event.c; path = src/rdkafka_event.c; sourceTree = "<group>"; };
+		104BB9A421958CA1002BB51D /* lz4hc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lz4hc.c; path = src/lz4hc.c; sourceTree = "<group>"; };
+		104BB9A521958CA1002BB51D /* rdkafka_aux.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_aux.c; path = src/rdkafka_aux.c; sourceTree = "<group>"; };
+		104BB9A621958CA1002BB51D /* lz4frame.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lz4frame.c; path = src/lz4frame.c; sourceTree = "<group>"; };
+		104BB9A721958CA1002BB51D /* rdkafka_background.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_background.c; path = src/rdkafka_background.c; sourceTree = "<group>"; };
+		104BB9A821958CA1002BB51D /* rdkafka_sasl_scram.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_sasl_scram.c; path = src/rdkafka_sasl_scram.c; sourceTree = "<group>"; };
+		104BB9A921958CA1002BB51D /* tinycthread_extra.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tinycthread_extra.c; path = src/tinycthread_extra.c; sourceTree = "<group>"; };
+		104BB9AA21958CA2002BB51D /* rdkafka.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka.c; path = src/rdkafka.c; sourceTree = "<group>"; };
+		104BB9AB21958CA2002BB51D /* rdkafka_admin.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_admin.c; path = src/rdkafka_admin.c; sourceTree = "<group>"; };
+		104BB9AC21958CA2002BB51D /* rdkafka_idempotence.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_idempotence.c; path = src/rdkafka_idempotence.c; sourceTree = "<group>"; };
+		104BB9AD21958CA2002BB51D /* rdkafka_lz4.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_lz4.c; path = src/rdkafka_lz4.c; sourceTree = "<group>"; };
+		104BB9AE21958CA2002BB51D /* rdkafka_op.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_op.c; path = src/rdkafka_op.c; sourceTree = "<group>"; };
+		104BB9AF21958CA2002BB51D /* rdkafka_metadata_cache.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_metadata_cache.c; path = src/rdkafka_metadata_cache.c; sourceTree = "<group>"; };
+		104BB9B021958CA2002BB51D /* rdkafka_pattern.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_pattern.c; path = src/rdkafka_pattern.c; sourceTree = "<group>"; };
+		104BB9B121958CA2002BB51D /* rdkafka_interceptor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_interceptor.c; path = src/rdkafka_interceptor.c; sourceTree = "<group>"; };
+		104BB9B221958CA2002BB51D /* rdkafka_timer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdkafka_timer.c; path = src/rdkafka_timer.c; sourceTree = "<group>"; };
+		104BB9B321958CA2002BB51D /* rdmurmur2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdmurmur2.c; path = src/rdmurmur2.c; sourceTree = "<group>"; };
+		104BB9B421958CA2002BB51D /* regexp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = regexp.c; path = src/regexp.c; sourceTree = "<group>"; };
+		104BB9EE21958D0E002BB51D /* rdavl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdavl.h; path = src/src/rdavl.h; sourceTree = SOURCE_ROOT; };
+		104BB9EF21958D0E002BB51D /* rdinterval.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdinterval.h; path = src/src/rdinterval.h; sourceTree = SOURCE_ROOT; };
+		104BB9F021958D0E002BB51D /* rdposix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdposix.h; path = src/src/rdposix.h; sourceTree = SOURCE_ROOT; };
+		104BB9F121958D0E002BB51D /* snappy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = snappy.h; path = src/src/snappy.h; sourceTree = SOURCE_ROOT; };
+		104BB9F221958D0E002BB51D /* rdkafka_header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_header.h; path = src/src/rdkafka_header.h; sourceTree = SOURCE_ROOT; };
+		104BB9F321958D0E002BB51D /* rdbuf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdbuf.h; path = src/src/rdbuf.h; sourceTree = SOURCE_ROOT; };
+		104BB9F421958D0E002BB51D /* rdkafka_broker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_broker.h; path = src/src/rdkafka_broker.h; sourceTree = SOURCE_ROOT; };
+		104BB9F521958D0E002BB51D /* rdkafka_interceptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_interceptor.h; path = src/src/rdkafka_interceptor.h; sourceTree = SOURCE_ROOT; };
+		104BB9F621958D0E002BB51D /* rdlog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdlog.h; path = src/src/rdlog.h; sourceTree = SOURCE_ROOT; };
+		104BB9F721958D0E002BB51D /* rdkafka_cgrp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_cgrp.h; path = src/src/rdkafka_cgrp.h; sourceTree = SOURCE_ROOT; };
+		104BB9F821958D0E002BB51D /* rdcrc32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdcrc32.h; path = src/src/rdcrc32.h; sourceTree = SOURCE_ROOT; };
+		104BB9F921958D0E002BB51D /* rdfloat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdfloat.h; path = src/src/rdfloat.h; sourceTree = SOURCE_ROOT; };
+		104BB9FA21958D0E002BB51D /* rdkafka_msgset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_msgset.h; path = src/src/rdkafka_msgset.h; sourceTree = SOURCE_ROOT; };
+		104BB9FB21958D0E002BB51D /* rdkafka_transport_int.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_transport_int.h; path = src/src/rdkafka_transport_int.h; sourceTree = SOURCE_ROOT; };
+		104BB9FC21958D0E002BB51D /* rdunittest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdunittest.h; path = src/src/rdunittest.h; sourceTree = SOURCE_ROOT; };
+		104BB9FD21958D0E002BB51D /* rdkafka_assignor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_assignor.h; path = src/src/rdkafka_assignor.h; sourceTree = SOURCE_ROOT; };
+		104BB9FE21958D0F002BB51D /* lz4hc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lz4hc.h; path = src/src/lz4hc.h; sourceTree = SOURCE_ROOT; };
+		104BB9FF21958D0F002BB51D /* regexp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = regexp.h; path = src/src/regexp.h; sourceTree = SOURCE_ROOT; };
+		104BBA0021958D0F002BB51D /* rdmurmur2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdmurmur2.h; path = src/src/rdmurmur2.h; sourceTree = SOURCE_ROOT; };
+		104BBA0121958D0F002BB51D /* tinycthread_extra.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tinycthread_extra.h; path = src/src/tinycthread_extra.h; sourceTree = SOURCE_ROOT; };
+		104BBA0221958D0F002BB51D /* rdkafka_request.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_request.h; path = src/src/rdkafka_request.h; sourceTree = SOURCE_ROOT; };
+		104BBA0321958D0F002BB51D /* rdkafka_admin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_admin.h; path = src/src/rdkafka_admin.h; sourceTree = SOURCE_ROOT; };
+		104BBA0421958D0F002BB51D /* rdkafka_queue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_queue.h; path = src/src/rdkafka_queue.h; sourceTree = SOURCE_ROOT; };
+		104BBA0521958D0F002BB51D /* rdkafka_int.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_int.h; path = src/src/rdkafka_int.h; sourceTree = SOURCE_ROOT; };
+		104BBA0621958D0F002BB51D /* rdlist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdlist.h; path = src/src/rdlist.h; sourceTree = SOURCE_ROOT; };
+		104BBA0721958D0F002BB51D /* rdkafka_confval.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_confval.h; path = src/src/rdkafka_confval.h; sourceTree = SOURCE_ROOT; };
+		104BBA0821958D0F002BB51D /* snappy_compat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = snappy_compat.h; path = src/src/snappy_compat.h; sourceTree = SOURCE_ROOT; };
+		104BBA0921958D0F002BB51D /* rdkafka_op.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_op.h; path = src/src/rdkafka_op.h; sourceTree = SOURCE_ROOT; };
+		104BBA0A21958D10002BB51D /* rdsysqueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdsysqueue.h; path = src/src/rdsysqueue.h; sourceTree = SOURCE_ROOT; };
+		104BBA0B21958D10002BB51D /* rdkafka_msg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_msg.h; path = src/src/rdkafka_msg.h; sourceTree = SOURCE_ROOT; };
+		104BBA0C21958D10002BB51D /* rdkafka_partition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_partition.h; path = src/src/rdkafka_partition.h; sourceTree = SOURCE_ROOT; };
+		104BBA0D21958D10002BB51D /* rdkafka_buf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_buf.h; path = src/src/rdkafka_buf.h; sourceTree = SOURCE_ROOT; };
+		104BBA0E21958D10002BB51D /* rdkafka_sasl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_sasl.h; path = src/src/rdkafka_sasl.h; sourceTree = SOURCE_ROOT; };
+		104BBA0F21958D10002BB51D /* rdgz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdgz.h; path = src/src/rdgz.h; sourceTree = SOURCE_ROOT; };
+		104BBA1021958D10002BB51D /* rdkafka_lz4.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_lz4.h; path = src/src/rdkafka_lz4.h; sourceTree = SOURCE_ROOT; };
+		104BBA1121958D10002BB51D /* lz4.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lz4.h; path = src/src/lz4.h; sourceTree = SOURCE_ROOT; };
+		104BBA1221958D10002BB51D /* queue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = queue.h; path = src/src/queue.h; sourceTree = SOURCE_ROOT; };
+		104BBA1321958D10002BB51D /* rdkafka_aux.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_aux.h; path = src/src/rdkafka_aux.h; sourceTree = SOURCE_ROOT; };
+		104BBA1421958D10002BB51D /* rdtypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdtypes.h; path = src/src/rdtypes.h; sourceTree = SOURCE_ROOT; };
+		104BBA1521958D10002BB51D /* rdkafka_proto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_proto.h; path = src/src/rdkafka_proto.h; sourceTree = SOURCE_ROOT; };
+		104BBA1621958D10002BB51D /* rdkafka_timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_timer.h; path = src/src/rdkafka_timer.h; sourceTree = SOURCE_ROOT; };
+		104BBA1721958D11002BB51D /* rdregex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdregex.h; path = src/src/rdregex.h; sourceTree = SOURCE_ROOT; };
+		104BBA1821958D11002BB51D /* rdkafka_offset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_offset.h; path = src/src/rdkafka_offset.h; sourceTree = SOURCE_ROOT; };
+		104BBA1921958D11002BB51D /* rdkafka_idempotence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_idempotence.h; path = src/src/rdkafka_idempotence.h; sourceTree = SOURCE_ROOT; };
+		104BBA1A21958D11002BB51D /* rdendian.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdendian.h; path = src/src/rdendian.h; sourceTree = SOURCE_ROOT; };
+		104BBA1B21958D11002BB51D /* rdkafka_pattern.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_pattern.h; path = src/src/rdkafka_pattern.h; sourceTree = SOURCE_ROOT; };
+		104BBA1C21958D11002BB51D /* rdports.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdports.h; path = src/src/rdports.h; sourceTree = SOURCE_ROOT; };
+		104BBA1D21958D11002BB51D /* rdaddr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdaddr.h; path = src/src/rdaddr.h; sourceTree = SOURCE_ROOT; };
+		104BBA1E21958D11002BB51D /* rd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rd.h; path = src/src/rd.h; sourceTree = SOURCE_ROOT; };
+		104BBA1F21958D11002BB51D /* rdavg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdavg.h; path = src/src/rdavg.h; sourceTree = SOURCE_ROOT; };
+		104BBA2021958D11002BB51D /* rdatomic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdatomic.h; path = src/src/rdatomic.h; sourceTree = SOURCE_ROOT; };
+		104BBA2121958D11002BB51D /* lz4frame_static.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lz4frame_static.h; path = src/src/lz4frame_static.h; sourceTree = SOURCE_ROOT; };
+		104BBA2221958D11002BB51D /* rdkafka_conf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_conf.h; path = src/src/rdkafka_conf.h; sourceTree = SOURCE_ROOT; };
+		104BBA2321958D11002BB51D /* rdstring.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdstring.h; path = src/src/rdstring.h; sourceTree = SOURCE_ROOT; };
+		104BBA2421958D11002BB51D /* rdsignal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdsignal.h; path = src/src/rdsignal.h; sourceTree = SOURCE_ROOT; };
+		104BBA2521958D12002BB51D /* crc32c.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = crc32c.h; path = src/src/crc32c.h; sourceTree = SOURCE_ROOT; };
+		104BBA2621958D12002BB51D /* rdkafka_feature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_feature.h; path = src/src/rdkafka_feature.h; sourceTree = SOURCE_ROOT; };
+		104BBA2721958D12002BB51D /* rdkafka_transport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_transport.h; path = src/src/rdkafka_transport.h; sourceTree = SOURCE_ROOT; };
+		104BBA2821958D12002BB51D /* lz4opt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lz4opt.h; path = src/src/lz4opt.h; sourceTree = SOURCE_ROOT; };
+		104BBA2921958D12002BB51D /* rdkafka_topic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_topic.h; path = src/src/rdkafka_topic.h; sourceTree = SOURCE_ROOT; };
+		104BBA2A21958D12002BB51D /* rdkafka_event.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_event.h; path = src/src/rdkafka_event.h; sourceTree = SOURCE_ROOT; };
+		104BBA2B21958D12002BB51D /* rdtime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdtime.h; path = src/src/rdtime.h; sourceTree = SOURCE_ROOT; };
+		104BBA2C21958D12002BB51D /* tinycthread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tinycthread.h; path = src/src/tinycthread.h; sourceTree = SOURCE_ROOT; };
+		104BBA2D21958D12002BB51D /* rdkafka.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka.h; path = src/src/rdkafka.h; sourceTree = SOURCE_ROOT; };
+		104BBA2E21958D12002BB51D /* rdkafka_sasl_int.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_sasl_int.h; path = src/src/rdkafka_sasl_int.h; sourceTree = SOURCE_ROOT; };
+		104BBA2F21958D12002BB51D /* rdrand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdrand.h; path = src/src/rdrand.h; sourceTree = SOURCE_ROOT; };
+		104BBA3021958D12002BB51D /* rdkafka_metadata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdkafka_metadata.h; path = src/src/rdkafka_metadata.h; sourceTree = SOURCE_ROOT; };
+		104BBA3121958D12002BB51D /* lz4frame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lz4frame.h; path = src/src/lz4frame.h; sourceTree = SOURCE_ROOT; };
+		104BBA3221958D1F002BB51D /* xxhash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = xxhash.h; path = src/src/xxhash.h; sourceTree = SOURCE_ROOT; };
+		104BBA3C21959143002BB51D /* rdvarint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rdvarint.c; path = src/rdvarint.c; sourceTree = "<group>"; };
+		104BBA3E21959153002BB51D /* rdvarint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rdvarint.h; path = src/src/rdvarint.h; sourceTree = SOURCE_ROOT; };
+		807AB6621C5CB17F008C4A04 /* libLibrary_librdkafka.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libLibrary_librdkafka.a; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		807AB65F1C5CB17F008C4A04 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		807AB6591C5CB17F008C4A04 = {
+			isa = PBXGroup;
+			children = (
+				807AB78D1C5CB1EF008C4A04 /* src */,
+				807AB67F1C5CB1E7008C4A04 /* include */,
+				807AB6631C5CB17F008C4A04 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		807AB6631C5CB17F008C4A04 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				807AB6621C5CB17F008C4A04 /* libLibrary_librdkafka.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		807AB67F1C5CB1E7008C4A04 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				104BBA3E21959153002BB51D /* rdvarint.h */,
+				104BBA3221958D1F002BB51D /* xxhash.h */,
+				104BBA2521958D12002BB51D /* crc32c.h */,
+				104BBA1121958D10002BB51D /* lz4.h */,
+				104BBA2121958D11002BB51D /* lz4frame_static.h */,
+				104BBA3121958D12002BB51D /* lz4frame.h */,
+				104BB9FE21958D0F002BB51D /* lz4hc.h */,
+				104BBA2821958D12002BB51D /* lz4opt.h */,
+				104BBA1221958D10002BB51D /* queue.h */,
+				104BBA1E21958D11002BB51D /* rd.h */,
+				104BBA1D21958D11002BB51D /* rdaddr.h */,
+				104BBA2021958D11002BB51D /* rdatomic.h */,
+				104BBA1F21958D11002BB51D /* rdavg.h */,
+				104BB9EE21958D0E002BB51D /* rdavl.h */,
+				104BB9F321958D0E002BB51D /* rdbuf.h */,
+				104BB9F821958D0E002BB51D /* rdcrc32.h */,
+				104BBA1A21958D11002BB51D /* rdendian.h */,
+				104BB9F921958D0E002BB51D /* rdfloat.h */,
+				104BBA0F21958D10002BB51D /* rdgz.h */,
+				104BB9EF21958D0E002BB51D /* rdinterval.h */,
+				104BBA0321958D0F002BB51D /* rdkafka_admin.h */,
+				104BB9FD21958D0E002BB51D /* rdkafka_assignor.h */,
+				104BBA1321958D10002BB51D /* rdkafka_aux.h */,
+				104BB9F421958D0E002BB51D /* rdkafka_broker.h */,
+				104BBA0D21958D10002BB51D /* rdkafka_buf.h */,
+				104BB9F721958D0E002BB51D /* rdkafka_cgrp.h */,
+				104BBA2221958D11002BB51D /* rdkafka_conf.h */,
+				104BBA0721958D0F002BB51D /* rdkafka_confval.h */,
+				104BBA2A21958D12002BB51D /* rdkafka_event.h */,
+				104BBA2621958D12002BB51D /* rdkafka_feature.h */,
+				104BB9F221958D0E002BB51D /* rdkafka_header.h */,
+				104BBA1921958D11002BB51D /* rdkafka_idempotence.h */,
+				104BBA0521958D0F002BB51D /* rdkafka_int.h */,
+				104BB9F521958D0E002BB51D /* rdkafka_interceptor.h */,
+				104BBA1021958D10002BB51D /* rdkafka_lz4.h */,
+				104BBA3021958D12002BB51D /* rdkafka_metadata.h */,
+				104BBA0B21958D10002BB51D /* rdkafka_msg.h */,
+				104BB9FA21958D0E002BB51D /* rdkafka_msgset.h */,
+				104BBA1821958D11002BB51D /* rdkafka_offset.h */,
+				104BBA0921958D0F002BB51D /* rdkafka_op.h */,
+				104BBA0C21958D10002BB51D /* rdkafka_partition.h */,
+				104BBA1B21958D11002BB51D /* rdkafka_pattern.h */,
+				104BBA1521958D10002BB51D /* rdkafka_proto.h */,
+				104BBA0421958D0F002BB51D /* rdkafka_queue.h */,
+				104BBA0221958D0F002BB51D /* rdkafka_request.h */,
+				104BBA2E21958D12002BB51D /* rdkafka_sasl_int.h */,
+				104BBA0E21958D10002BB51D /* rdkafka_sasl.h */,
+				104BBA1621958D10002BB51D /* rdkafka_timer.h */,
+				104BBA2921958D12002BB51D /* rdkafka_topic.h */,
+				104BB9FB21958D0E002BB51D /* rdkafka_transport_int.h */,
+				104BBA2721958D12002BB51D /* rdkafka_transport.h */,
+				104BBA2D21958D12002BB51D /* rdkafka.h */,
+				104BBA0621958D0F002BB51D /* rdlist.h */,
+				104BB9F621958D0E002BB51D /* rdlog.h */,
+				104BBA0021958D0F002BB51D /* rdmurmur2.h */,
+				104BBA1C21958D11002BB51D /* rdports.h */,
+				104BB9F021958D0E002BB51D /* rdposix.h */,
+				104BBA2F21958D12002BB51D /* rdrand.h */,
+				104BBA1721958D11002BB51D /* rdregex.h */,
+				104BBA2421958D11002BB51D /* rdsignal.h */,
+				104BBA2321958D11002BB51D /* rdstring.h */,
+				104BBA0A21958D10002BB51D /* rdsysqueue.h */,
+				104BBA2B21958D12002BB51D /* rdtime.h */,
+				104BBA1421958D10002BB51D /* rdtypes.h */,
+				104BB9FC21958D0E002BB51D /* rdunittest.h */,
+				104BB9FF21958D0F002BB51D /* regexp.h */,
+				104BBA0821958D0F002BB51D /* snappy_compat.h */,
+				104BB9F121958D0E002BB51D /* snappy.h */,
+				104BBA0121958D0F002BB51D /* tinycthread_extra.h */,
+				104BBA2C21958D12002BB51D /* tinycthread.h */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		807AB78D1C5CB1EF008C4A04 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				104BBA3C21959143002BB51D /* rdvarint.c */,
+				104BB98421958C9F002BB51D /* crc32c.c */,
+				104BB99321958C9F002BB51D /* lz4.c */,
+				104BB9A621958CA1002BB51D /* lz4frame.c */,
+				104BB9A421958CA1002BB51D /* lz4hc.c */,
+				104BB99D21958CA0002BB51D /* rdaddr.c */,
+				104BB97F21958C9E002BB51D /* rdavl.c */,
+				104BB97D21958C9E002BB51D /* rdbuf.c */,
+				104BB98821958C9F002BB51D /* rdcrc32.c */,
+				104BB98321958C9F002BB51D /* rdgz.c */,
+				104BB9AB21958CA2002BB51D /* rdkafka_admin.c */,
+				104BB98121958C9E002BB51D /* rdkafka_assignor.c */,
+				104BB9A521958CA1002BB51D /* rdkafka_aux.c */,
+				104BB9A721958CA1002BB51D /* rdkafka_background.c */,
+				104BB98021958C9E002BB51D /* rdkafka_broker.c */,
+				104BB98221958C9E002BB51D /* rdkafka_buf.c */,
+				104BB97E21958C9E002BB51D /* rdkafka_cgrp.c */,
+				104BB98721958C9F002BB51D /* rdkafka_conf.c */,
+				104BB9A321958CA1002BB51D /* rdkafka_event.c */,
+				104BB99921958CA0002BB51D /* rdkafka_feature.c */,
+				104BB99521958CA0002BB51D /* rdkafka_header.c */,
+				104BB9AC21958CA2002BB51D /* rdkafka_idempotence.c */,
+				104BB9B121958CA2002BB51D /* rdkafka_interceptor.c */,
+				104BB9AD21958CA2002BB51D /* rdkafka_lz4.c */,
+				104BB9AF21958CA2002BB51D /* rdkafka_metadata_cache.c */,
+				104BB99A21958CA0002BB51D /* rdkafka_metadata.c */,
+				104BB98521958C9F002BB51D /* rdkafka_msg.c */,
+				104BB98621958C9F002BB51D /* rdkafka_msgset_reader.c */,
+				104BB99721958CA0002BB51D /* rdkafka_msgset_writer.c */,
+				104BB99821958CA0002BB51D /* rdkafka_offset.c */,
+				104BB9AE21958CA2002BB51D /* rdkafka_op.c */,
+				104BB99021958C9F002BB51D /* rdkafka_partition.c */,
+				104BB9B021958CA2002BB51D /* rdkafka_pattern.c */,
+				104BB9A121958CA1002BB51D /* rdkafka_queue.c */,
+				104BB98C21958C9F002BB51D /* rdkafka_range_assignor.c */,
+				104BB99F21958CA0002BB51D /* rdkafka_request.c */,
+				104BB98F21958C9F002BB51D /* rdkafka_roundrobin_assignor.c */,
+				104BB98A21958C9F002BB51D /* rdkafka_sasl_plain.c */,
+				104BB9A821958CA1002BB51D /* rdkafka_sasl_scram.c */,
+				104BB99221958C9F002BB51D /* rdkafka_sasl.c */,
+				104BB99121958C9F002BB51D /* rdkafka_subscription.c */,
+				104BB9B221958CA2002BB51D /* rdkafka_timer.c */,
+				104BB99B21958CA0002BB51D /* rdkafka_topic.c */,
+				104BB97C21958C9E002BB51D /* rdkafka_transport.c */,
+				104BB9AA21958CA2002BB51D /* rdkafka.c */,
+				104BB98921958C9F002BB51D /* rdlist.c */,
+				104BB9A021958CA1002BB51D /* rdlog.c */,
+				104BB9B321958CA2002BB51D /* rdmurmur2.c */,
+				104BB99E21958CA0002BB51D /* rdports.c */,
+				104BB99621958CA0002BB51D /* rdrand.c */,
+				104BB99421958CA0002BB51D /* rdregex.c */,
+				104BB99C21958CA0002BB51D /* rdstring.c */,
+				104BB9A221958CA1002BB51D /* rdunittest.c */,
+				104BB9B421958CA2002BB51D /* regexp.c */,
+				104BB98E21958C9F002BB51D /* snappy.c */,
+				104BB9A921958CA1002BB51D /* tinycthread_extra.c */,
+				104BB98B21958C9F002BB51D /* tinycthread.c */,
+				104BB98D21958C9F002BB51D /* xxhash.c */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		807AB6611C5CB17F008C4A04 /* Library_librdkafka */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 807AB66B1C5CB17F008C4A04 /* Build configuration list for PBXNativeTarget "Library_librdkafka" */;
+			buildPhases = (
+				807AB65E1C5CB17F008C4A04 /* Sources */,
+				807AB65F1C5CB17F008C4A04 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Library_librdkafka;
+			productName = Library_librdkafka;
+			productReference = 807AB6621C5CB17F008C4A04 /* libLibrary_librdkafka.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		807AB65A1C5CB17F008C4A04 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0720;
+				ORGANIZATIONNAME = "";
+				TargetAttributes = {
+					807AB6611C5CB17F008C4A04 = {
+						CreatedOnToolsVersion = 7.2;
+						DevelopmentTeam = ER7BUZVGH2;
+					};
+				};
+			};
+			buildConfigurationList = 807AB65D1C5CB17F008C4A04 /* Build configuration list for PBXProject "Library_librdkafka" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 807AB6591C5CB17F008C4A04;
+			productRefGroup = 807AB6631C5CB17F008C4A04 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				807AB6611C5CB17F008C4A04 /* Library_librdkafka */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		807AB65E1C5CB17F008C4A04 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				104BB9DD21958CA3002BB51D /* lz4hc.c in Sources */,
+				104BB9ED21958CA3002BB51D /* regexp.c in Sources */,
+				104BB9D621958CA3002BB51D /* rdaddr.c in Sources */,
+				104BB9E921958CA3002BB51D /* rdkafka_pattern.c in Sources */,
+				104BB9CF21958CA3002BB51D /* rdrand.c in Sources */,
+				104BB9CC21958CA3002BB51D /* lz4.c in Sources */,
+				104BB9C821958CA3002BB51D /* rdkafka_roundrobin_assignor.c in Sources */,
+				104BB9E321958CA3002BB51D /* rdkafka.c in Sources */,
+				104BB9CD21958CA3002BB51D /* rdregex.c in Sources */,
+				104BB9C021958CA3002BB51D /* rdkafka_conf.c in Sources */,
+				104BB9BA21958CA3002BB51D /* rdkafka_assignor.c in Sources */,
+				104BB9B921958CA3002BB51D /* rdkafka_broker.c in Sources */,
+				104BB9B521958CA3002BB51D /* rdkafka_transport.c in Sources */,
+				104BB9C721958CA3002BB51D /* snappy.c in Sources */,
+				104BB9E421958CA3002BB51D /* rdkafka_admin.c in Sources */,
+				104BB9D721958CA3002BB51D /* rdports.c in Sources */,
+				104BB9D521958CA3002BB51D /* rdstring.c in Sources */,
+				104BB9EA21958CA3002BB51D /* rdkafka_interceptor.c in Sources */,
+				104BB9B821958CA3002BB51D /* rdavl.c in Sources */,
+				104BB9D021958CA3002BB51D /* rdkafka_msgset_writer.c in Sources */,
+				104BB9DA21958CA3002BB51D /* rdkafka_queue.c in Sources */,
+				104BB9EC21958CA3002BB51D /* rdmurmur2.c in Sources */,
+				104BB9BE21958CA3002BB51D /* rdkafka_msg.c in Sources */,
+				104BB9C521958CA3002BB51D /* rdkafka_range_assignor.c in Sources */,
+				104BB9C921958CA3002BB51D /* rdkafka_partition.c in Sources */,
+				104BB9C621958CA3002BB51D /* xxhash.c in Sources */,
+				104BB9EB21958CA3002BB51D /* rdkafka_timer.c in Sources */,
+				104BB9D821958CA3002BB51D /* rdkafka_request.c in Sources */,
+				104BB9D121958CA3002BB51D /* rdkafka_offset.c in Sources */,
+				104BB9E821958CA3002BB51D /* rdkafka_metadata_cache.c in Sources */,
+				104BB9C321958CA3002BB51D /* rdkafka_sasl_plain.c in Sources */,
+				104BB9BF21958CA3002BB51D /* rdkafka_msgset_reader.c in Sources */,
+				104BB9D421958CA3002BB51D /* rdkafka_topic.c in Sources */,
+				104BB9E621958CA3002BB51D /* rdkafka_lz4.c in Sources */,
+				104BB9C121958CA3002BB51D /* rdcrc32.c in Sources */,
+				104BB9BD21958CA3002BB51D /* crc32c.c in Sources */,
+				104BB9CE21958CA3002BB51D /* rdkafka_header.c in Sources */,
+				104BB9D221958CA3002BB51D /* rdkafka_feature.c in Sources */,
+				104BB9B621958CA3002BB51D /* rdbuf.c in Sources */,
+				104BB9E221958CA3002BB51D /* tinycthread_extra.c in Sources */,
+				104BB9DC21958CA3002BB51D /* rdkafka_event.c in Sources */,
+				104BB9BB21958CA3002BB51D /* rdkafka_buf.c in Sources */,
+				104BB9DF21958CA3002BB51D /* lz4frame.c in Sources */,
+				104BBA3D21959143002BB51D /* rdvarint.c in Sources */,
+				104BB9C221958CA3002BB51D /* rdlist.c in Sources */,
+				104BB9DE21958CA3002BB51D /* rdkafka_aux.c in Sources */,
+				104BB9E121958CA3002BB51D /* rdkafka_sasl_scram.c in Sources */,
+				104BB9E721958CA3002BB51D /* rdkafka_op.c in Sources */,
+				104BB9C421958CA3002BB51D /* tinycthread.c in Sources */,
+				104BB9DB21958CA3002BB51D /* rdunittest.c in Sources */,
+				104BB9BC21958CA3002BB51D /* rdgz.c in Sources */,
+				104BB9CB21958CA3002BB51D /* rdkafka_sasl.c in Sources */,
+				104BB9B721958CA3002BB51D /* rdkafka_cgrp.c in Sources */,
+				104BB9E521958CA3002BB51D /* rdkafka_idempotence.c in Sources */,
+				104BB9E021958CA3002BB51D /* rdkafka_background.c in Sources */,
+				104BB9CA21958CA3002BB51D /* rdkafka_subscription.c in Sources */,
+				104BB9D921958CA3002BB51D /* rdlog.c in Sources */,
+				104BB9D321958CA3002BB51D /* rdkafka_metadata.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		807AB6691C5CB17F008C4A04 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		807AB66A1C5CB17F008C4A04 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		807AB66C1C5CB17F008C4A04 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/lib",
+				);
+				OTHER_CFLAGS = (
+					"-DTARGET_OS_IPHONE",
+					"-DMMDAGENT",
+					"-DWITH_ZLIB",
+					"-DWITH_SSL",
+					"-DWITH_SNAPPY",
+					"-DWITH_SASL_SCRAM",
+					"-DHAVE_REGEX",
+					"-DHAVE_STRNDUP",
+					"-DHAVE_STRERROR_R",
+					"-DLIBRDKAFKA_STATICLIB",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/src $(SRCROOT)/../Library_Poco/iOS/include";
+				VALID_ARCHS = arm64;
+			};
+			name = Debug;
+		};
+		807AB66D1C5CB17F008C4A04 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/lib",
+				);
+				OTHER_CFLAGS = (
+					"-DTARGET_OS_IPHONE",
+					"-DMMDAGENT",
+					"-DWITH_ZLIB",
+					"-DWITH_SSL",
+					"-DWITH_SNAPPY",
+					"-DWITH_SASL_SCRAM",
+					"-DHAVE_REGEX",
+					"-DHAVE_STRNDUP",
+					"-DHAVE_STRERROR_R",
+					"-DLIBRDKAFKA_STATICLIB",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/src $(SRCROOT)/../Library_Poco/iOS/include";
+				VALID_ARCHS = arm64;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		807AB65D1C5CB17F008C4A04 /* Build configuration list for PBXProject "Library_librdkafka" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				807AB6691C5CB17F008C4A04 /* Debug */,
+				807AB66A1C5CB17F008C4A04 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		807AB66B1C5CB17F008C4A04 /* Build configuration list for PBXNativeTarget "Library_librdkafka" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				807AB66C1C5CB17F008C4A04 /* Debug */,
+				807AB66D1C5CB17F008C4A04 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 807AB65A1C5CB17F008C4A04 /* Project object */;
+}

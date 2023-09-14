@@ -1,0 +1,9 @@
+/* 
+  InfoPlist.strings
+  main
+
+  Created by Akinobu Lee on 2018/10/31.
+  
+*/
+
+NSMicrophoneUsageDescription = "音声認識のためにマイクを使用します";

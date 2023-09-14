@@ -1,0 +1,212 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\jpcommon\jpcommon.h" />
+    <ClInclude Include="src\jpcommon\jpcommon_rule_shift_jis.h" />
+    <ClInclude Include="src\mecab2njd\mecab2njd.h" />
+    <ClInclude Include="src\mecab\src\char_property.h" />
+    <ClInclude Include="src\mecab\src\common.h" />
+    <ClInclude Include="src\mecab\src\connector.h" />
+    <ClInclude Include="src\mecab\src\context_id.h" />
+    <ClInclude Include="src\mecab\src\darts.h" />
+    <ClInclude Include="src\mecab\src\dictionary.h" />
+    <ClInclude Include="src\mecab\src\dictionary_rewriter.h" />
+    <ClInclude Include="src\mecab\src\feature_index.h" />
+    <ClInclude Include="src\mecab\src\freelist.h" />
+    <ClInclude Include="src\mecab\src\iconv_utils.h" />
+    <ClInclude Include="src\mecab\src\lbfgs.h" />
+    <ClInclude Include="src\mecab\src\learner_node.h" />
+    <ClInclude Include="src\mecab\src\learner_tagger.h" />
+    <ClInclude Include="src\mecab\src\mecab.h" />
+    <ClInclude Include="src\mecab\src\mmap.h" />
+    <ClInclude Include="src\mecab\src\nbest_generator.h" />
+    <ClInclude Include="src\mecab\src\param.h" />
+    <ClInclude Include="src\mecab\src\scoped_ptr.h" />
+    <ClInclude Include="src\mecab\src\stream_wrapper.h" />
+    <ClInclude Include="src\mecab\src\string_buffer.h" />
+    <ClInclude Include="src\mecab\src\thread.h" />
+    <ClInclude Include="src\mecab\src\tokenizer.h" />
+    <ClInclude Include="src\mecab\src\ucs.h" />
+    <ClInclude Include="src\mecab\src\ucstable.h" />
+    <ClInclude Include="src\mecab\src\utils.h" />
+    <ClInclude Include="src\mecab\src\viterbi.h" />
+    <ClInclude Include="src\mecab\src\writer.h" />
+    <ClInclude Include="src\njd2jpcommon\njd2jpcommon.h" />
+    <ClInclude Include="src\njd2jpcommon\njd2jpcommon_rule_shift_jis.h" />
+    <ClInclude Include="src\njd\njd.h" />
+    <ClInclude Include="src\njd_set_accent_phrase\njd_set_accent_phrase.h" />
+    <ClInclude Include="src\njd_set_accent_phrase\njd_set_accent_phrase_rule_shift_jis.h" />
+    <ClInclude Include="src\njd_set_accent_type\njd_set_accent_type.h" />
+    <ClInclude Include="src\njd_set_accent_type\njd_set_accent_type_rule_shift_jis.h" />
+    <ClInclude Include="src\njd_set_digit\njd_set_digit.h" />
+    <ClInclude Include="src\njd_set_digit\njd_set_digit_rule_shift_jis.h" />
+    <ClInclude Include="src\njd_set_long_vowel\njd_set_long_vowel.h" />
+    <ClInclude Include="src\njd_set_long_vowel\njd_set_long_vowel_rule_shift_jis.h" />
+    <ClInclude Include="src\njd_set_pronunciation\njd_set_pronunciation.h" />
+    <ClInclude Include="src\njd_set_pronunciation\njd_set_pronunciation_rule_shift_jis.h" />
+    <ClInclude Include="src\njd_set_unvoiced_vowel\njd_set_unvoiced_vowel.h" />
+    <ClInclude Include="src\njd_set_unvoiced_vowel\njd_set_unvoiced_vowel_rule_shift_jis.h" />
+    <ClInclude Include="src\text2mecab\text2mecab.h" />
+    <ClInclude Include="src\text2mecab\text2mecab_rule_shift_jis.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\jpcommon\jpcommon.c" />
+    <ClCompile Include="src\jpcommon\jpcommon_label.c" />
+    <ClCompile Include="src\jpcommon\jpcommon_node.c" />
+    <ClCompile Include="src\mecab2njd\mecab2njd.c" />
+    <ClCompile Include="src\mecab\src\char_property.cpp" />
+    <ClCompile Include="src\mecab\src\connector.cpp" />
+    <ClCompile Include="src\mecab\src\context_id.cpp" />
+    <ClCompile Include="src\mecab\src\dictionary.cpp" />
+    <ClCompile Include="src\mecab\src\dictionary_compiler.cpp" />
+    <ClCompile Include="src\mecab\src\dictionary_generator.cpp" />
+    <ClCompile Include="src\mecab\src\dictionary_rewriter.cpp" />
+    <ClCompile Include="src\mecab\src\eval.cpp" />
+    <ClCompile Include="src\mecab\src\feature_index.cpp" />
+    <ClCompile Include="src\mecab\src\iconv_utils.cpp" />
+    <ClCompile Include="src\mecab\src\lbfgs.cpp" />
+    <ClCompile Include="src\mecab\src\learner.cpp" />
+    <ClCompile Include="src\mecab\src\learner_tagger.cpp" />
+    <ClCompile Include="src\mecab\src\libmecab.cpp" />
+    <ClCompile Include="src\mecab\src\mecab.cpp" />
+    <ClCompile Include="src\mecab\src\nbest_generator.cpp" />
+    <ClCompile Include="src\mecab\src\param.cpp" />
+    <ClCompile Include="src\mecab\src\string_buffer.cpp" />
+    <ClCompile Include="src\mecab\src\tagger.cpp" />
+    <ClCompile Include="src\mecab\src\tokenizer.cpp" />
+    <ClCompile Include="src\mecab\src\utils.cpp" />
+    <ClCompile Include="src\mecab\src\viterbi.cpp" />
+    <ClCompile Include="src\mecab\src\writer.cpp" />
+    <ClCompile Include="src\njd2jpcommon\njd2jpcommon.c" />
+    <ClCompile Include="src\njd\njd.c" />
+    <ClCompile Include="src\njd\njd_node.c" />
+    <ClCompile Include="src\njd_set_accent_phrase\njd_set_accent_phrase.c" />
+    <ClCompile Include="src\njd_set_accent_type\njd_set_accent_type.c" />
+    <ClCompile Include="src\njd_set_digit\njd_set_digit.c" />
+    <ClCompile Include="src\njd_set_long_vowel\njd_set_long_vowel.c" />
+    <ClCompile Include="src\njd_set_pronunciation\njd_set_pronunciation.c" />
+    <ClCompile Include="src\njd_set_unvoiced_vowel\njd_set_unvoiced_vowel.c" />
+    <ClCompile Include="src\text2mecab\text2mecab.c" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{3E65FB22-D2F9-4E56-A3DF-F25C2871FA66}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Library_Open_JTalk</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(ProjectName)\lib\</OutDir>
+    <TargetName>Open_JTalk</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(ProjectName)\lib\</OutDir>
+    <TargetName>Open_JTalk_D</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;DIC_VERSION=102;MECAB_DEFAULT_RC="dummy";PACKAGE="open_jtalk";VERSION="1.02";MECAB_WITHOUT_SHARE_DIC;HAVE_WINDOWS_H;CHARSET_UTF_8;ASCII_HEADER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src\jpcommon;src\mecab\src;src\mecab2njd;src\njd;src\njd2jpcommon;src\njd_set_accent_phrase;src\njd_set_accent_type;src\njd_set_digit;src\njd_set_long_vowel;src\njd_set_pronunciation;src\njd_set_unvoiced_vowel;src\text2mecab;..\Library_hts_engine_API\include;</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <OutputFile>lib\Open_JTalk_D.lib</OutputFile>
+    </Lib>
+    <PreBuildEvent>
+      <Command>copy src\text2mecab\text2mecab.h include\text2mecab.h;
+copy src\mecab\src\mecab.h include\mecab.h;
+copy src\mecab2njd\mecab2njd.h include\mecab2njd.h;
+copy src\njd\njd.h include\njd.h;
+copy src\njd_set_pronunciation\njd_set_pronunciation.h include\njd_set_pronunciation.h;
+copy src\njd_set_digit\njd_set_digit.h include\njd_set_digit.h;
+copy src\njd_set_accent_phrase\njd_set_accent_phrase.h include\njd_set_accent_phrase.h;
+copy src\njd_set_accent_type\njd_set_accent_type.h include\njd_set_accent_type.h;
+copy src\njd_set_unvoiced_vowel\njd_set_unvoiced_vowel.h include\njd_set_unvoiced_vowel.h;
+copy src\njd_set_long_vowel\njd_set_long_vowel.h include\njd_set_long_vowel.h;
+copy src\njd2jpcommon\njd2jpcommon.h include\njd2jpcommon.h;
+copy src\jpcommon\jpcommon.h include\jpcommon.h;
+</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;DIC_VERSION=102;MECAB_DEFAULT_RC="dummy";PACKAGE="open_jtalk";VERSION="1.02";MECAB_WITHOUT_SHARE_DIC;HAVE_WINDOWS_H;CHARSET_UTF_8;ASCII_HEADER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src\jpcommon;src\mecab\src;src\mecab2njd;src\njd;src\njd2jpcommon;src\njd_set_accent_phrase;src\njd_set_accent_type;src\njd_set_digit;src\njd_set_long_vowel;src\njd_set_pronunciation;src\njd_set_unvoiced_vowel;src\text2mecab;..\Library_hts_engine_API\include;</AdditionalIncludeDirectories>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <OutputFile>lib\Open_JTalk.lib</OutputFile>
+    </Lib>
+    <PreBuildEvent>
+      <Command>copy src\text2mecab\text2mecab.h include\text2mecab.h;
+copy src\mecab\src\mecab.h include\mecab.h;
+copy src\mecab2njd\mecab2njd.h include\mecab2njd.h;
+copy src\njd\njd.h include\njd.h;
+copy src\njd_set_pronunciation\njd_set_pronunciation.h include\njd_set_pronunciation.h;
+copy src\njd_set_digit\njd_set_digit.h include\njd_set_digit.h;
+copy src\njd_set_accent_phrase\njd_set_accent_phrase.h include\njd_set_accent_phrase.h;
+copy src\njd_set_accent_type\njd_set_accent_type.h include\njd_set_accent_type.h;
+copy src\njd_set_unvoiced_vowel\njd_set_unvoiced_vowel.h include\njd_set_unvoiced_vowel.h;
+copy src\njd_set_long_vowel\njd_set_long_vowel.h include\njd_set_long_vowel.h;
+copy src\njd2jpcommon\njd2jpcommon.h include\njd2jpcommon.h;
+copy src\jpcommon\jpcommon.h include\jpcommon.h;
+</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

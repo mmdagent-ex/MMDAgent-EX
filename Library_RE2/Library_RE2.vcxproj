@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\re2\bitstate.cc" />
+    <ClCompile Include="src\re2\compile.cc" />
+    <ClCompile Include="src\re2\dfa.cc" />
+    <ClCompile Include="src\re2\filtered_re2.cc" />
+    <ClCompile Include="src\re2\mimics_pcre.cc" />
+    <ClCompile Include="src\re2\nfa.cc" />
+    <ClCompile Include="src\re2\onepass.cc" />
+    <ClCompile Include="src\re2\parse.cc" />
+    <ClCompile Include="src\re2\perl_groups.cc" />
+    <ClCompile Include="src\re2\prefilter.cc" />
+    <ClCompile Include="src\re2\prefilter_tree.cc" />
+    <ClCompile Include="src\re2\prog.cc" />
+    <ClCompile Include="src\re2\re2.cc" />
+    <ClCompile Include="src\re2\regexp.cc" />
+    <ClCompile Include="src\re2\set.cc" />
+    <ClCompile Include="src\re2\simplify.cc" />
+    <ClCompile Include="src\re2\stringpiece.cc" />
+    <ClCompile Include="src\re2\tostring.cc" />
+    <ClCompile Include="src\re2\unicode_casefold.cc" />
+    <ClCompile Include="src\re2\unicode_groups.cc" />
+    <ClCompile Include="src\util\hash.cc" />
+    <ClCompile Include="src\util\rune.cc" />
+    <ClCompile Include="src\util\stringprintf.cc" />
+    <ClCompile Include="src\util\strutil.cc" />
+    <ClCompile Include="src\util\valgrind.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\re2\filtered_re2.h" />
+    <ClInclude Include="src\re2\prefilter.h" />
+    <ClInclude Include="src\re2\prefilter_tree.h" />
+    <ClInclude Include="src\re2\prog.h" />
+    <ClInclude Include="src\re2\re2.h" />
+    <ClInclude Include="src\re2\regexp.h" />
+    <ClInclude Include="src\re2\set.h" />
+    <ClInclude Include="src\re2\stringpiece.h" />
+    <ClInclude Include="src\re2\unicode_casefold.h" />
+    <ClInclude Include="src\re2\unicode_groups.h" />
+    <ClInclude Include="src\re2\variadic_function.h" />
+    <ClInclude Include="src\re2\walker-inl.h" />
+    <ClInclude Include="src\util\atomicops.h" />
+    <ClInclude Include="src\util\flags.h" />
+    <ClInclude Include="src\util\logging.h" />
+    <ClInclude Include="src\util\mutex.h" />
+    <ClInclude Include="src\util\sparse_array.h" />
+    <ClInclude Include="src\util\sparse_set.h" />
+    <ClInclude Include="src\util\utf.h" />
+    <ClInclude Include="src\util\util.h" />
+    <ClInclude Include="src\util\valgrind.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{B3557918-8E24-4868-A46A-19EE53C0D0BC}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Library_RE2</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(ProjectName)\lib\</OutDir>
+    <TargetName>RE2</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(ProjectName)\lib\</OutDir>
+    <TargetName>RE2_D</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_NO_SECURE_WARNINGS;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>include;</AdditionalIncludeDirectories>
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <OutputFile>lib\RE2_D.lib</OutputFile>
+    </Lib>
+    <PreBuildEvent>
+      <Command>copy src\re2\*.h include\re2;
+copy src\util\*.h include\util;</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>include;</AdditionalIncludeDirectories>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <OutputFile>lib\RE2.lib</OutputFile>
+    </Lib>
+    <PreBuildEvent>
+      <Command>copy src\re2\*.h include\re2;
+copy src\util\*.h include\util;
+</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

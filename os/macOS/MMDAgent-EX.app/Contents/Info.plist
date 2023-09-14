@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+   <key>CFBundleExecutable</key>
+   <string>MMDAgent-EX</string>
+   <key>CFBundleDisplayName</key>
+   <string>MMDAgent-EX</string>
+   <key>CFBundleIconFile</key>
+   <string>MMDAgent-EX.icns</string>
+   <key>NSHighResolutionCapable</key>
+   <string>True</string>
+   <key>CFBundleDocumentTypes</key>
+   <array>
+      <dict>
+         <key>CFBundleTypeName</key>
+         <string>MMDAgent-EX mdf file</string>
+         <key>CFBundleTypeIconFile</key>
+         <string>MMDAgent-EX.icns</string>
+         <key>CFBundleTypeRole</key>
+         <string>Viewer</string>
+         <key>LSHandlerRank</key>
+         <string>Owner</string>
+         <key>LSItemContentTypes</key>
+         <array>
+            <string>jp.mmdagent.mdf</string>
+         </array>
+      </dict>
+   </array>
+   <key>UTExportedTypeDeclarations</key>
+   <array>
+      <dict>
+         <key>UTTypeIdentifier</key>
+         <string>jp.mmdagent.mdf</string>
+         <key>UTTypeConformsTo</key>
+         <array>
+               <string>public.data</string>
+         </array>
+         <key>UTTypeDescription</key>
+         <string>MMDAgent mdf</string>
+         <key>UTTypeTagSpecification</key>
+         <dict>
+               <key>public.filename-extension</key>
+               <array>
+                  <string>mdf</string>
+               </array>
+         </dict>
+      </dict>
+   </array>
+   <key>CFBundleURLTypes</key>
+   <array>
+      <dict>
+         <key>CFBundleURLName</key>
+         <string>jp.mmdagent</string>
+         <key>CFBundleURLSchemes</key>
+         <array>
+            <string>mmdagent</string>
+         </array>
+      </dict>
+   </array>
+   <key>NSCameraUsageDescription</key>
+   <string>This app requires camera access for avatar communication</string>
+   <key>NSMicrophoneUsageDescription</key>
+   <string>This app requires microphone access to capture your voice for avatar communication</string>
+</dict>
+</plist>

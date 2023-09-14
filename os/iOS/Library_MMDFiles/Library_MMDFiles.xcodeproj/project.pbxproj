@@ -1,0 +1,502 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1046F59A22D43BD1003303A5 /* PMDGroupMorph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1046F59722D43BD1003303A5 /* PMDGroupMorph.cpp */; };
+		1046F59B22D43BD1003303A5 /* PMDMaterialMorph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1046F59822D43BD1003303A5 /* PMDMaterialMorph.cpp */; };
+		1046F59C22D43BD1003303A5 /* PMDUVMorph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1046F59922D43BD1003303A5 /* PMDUVMorph.cpp */; };
+		106E7850215A02A5000881F3 /* PMDVertexMorph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 106E784E215A02A5000881F3 /* PMDVertexMorph.cpp */; };
+		106E7851215A02A5000881F3 /* PMDBoneMorph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 106E784F215A02A5000881F3 /* PMDBoneMorph.cpp */; };
+		108090D1237E55D60057D4AA /* ZFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 108090D0237E55D60057D4AA /* ZFile.cpp */; };
+		804260F31C5CC2BF00B78D8A /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 804260F21C5CC2BF00B78D8A /* CoreFoundation.framework */; };
+		804260F51C5CC2C800B78D8A /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 804260F41C5CC2C800B78D8A /* OpenGLES.framework */; };
+		804260F61C5CC32100B78D8A /* BulletPhysics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 804260DC1C5CC1D600B78D8A /* BulletPhysics.cpp */; };
+		804260F71C5CC32100B78D8A /* CameraController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 804260DD1C5CC1D600B78D8A /* CameraController.cpp */; };
+		804260F81C5CC32100B78D8A /* KinematicMotionState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 804260DE1C5CC1D600B78D8A /* KinematicMotionState.cpp */; };
+		804260FA1C5CC32100B78D8A /* MMDFiles_utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 804260E01C5CC1D600B78D8A /* MMDFiles_utils.cpp */; };
+		804260FB1C5CC32100B78D8A /* MotionController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 804260E11C5CC1D600B78D8A /* MotionController.cpp */; };
+		804260FC1C5CC32100B78D8A /* MotionManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 804260E21C5CC1D600B78D8A /* MotionManager.cpp */; };
+		804260FD1C5CC32100B78D8A /* PMDBone.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 804260E31C5CC1D600B78D8A /* PMDBone.cpp */; };
+		804260FE1C5CC32100B78D8A /* PMDConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 804260E41C5CC1D600B78D8A /* PMDConstraint.cpp */; };
+		804260FF1C5CC32100B78D8A /* PMDFace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 804260E51C5CC1D600B78D8A /* PMDFace.cpp */; };
+		804261001C5CC32100B78D8A /* PMDIK.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 804260E61C5CC1D600B78D8A /* PMDIK.cpp */; };
+		804261011C5CC32100B78D8A /* PMDMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 804260E71C5CC1D600B78D8A /* PMDMaterial.cpp */; };
+		804261021C5CC32100B78D8A /* PMDModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 804260E81C5CC1D600B78D8A /* PMDModel.cpp */; };
+		804261031C5CC32100B78D8A /* PMDModel_parse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 804260E91C5CC1D600B78D8A /* PMDModel_parse.cpp */; };
+		804261041C5CC32100B78D8A /* PMDModel_render.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 804260EA1C5CC1D600B78D8A /* PMDModel_render.cpp */; };
+		804261051C5CC32100B78D8A /* PMDModel_update.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 804260EB1C5CC1D600B78D8A /* PMDModel_update.cpp */; };
+		804261061C5CC32100B78D8A /* PMDRigidBody.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 804260EC1C5CC1D600B78D8A /* PMDRigidBody.cpp */; };
+		804261071C5CC32100B78D8A /* PMDTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 804260ED1C5CC1D600B78D8A /* PMDTexture.cpp */; };
+		804261081C5CC32100B78D8A /* PMDTextureLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 804260EE1C5CC1D600B78D8A /* PMDTextureLoader.cpp */; };
+		804261091C5CC32100B78D8A /* PTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 804260EF1C5CC1D600B78D8A /* PTree.cpp */; };
+		8042610A1C5CC32100B78D8A /* SystemTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 804260F01C5CC1D600B78D8A /* SystemTexture.cpp */; };
+		8042610B1C5CC32100B78D8A /* VMD.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 804260F11C5CC1D600B78D8A /* VMD.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1046F59722D43BD1003303A5 /* PMDGroupMorph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PMDGroupMorph.cpp; sourceTree = "<group>"; };
+		1046F59822D43BD1003303A5 /* PMDMaterialMorph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PMDMaterialMorph.cpp; sourceTree = "<group>"; };
+		1046F59922D43BD1003303A5 /* PMDUVMorph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PMDUVMorph.cpp; sourceTree = "<group>"; };
+		1046F59D22D43BE2003303A5 /* PMDGroupMorph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PMDGroupMorph.h; sourceTree = "<group>"; };
+		1046F59E22D43BE2003303A5 /* PMDUVMorph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PMDUVMorph.h; sourceTree = "<group>"; };
+		1046F59F22D43BE2003303A5 /* PMDMaterialMorph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PMDMaterialMorph.h; sourceTree = "<group>"; };
+		106E784E215A02A5000881F3 /* PMDVertexMorph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PMDVertexMorph.cpp; sourceTree = "<group>"; };
+		106E784F215A02A5000881F3 /* PMDBoneMorph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PMDBoneMorph.cpp; sourceTree = "<group>"; };
+		106E7852215A02B3000881F3 /* PMDBoneMorph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PMDBoneMorph.h; sourceTree = "<group>"; };
+		106E7853215A02B3000881F3 /* PMDVertexMorph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PMDVertexMorph.h; sourceTree = "<group>"; };
+		106E7854215A02BD000881F3 /* PMDVertexMorph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PMDVertexMorph.h; sourceTree = "<group>"; };
+		106E7855215A02BD000881F3 /* PMDBoneMorph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PMDBoneMorph.h; sourceTree = "<group>"; };
+		108090D0237E55D60057D4AA /* ZFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ZFile.cpp; sourceTree = "<group>"; };
+		108090D2237E55E40057D4AA /* ZFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZFile.h; sourceTree = "<group>"; };
+		8042609F1C5CC17600B78D8A /* libLibrary_MMDFiles.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libLibrary_MMDFiles.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		804260AC1C5CC1D600B78D8A /* BulletPhysics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BulletPhysics.h; sourceTree = "<group>"; };
+		804260AD1C5CC1D600B78D8A /* CameraController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CameraController.h; sourceTree = "<group>"; };
+		804260AE1C5CC1D600B78D8A /* MMDFiles.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MMDFiles.h; sourceTree = "<group>"; };
+		804260AF1C5CC1D600B78D8A /* MMDFiles_utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MMDFiles_utils.h; sourceTree = "<group>"; };
+		804260B01C5CC1D600B78D8A /* MotionController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MotionController.h; sourceTree = "<group>"; };
+		804260B11C5CC1D600B78D8A /* MotionManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MotionManager.h; sourceTree = "<group>"; };
+		804260B21C5CC1D600B78D8A /* PMDBone.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PMDBone.h; sourceTree = "<group>"; };
+		804260B31C5CC1D600B78D8A /* PMDConstraint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PMDConstraint.h; sourceTree = "<group>"; };
+		804260B41C5CC1D600B78D8A /* PMDFace.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PMDFace.h; sourceTree = "<group>"; };
+		804260B51C5CC1D600B78D8A /* PMDFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PMDFile.h; sourceTree = "<group>"; };
+		804260B61C5CC1D600B78D8A /* PMDIK.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PMDIK.h; sourceTree = "<group>"; };
+		804260B71C5CC1D600B78D8A /* PMDMaterial.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PMDMaterial.h; sourceTree = "<group>"; };
+		804260B81C5CC1D600B78D8A /* PMDModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PMDModel.h; sourceTree = "<group>"; };
+		804260B91C5CC1D600B78D8A /* PMDRigidBody.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PMDRigidBody.h; sourceTree = "<group>"; };
+		804260BA1C5CC1D600B78D8A /* PMDTexture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PMDTexture.h; sourceTree = "<group>"; };
+		804260BB1C5CC1D600B78D8A /* PMDTextureLoader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PMDTextureLoader.h; sourceTree = "<group>"; };
+		804260BC1C5CC1D600B78D8A /* PTree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PTree.h; sourceTree = "<group>"; };
+		804260BD1C5CC1D600B78D8A /* SystemTexture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SystemTexture.h; sourceTree = "<group>"; };
+		804260BE1C5CC1D600B78D8A /* UTF8Table.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UTF8Table.h; sourceTree = "<group>"; };
+		804260BF1C5CC1D600B78D8A /* VMD.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VMD.h; sourceTree = "<group>"; };
+		804260C01C5CC1D600B78D8A /* VMDFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VMDFile.h; sourceTree = "<group>"; };
+		804260C61C5CC1D600B78D8A /* BulletPhysics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BulletPhysics.h; sourceTree = "<group>"; };
+		804260C71C5CC1D600B78D8A /* CameraController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CameraController.h; sourceTree = "<group>"; };
+		804260C81C5CC1D600B78D8A /* MMDFiles.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MMDFiles.h; sourceTree = "<group>"; };
+		804260C91C5CC1D600B78D8A /* MMDFiles_utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MMDFiles_utils.h; sourceTree = "<group>"; };
+		804260CA1C5CC1D600B78D8A /* MotionController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MotionController.h; sourceTree = "<group>"; };
+		804260CB1C5CC1D600B78D8A /* MotionManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MotionManager.h; sourceTree = "<group>"; };
+		804260CC1C5CC1D600B78D8A /* PMDBone.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PMDBone.h; sourceTree = "<group>"; };
+		804260CD1C5CC1D600B78D8A /* PMDConstraint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PMDConstraint.h; sourceTree = "<group>"; };
+		804260CE1C5CC1D600B78D8A /* PMDFace.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PMDFace.h; sourceTree = "<group>"; };
+		804260CF1C5CC1D600B78D8A /* PMDFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PMDFile.h; sourceTree = "<group>"; };
+		804260D01C5CC1D600B78D8A /* PMDIK.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PMDIK.h; sourceTree = "<group>"; };
+		804260D11C5CC1D600B78D8A /* PMDMaterial.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PMDMaterial.h; sourceTree = "<group>"; };
+		804260D21C5CC1D600B78D8A /* PMDModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PMDModel.h; sourceTree = "<group>"; };
+		804260D31C5CC1D600B78D8A /* PMDRigidBody.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PMDRigidBody.h; sourceTree = "<group>"; };
+		804260D41C5CC1D600B78D8A /* PMDTexture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PMDTexture.h; sourceTree = "<group>"; };
+		804260D51C5CC1D600B78D8A /* PMDTextureLoader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PMDTextureLoader.h; sourceTree = "<group>"; };
+		804260D61C5CC1D600B78D8A /* PTree.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PTree.h; sourceTree = "<group>"; };
+		804260D71C5CC1D600B78D8A /* SystemTexture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SystemTexture.h; sourceTree = "<group>"; };
+		804260D81C5CC1D600B78D8A /* UTF8Table.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UTF8Table.h; sourceTree = "<group>"; };
+		804260D91C5CC1D600B78D8A /* VMD.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VMD.h; sourceTree = "<group>"; };
+		804260DA1C5CC1D600B78D8A /* VMDFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VMDFile.h; sourceTree = "<group>"; };
+		804260DC1C5CC1D600B78D8A /* BulletPhysics.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BulletPhysics.cpp; sourceTree = "<group>"; };
+		804260DD1C5CC1D600B78D8A /* CameraController.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CameraController.cpp; sourceTree = "<group>"; };
+		804260DE1C5CC1D600B78D8A /* KinematicMotionState.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = KinematicMotionState.cpp; sourceTree = "<group>"; };
+		804260DF1C5CC1D600B78D8A /* KinematicMotionState.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KinematicMotionState.h; sourceTree = "<group>"; };
+		804260E01C5CC1D600B78D8A /* MMDFiles_utils.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MMDFiles_utils.cpp; sourceTree = "<group>"; };
+		804260E11C5CC1D600B78D8A /* MotionController.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MotionController.cpp; sourceTree = "<group>"; };
+		804260E21C5CC1D600B78D8A /* MotionManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MotionManager.cpp; sourceTree = "<group>"; };
+		804260E31C5CC1D600B78D8A /* PMDBone.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PMDBone.cpp; sourceTree = "<group>"; };
+		804260E41C5CC1D600B78D8A /* PMDConstraint.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PMDConstraint.cpp; sourceTree = "<group>"; };
+		804260E51C5CC1D600B78D8A /* PMDFace.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PMDFace.cpp; sourceTree = "<group>"; };
+		804260E61C5CC1D600B78D8A /* PMDIK.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PMDIK.cpp; sourceTree = "<group>"; };
+		804260E71C5CC1D600B78D8A /* PMDMaterial.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PMDMaterial.cpp; sourceTree = "<group>"; };
+		804260E81C5CC1D600B78D8A /* PMDModel.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PMDModel.cpp; sourceTree = "<group>"; };
+		804260E91C5CC1D600B78D8A /* PMDModel_parse.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PMDModel_parse.cpp; sourceTree = "<group>"; };
+		804260EA1C5CC1D600B78D8A /* PMDModel_render.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PMDModel_render.cpp; sourceTree = "<group>"; };
+		804260EB1C5CC1D600B78D8A /* PMDModel_update.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PMDModel_update.cpp; sourceTree = "<group>"; };
+		804260EC1C5CC1D600B78D8A /* PMDRigidBody.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PMDRigidBody.cpp; sourceTree = "<group>"; };
+		804260ED1C5CC1D600B78D8A /* PMDTexture.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PMDTexture.cpp; sourceTree = "<group>"; };
+		804260EE1C5CC1D600B78D8A /* PMDTextureLoader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PMDTextureLoader.cpp; sourceTree = "<group>"; };
+		804260EF1C5CC1D600B78D8A /* PTree.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PTree.cpp; sourceTree = "<group>"; };
+		804260F01C5CC1D600B78D8A /* SystemTexture.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SystemTexture.cpp; sourceTree = "<group>"; };
+		804260F11C5CC1D600B78D8A /* VMD.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = VMD.cpp; sourceTree = "<group>"; };
+		804260F21C5CC2BF00B78D8A /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
+		804260F41C5CC2C800B78D8A /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8042609C1C5CC17600B78D8A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				804260F51C5CC2C800B78D8A /* OpenGLES.framework in Frameworks */,
+				804260F31C5CC2BF00B78D8A /* CoreFoundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		804260961C5CC17600B78D8A = {
+			isa = PBXGroup;
+			children = (
+				804260F41C5CC2C800B78D8A /* OpenGLES.framework */,
+				804260F21C5CC2BF00B78D8A /* CoreFoundation.framework */,
+				804260AB1C5CC1D600B78D8A /* include */,
+				804260C41C5CC1D600B78D8A /* src */,
+				804260A01C5CC17600B78D8A /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		804260A01C5CC17600B78D8A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8042609F1C5CC17600B78D8A /* libLibrary_MMDFiles.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		804260AB1C5CC1D600B78D8A /* include */ = {
+			isa = PBXGroup;
+			children = (
+				106E7855215A02BD000881F3 /* PMDBoneMorph.h */,
+				106E7854215A02BD000881F3 /* PMDVertexMorph.h */,
+				804260AC1C5CC1D600B78D8A /* BulletPhysics.h */,
+				804260AD1C5CC1D600B78D8A /* CameraController.h */,
+				804260AE1C5CC1D600B78D8A /* MMDFiles.h */,
+				804260AF1C5CC1D600B78D8A /* MMDFiles_utils.h */,
+				804260B01C5CC1D600B78D8A /* MotionController.h */,
+				804260B11C5CC1D600B78D8A /* MotionManager.h */,
+				804260B21C5CC1D600B78D8A /* PMDBone.h */,
+				804260B31C5CC1D600B78D8A /* PMDConstraint.h */,
+				804260B41C5CC1D600B78D8A /* PMDFace.h */,
+				804260B51C5CC1D600B78D8A /* PMDFile.h */,
+				804260B61C5CC1D600B78D8A /* PMDIK.h */,
+				804260B71C5CC1D600B78D8A /* PMDMaterial.h */,
+				804260B81C5CC1D600B78D8A /* PMDModel.h */,
+				804260B91C5CC1D600B78D8A /* PMDRigidBody.h */,
+				804260BA1C5CC1D600B78D8A /* PMDTexture.h */,
+				804260BB1C5CC1D600B78D8A /* PMDTextureLoader.h */,
+				804260BC1C5CC1D600B78D8A /* PTree.h */,
+				804260BD1C5CC1D600B78D8A /* SystemTexture.h */,
+				804260BE1C5CC1D600B78D8A /* UTF8Table.h */,
+				804260BF1C5CC1D600B78D8A /* VMD.h */,
+				804260C01C5CC1D600B78D8A /* VMDFile.h */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		804260C41C5CC1D600B78D8A /* src */ = {
+			isa = PBXGroup;
+			children = (
+				804260C51C5CC1D600B78D8A /* include */,
+				804260DB1C5CC1D600B78D8A /* lib */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		804260C51C5CC1D600B78D8A /* include */ = {
+			isa = PBXGroup;
+			children = (
+				108090D2237E55E40057D4AA /* ZFile.h */,
+				1046F59D22D43BE2003303A5 /* PMDGroupMorph.h */,
+				1046F59F22D43BE2003303A5 /* PMDMaterialMorph.h */,
+				1046F59E22D43BE2003303A5 /* PMDUVMorph.h */,
+				106E7852215A02B3000881F3 /* PMDBoneMorph.h */,
+				106E7853215A02B3000881F3 /* PMDVertexMorph.h */,
+				804260C61C5CC1D600B78D8A /* BulletPhysics.h */,
+				804260C71C5CC1D600B78D8A /* CameraController.h */,
+				804260C81C5CC1D600B78D8A /* MMDFiles.h */,
+				804260C91C5CC1D600B78D8A /* MMDFiles_utils.h */,
+				804260CA1C5CC1D600B78D8A /* MotionController.h */,
+				804260CB1C5CC1D600B78D8A /* MotionManager.h */,
+				804260CC1C5CC1D600B78D8A /* PMDBone.h */,
+				804260CD1C5CC1D600B78D8A /* PMDConstraint.h */,
+				804260CE1C5CC1D600B78D8A /* PMDFace.h */,
+				804260CF1C5CC1D600B78D8A /* PMDFile.h */,
+				804260D01C5CC1D600B78D8A /* PMDIK.h */,
+				804260D11C5CC1D600B78D8A /* PMDMaterial.h */,
+				804260D21C5CC1D600B78D8A /* PMDModel.h */,
+				804260D31C5CC1D600B78D8A /* PMDRigidBody.h */,
+				804260D41C5CC1D600B78D8A /* PMDTexture.h */,
+				804260D51C5CC1D600B78D8A /* PMDTextureLoader.h */,
+				804260D61C5CC1D600B78D8A /* PTree.h */,
+				804260D71C5CC1D600B78D8A /* SystemTexture.h */,
+				804260D81C5CC1D600B78D8A /* UTF8Table.h */,
+				804260D91C5CC1D600B78D8A /* VMD.h */,
+				804260DA1C5CC1D600B78D8A /* VMDFile.h */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		804260DB1C5CC1D600B78D8A /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				108090D0237E55D60057D4AA /* ZFile.cpp */,
+				1046F59722D43BD1003303A5 /* PMDGroupMorph.cpp */,
+				1046F59822D43BD1003303A5 /* PMDMaterialMorph.cpp */,
+				1046F59922D43BD1003303A5 /* PMDUVMorph.cpp */,
+				106E784F215A02A5000881F3 /* PMDBoneMorph.cpp */,
+				106E784E215A02A5000881F3 /* PMDVertexMorph.cpp */,
+				804260DC1C5CC1D600B78D8A /* BulletPhysics.cpp */,
+				804260DD1C5CC1D600B78D8A /* CameraController.cpp */,
+				804260DE1C5CC1D600B78D8A /* KinematicMotionState.cpp */,
+				804260DF1C5CC1D600B78D8A /* KinematicMotionState.h */,
+				804260E01C5CC1D600B78D8A /* MMDFiles_utils.cpp */,
+				804260E11C5CC1D600B78D8A /* MotionController.cpp */,
+				804260E21C5CC1D600B78D8A /* MotionManager.cpp */,
+				804260E31C5CC1D600B78D8A /* PMDBone.cpp */,
+				804260E41C5CC1D600B78D8A /* PMDConstraint.cpp */,
+				804260E51C5CC1D600B78D8A /* PMDFace.cpp */,
+				804260E61C5CC1D600B78D8A /* PMDIK.cpp */,
+				804260E71C5CC1D600B78D8A /* PMDMaterial.cpp */,
+				804260E81C5CC1D600B78D8A /* PMDModel.cpp */,
+				804260E91C5CC1D600B78D8A /* PMDModel_parse.cpp */,
+				804260EA1C5CC1D600B78D8A /* PMDModel_render.cpp */,
+				804260EB1C5CC1D600B78D8A /* PMDModel_update.cpp */,
+				804260EC1C5CC1D600B78D8A /* PMDRigidBody.cpp */,
+				804260ED1C5CC1D600B78D8A /* PMDTexture.cpp */,
+				804260EE1C5CC1D600B78D8A /* PMDTextureLoader.cpp */,
+				804260EF1C5CC1D600B78D8A /* PTree.cpp */,
+				804260F01C5CC1D600B78D8A /* SystemTexture.cpp */,
+				804260F11C5CC1D600B78D8A /* VMD.cpp */,
+			);
+			path = lib;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8042609E1C5CC17600B78D8A /* Library_MMDFiles */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 804260A81C5CC17600B78D8A /* Build configuration list for PBXNativeTarget "Library_MMDFiles" */;
+			buildPhases = (
+				8042609B1C5CC17600B78D8A /* Sources */,
+				8042609C1C5CC17600B78D8A /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Library_MMDFiles;
+			productName = Library_MMDFiles;
+			productReference = 8042609F1C5CC17600B78D8A /* libLibrary_MMDFiles.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		804260971C5CC17600B78D8A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0720;
+				ORGANIZATIONNAME = "";
+				TargetAttributes = {
+					8042609E1C5CC17600B78D8A = {
+						CreatedOnToolsVersion = 7.2;
+						DevelopmentTeam = ER7BUZVGH2;
+					};
+				};
+			};
+			buildConfigurationList = 8042609A1C5CC17600B78D8A /* Build configuration list for PBXProject "Library_MMDFiles" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				English,
+				en,
+			);
+			mainGroup = 804260961C5CC17600B78D8A;
+			productRefGroup = 804260A01C5CC17600B78D8A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8042609E1C5CC17600B78D8A /* Library_MMDFiles */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8042609B1C5CC17600B78D8A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				804260F61C5CC32100B78D8A /* BulletPhysics.cpp in Sources */,
+				804260F71C5CC32100B78D8A /* CameraController.cpp in Sources */,
+				804260F81C5CC32100B78D8A /* KinematicMotionState.cpp in Sources */,
+				804260FA1C5CC32100B78D8A /* MMDFiles_utils.cpp in Sources */,
+				1046F59B22D43BD1003303A5 /* PMDMaterialMorph.cpp in Sources */,
+				804260FB1C5CC32100B78D8A /* MotionController.cpp in Sources */,
+				804260FC1C5CC32100B78D8A /* MotionManager.cpp in Sources */,
+				804260FD1C5CC32100B78D8A /* PMDBone.cpp in Sources */,
+				804260FE1C5CC32100B78D8A /* PMDConstraint.cpp in Sources */,
+				804260FF1C5CC32100B78D8A /* PMDFace.cpp in Sources */,
+				804261001C5CC32100B78D8A /* PMDIK.cpp in Sources */,
+				804261011C5CC32100B78D8A /* PMDMaterial.cpp in Sources */,
+				108090D1237E55D60057D4AA /* ZFile.cpp in Sources */,
+				804261021C5CC32100B78D8A /* PMDModel.cpp in Sources */,
+				804261031C5CC32100B78D8A /* PMDModel_parse.cpp in Sources */,
+				106E7851215A02A5000881F3 /* PMDBoneMorph.cpp in Sources */,
+				804261041C5CC32100B78D8A /* PMDModel_render.cpp in Sources */,
+				804261051C5CC32100B78D8A /* PMDModel_update.cpp in Sources */,
+				804261061C5CC32100B78D8A /* PMDRigidBody.cpp in Sources */,
+				804261071C5CC32100B78D8A /* PMDTexture.cpp in Sources */,
+				804261081C5CC32100B78D8A /* PMDTextureLoader.cpp in Sources */,
+				804261091C5CC32100B78D8A /* PTree.cpp in Sources */,
+				8042610A1C5CC32100B78D8A /* SystemTexture.cpp in Sources */,
+				106E7850215A02A5000881F3 /* PMDVertexMorph.cpp in Sources */,
+				1046F59C22D43BD1003303A5 /* PMDUVMorph.cpp in Sources */,
+				1046F59A22D43BD1003303A5 /* PMDGroupMorph.cpp in Sources */,
+				8042610B1C5CC32100B78D8A /* VMD.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		804260A61C5CC17600B78D8A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		804260A71C5CC17600B78D8A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		804260A91C5CC17600B78D8A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				OTHER_CFLAGS = (
+					"-DMMDFILES_DONTUPDATEMATRICESFORIK",
+					"-DMMDFILES_DONTRENDERDEBUG",
+					"-DMMDFILES_DONTUSEGLMAPBUFFER",
+					"-DMMDFILES_DONTUSESPHEREMAP",
+					"-DMMDAGENT",
+					"-DTARGET_OS_IPHONE",
+					"-ferror-limit=0",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../Library_Bullet_Physics/include $(SRCROOT)/src/include $(SRCROOT)/../Library_JPEG/include $(SRCROOT)/../Library_libpng/include $(SRCROOT)/../Library_zlib/include $(SRCROOT)/../Library_GLee/include $(SRCROOT)/../Library_Poco/iOS/include";
+				VALID_ARCHS = arm64;
+			};
+			name = Debug;
+		};
+		804260AA1C5CC17600B78D8A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				GCC_OPTIMIZATION_LEVEL = fast;
+				OTHER_CFLAGS = (
+					"-DMMDFILES_DONTUPDATEMATRICESFORIK",
+					"-DMMDFILES_DONTRENDERDEBUG",
+					"-DMMDFILES_DONTUSEGLMAPBUFFER",
+					"-DMMDFILES_DONTUSESPHEREMAP",
+					"-DMMDAGENT",
+					"-DTARGET_OS_IPHONE",
+					"-ferror-limit=0",
+				);
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../Library_Bullet_Physics/include $(SRCROOT)/src/include $(SRCROOT)/../Library_JPEG/include $(SRCROOT)/../Library_libpng/include $(SRCROOT)/../Library_zlib/include $(SRCROOT)/../Library_GLee/include $(SRCROOT)/../Library_Poco/iOS/include";
+				VALID_ARCHS = arm64;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		8042609A1C5CC17600B78D8A /* Build configuration list for PBXProject "Library_MMDFiles" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				804260A61C5CC17600B78D8A /* Debug */,
+				804260A71C5CC17600B78D8A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		804260A81C5CC17600B78D8A /* Build configuration list for PBXNativeTarget "Library_MMDFiles" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				804260A91C5CC17600B78D8A /* Debug */,
+				804260AA1C5CC17600B78D8A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 804260971C5CC17600B78D8A /* Project object */;
+}

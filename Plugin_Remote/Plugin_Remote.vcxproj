@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{54938B06-B7C9-47A1-800E-CB2FF4371860}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Plugin_Remote</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)$(Configuration)\Plugins\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)$(Configuration)\Plugins\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;MMDAGENT;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\Library_glew\include;..\Library_Bullet_physics\include;..\Library_MMDFiles\include;..\Library_Julius\include;..\Library_MMDAgent\include;..\Library_GLFW\include;..\Library_PortAudio\include;..\Library_libsndfile\win32\include;..\Library_Poco\include;..\Library_Poco\win32\include;..\Library_ffmpeg\include;..\Library_OpenCV\include</AdditionalIncludeDirectories>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DisableSpecificWarnings>4819</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>..\Library_Bullet_Physics\lib;..\Library_MMDFiles\lib;..\Library_zlib\lib;..\Library_libpng\lib;..\Library_glew\lib;..\Library_MMDAgent\lib;..\Library_JPEG\lib;..\Library_GLFW\lib;..\Library_FreeType\lib;..\Library_Poco\win32\lib;..\Library_Julius\lib;..\Library_PortAudio\lib;..\Library_libsndfile\win32\lib;..\Library_ffmpeg\lib;..\Library_OpenCV\lib\x86</AdditionalLibraryDirectories>
+      <AdditionalDependencies>MMDFiles_D.lib;libpng_D.lib;Bullet_Physics_D.lib;winmm.lib;opengl32.lib;glu32.lib;ws2_32.lib;zlib_D.lib;glew_D.lib;MMDAgent_D.lib;JPEG_D.lib;GLFW_D.lib;FreeType_D.lib;Julius_D.lib;PortAudio_D.lib;PocoXMLmdd.lib;PocoUtilmdd.lib;PocoNetSSLmdd.lib;PocoNetmdd.lib;PocoJSONmdd.lib;PocoFoundationmdd.lib;PocoCryptomdd.lib;libeay32MDd.lib;ssleay32MDd.lib;crypt32.lib;IPHLPAPI.lib;sndfile.lib;samplerate.lib;avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;postproc.lib;swresample.lib;swscale.lib;opencv_calib3d470.lib;opencv_core470.lib;opencv_dnn470.lib;opencv_features2d470.lib;opencv_flann470.lib;opencv_gapi470.lib;opencv_highgui470.lib;opencv_imgcodecs470.lib;opencv_imgproc470.lib;opencv_ml470.lib;opencv_objdetect470.lib;opencv_photo470.lib;opencv_stitching470.lib;opencv_video470.lib;opencv_videoio470.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;MMDAGENT;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\Library_glew\include;..\Library_Bullet_physics\include;..\Library_MMDFiles\include;..\Library_Julius\include;..\Library_MMDAgent\include;..\Library_GLFW\include;..\Library_PortAudio\include;..\Library_libsndfile\win32\include;..\Library_Poco\include;..\Library_Poco\win32\include;..\Library_ffmpeg\include;..\Library_OpenCV\include</AdditionalIncludeDirectories>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DisableSpecificWarnings>4819</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalDependencies>MMDFiles.lib;libpng.lib;Bullet_Physics.lib;winmm.lib;opengl32.lib;ws2_32.lib;glu32.lib;zlib.lib;glew.lib;MMDAgent.lib;Julius.lib;PortAudio.lib;JPEG.lib;GLFW.lib;FreeType.lib;PocoXMLmd.lib;PocoUtilmd.lib;PocoNetSSLmd.lib;PocoNetmd.lib;PocoJSONmd.lib;PocoFoundationmd.lib;PocoCryptomd.lib;libeay32MD.lib;ssleay32MD.lib;PocoZipmd.lib;crypt32.lib;sndfile.lib;samplerate.lib;avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;postproc.lib;swresample.lib;swscale.lib;opencv_calib3d470.lib;opencv_core470.lib;opencv_dnn470.lib;opencv_features2d470.lib;opencv_flann470.lib;opencv_gapi470.lib;opencv_highgui470.lib;opencv_imgcodecs470.lib;opencv_imgproc470.lib;opencv_ml470.lib;opencv_objdetect470.lib;opencv_photo470.lib;opencv_stitching470.lib;opencv_video470.lib;opencv_videoio470.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\Library_Bullet_Physics\lib;..\Library_MMDFiles\lib;..\Library_zlib\lib;..\Library_libpng\lib;..\Library_Julius\lib;..\Library_PortAudio\lib;..\Library_glew\lib;..\Library_MMDAgent\lib;..\Library_JPEG\lib;..\Library_GLFW\lib;..\Library_FreeType\lib;..\Library_Poco\win32\lib;..\Library_libsndfile\win32\lib;..\Library_ffmpeg\lib;..\Library_OpenCV\lib\x86</AdditionalLibraryDirectories>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="adin_file.c" />
+    <ClCompile Include="AudioEncoder.cpp" />
+    <ClCompile Include="Avatar.cpp" />
+    <ClCompile Include="BoneControl.cpp" />
+    <ClCompile Include="Julius_Record.cpp" />
+    <ClCompile Include="Julius_Thread.cpp" />
+    <ClCompile Include="MorphControl.cpp" />
+    <ClCompile Include="MouseQueue.cpp" />
+    <ClCompile Include="Plugin_Remote.cpp" />
+    <ClCompile Include="ScreenEncoder.cpp" />
+    <ClCompile Include="ServerClient.cpp" />
+    <ClCompile Include="Speak.cpp" />
+    <ClCompile Include="Thread.cpp" />
+    <ClCompile Include="TransFile.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="adin_file.h" />
+    <ClInclude Include="AudioEncoder.h" />
+    <ClInclude Include="Avatar.h" />
+    <ClInclude Include="BoneControl.h" />
+    <ClInclude Include="Julius_Record.h" />
+    <ClInclude Include="Julius_Thread.h" />
+    <ClInclude Include="MorphControl.h" />
+    <ClInclude Include="MouseQueue.h" />
+    <ClInclude Include="ScreenEncoder.h" />
+    <ClInclude Include="ServerClient.h" />
+    <ClInclude Include="Speak.h" />
+    <ClInclude Include="Thread.h" />
+    <ClInclude Include="TransFile.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

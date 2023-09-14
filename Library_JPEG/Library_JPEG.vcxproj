@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\jaricom.c" />
+    <ClCompile Include="src\jcapimin.c" />
+    <ClCompile Include="src\jcapistd.c" />
+    <ClCompile Include="src\jcarith.c" />
+    <ClCompile Include="src\jccoefct.c" />
+    <ClCompile Include="src\jccolor.c" />
+    <ClCompile Include="src\jcdctmgr.c" />
+    <ClCompile Include="src\jchuff.c" />
+    <ClCompile Include="src\jcinit.c" />
+    <ClCompile Include="src\jcmainct.c" />
+    <ClCompile Include="src\jcmarker.c" />
+    <ClCompile Include="src\jcmaster.c" />
+    <ClCompile Include="src\jcomapi.c" />
+    <ClCompile Include="src\jcparam.c" />
+    <ClCompile Include="src\jcprepct.c" />
+    <ClCompile Include="src\jcsample.c" />
+    <ClCompile Include="src\jctrans.c" />
+    <ClCompile Include="src\jdapimin.c" />
+    <ClCompile Include="src\jdapistd.c" />
+    <ClCompile Include="src\jdarith.c" />
+    <ClCompile Include="src\jdatadst.c" />
+    <ClCompile Include="src\jdatasrc.c" />
+    <ClCompile Include="src\jdcoefct.c" />
+    <ClCompile Include="src\jdcolor.c" />
+    <ClCompile Include="src\jddctmgr.c" />
+    <ClCompile Include="src\jdhuff.c" />
+    <ClCompile Include="src\jdinput.c" />
+    <ClCompile Include="src\jdmainct.c" />
+    <ClCompile Include="src\jdmarker.c" />
+    <ClCompile Include="src\jdmaster.c" />
+    <ClCompile Include="src\jdmerge.c" />
+    <ClCompile Include="src\jdpostct.c" />
+    <ClCompile Include="src\jdsample.c" />
+    <ClCompile Include="src\jdtrans.c" />
+    <ClCompile Include="src\jerror.c" />
+    <ClCompile Include="src\jfdctflt.c" />
+    <ClCompile Include="src\jfdctfst.c" />
+    <ClCompile Include="src\jfdctint.c" />
+    <ClCompile Include="src\jidctflt.c" />
+    <ClCompile Include="src\jidctfst.c" />
+    <ClCompile Include="src\jidctint.c" />
+    <ClCompile Include="src\jmemmgr.c" />
+    <ClCompile Include="src\jmemnobs.c" />
+    <ClCompile Include="src\jquant1.c" />
+    <ClCompile Include="src\jquant2.c" />
+    <ClCompile Include="src\jutils.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\cderror.h" />
+    <ClInclude Include="src\cdjpeg.h" />
+    <ClInclude Include="src\jdct.h" />
+    <ClInclude Include="src\jerror.h" />
+    <ClInclude Include="src\jinclude.h" />
+    <ClInclude Include="src\jmemsys.h" />
+    <ClInclude Include="src\jmorecfg.h" />
+    <ClInclude Include="src\jpegint.h" />
+    <ClInclude Include="src\jpeglib.h" />
+    <ClInclude Include="src\jversion.h" />
+    <ClInclude Include="src\transupp.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{BE12CB6A-6337-4C11-8F56-8B90123FBA0A}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Library_JPEG</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(ProjectName)\lib\</OutDir>
+    <TargetName>JPEG</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(ProjectName)\lib\</OutDir>
+    <TargetName>JPEG_D</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>include;</AdditionalIncludeDirectories>
+      <CompileAs>CompileAsC</CompileAs>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <OutputFile>lib\JPEG_D.lib</OutputFile>
+    </Lib>
+    <PreBuildEvent>
+      <Command>copy src\jconfig.txt include\jconfig.h;
+copy src\*.h include;
+</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>include;</AdditionalIncludeDirectories>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <CompileAs>CompileAsC</CompileAs>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <OutputFile>lib\JPEG.lib</OutputFile>
+    </Lib>
+    <PreBuildEvent>
+      <Command>copy src\jconfig.txt include\jconfig.h;
+copy src\*.h include;
+</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

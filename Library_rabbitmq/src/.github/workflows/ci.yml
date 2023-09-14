@@ -1,0 +1,76 @@
+name: CI
+
+on: 
+  # Run the jobs on either push or a pull_request, but not both.
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - compiler: gcc
+            config: cmake
+          - compiler: clang
+            config: cmake
+          - compiler: clang
+            config: asan
+          - compiler: clang
+            config: tsan
+          - compiler: clang
+            config: format
+          - compiler: clang
+            config: scan-build
+          - compiler: clang
+            config: framing
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - name: Install Prerequisites
+      shell: bash
+      run: sudo apt install -y ninja-build libpopt-dev
+
+    - name: Configure Build & Test
+      shell: bash
+      env:
+        CC: ${{ matrix.compiler }}
+      run: ./travis.sh ${{ matrix.config }}
+
+  build-macox:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - name: Install Prerequisites
+      shell: bash
+      run: brew install ninja popt
+    
+    - name: Configure Build & Test
+      shell: bash
+      run: ./travis.sh macos
+
+  build-win32:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - name: Install Prerequisites
+      run: choco install openssl
+    - name: Configure Build & Test
+      shell: bash
+      run: |
+        cmake -E make_directory build/
+        cmake -S . -B build/ -DBUILD_EXAMPLES=ON -DCMAKE_C_FLAGS=" /W4"
+        cmake --build build/ --config Debug --target INSTALL
+        ctest -V ./build/
