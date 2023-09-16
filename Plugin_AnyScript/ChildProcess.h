@@ -51,12 +51,18 @@ private:
    MMDAgent *m_mmdagent;
    int m_id;
 
+#ifdef _WIN32
    PROCESS_INFORMATION m_process_info;
    HANDLE m_job;
    HANDLE m_hReadFromChild;
    HANDLE m_hWriteToChild;
    HANDLE m_hChildIn;
    HANDLE m_hChildOut;
+#else
+   int m_pid;
+   int m_fd_r;
+   int m_fd_w;
+#endif
 
    GLFWthread m_threadId;  /* thread id */
    bool m_kill;            /* thread kill flag */
@@ -67,18 +73,18 @@ private:
    /* clear: clear */
    void clear();
 
-   // closeProcess: close process handlers
+   /* closeProcess: close process handlers */
    void closeProcess();
 
 public:
 
-   // constructor
+   /* constructor */
    ChildProcess(MMDAgent *mmdagent, int mid);
 
-   // destructor
+   /* destructor */
    ~ChildProcess();
 
-   // runProcess: start process
+   /* runProcess: start process */
    bool runProcess(const char *consoleTitle, const char *execString);
 
    /* stopProcess: stop process */
@@ -90,13 +96,13 @@ public:
    /* update: update status */
    void update();
 
-   // readFromProcess: read from process's stdout
+   /* readFromProcess: read from process's stdout */
    int readFromProcess(char *buf, int buflen);
 
-   // writeToProcess: write to process's stdin
+   /* writeToProcess: write to process's stdin */
    void writeToProcess(const char *buf);
 
-   // receivingThreadRun: receiving thread main function
+   /* receivingThreadRun: receiving thread main function */
    void receivingThreadRun();
 
 };
