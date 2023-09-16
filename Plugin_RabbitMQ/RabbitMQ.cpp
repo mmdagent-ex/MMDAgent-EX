@@ -148,17 +148,20 @@ void RabbitMQ::start()
 void RabbitMQ::run()
 {
    char buff[MMDAGENT_MAXBUFLEN];
+   amqp_bytes_t queuename;
 
    /* make connection to rabbitmq server */
    amqp_connection_state_t conn = amqp_new_connection();
    amqp_socket_t *socket = amqp_tcp_socket_new(conn);
    if (socket == NULL) {
       m_mmdagent->sendLogString(m_id, MLOG_ERROR, "%s: failed to create TCP socket", m_name);
+      m_active = false;
       return;
    }
    int status = amqp_socket_open(socket, m_host, m_port);
    if (status) {
       m_mmdagent->sendLogString(m_id, MLOG_ERROR, "%s: failed to connect to rabbitmq server %s:%d", m_name, m_host, m_port);
+      m_active = false;
       return;
    }
 
@@ -167,31 +170,33 @@ void RabbitMQ::run()
    if (on_amqp_error(amqp_get_rpc_reply(conn), "Opening channel")) return;
 
    if (m_mode == RABBITMQ_CONSUMER_MODE) {
-#if 1
-      // start listening to a queue as a consumer
-      amqp_basic_consume(conn, 1, amqp_cstring_bytes(m_queuename), amqp_empty_bytes, 0, 0, 0, amqp_empty_table);
-      if (on_amqp_error(amqp_get_rpc_reply(conn), "Consuming")) return;
-      m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: listening %s:%d: queue=%s", m_name, m_host, m_port, m_queuename);
-#else
-      // declare a new queue for given exchange and binding key and connect to it as a consumer
-      amqp_queue_declare_ok_t *r = amqp_queue_declare(conn, 1, amqp_empty_bytes, 0, 0, 0, 1, amqp_empty_table);
-      if (on_amqp_error(amqp_get_rpc_reply(conn), "Declaring queue")) return;
-      amqp_bytes_t queuename = amqp_bytes_malloc_dup(r->queue);
-      if (queuename.bytes == NULL) {
-         m_mmdagent->sendLogString(m_id, MLOG_ERROR, "out of memory while copying queue name");
-         m_active = false;
-         return;
+      if (MMDAgent_strlen(m_exchangename) == 0) {
+         // start listening to a queue as a consumer using default exchange
+         amqp_queue_declare_ok_t *r = amqp_queue_declare(conn, 1, amqp_cstring_bytes(m_queuename), 0, 0, 0, 1, amqp_empty_table);
+         if (on_amqp_error(amqp_get_rpc_reply(conn), "Declaring queue")) return;
+         amqp_basic_consume(conn, 1, amqp_cstring_bytes(m_queuename), amqp_empty_bytes, 0, 0, 0, amqp_empty_table);
+         if (on_amqp_error(amqp_get_rpc_reply(conn), "Consuming")) return;
+         m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: %s:%d: listen queue=%s", m_name, m_host, m_port, m_queuename);
+      } else {
+         // declare a queue for given exchange and binding key and connect to it as a consumer
+         amqp_queue_declare_ok_t *r = amqp_queue_declare(conn, 1, amqp_empty_bytes, 0, 0, 0, 1, amqp_empty_table);
+         if (on_amqp_error(amqp_get_rpc_reply(conn), "Declaring queue")) return;
+         queuename = amqp_bytes_malloc_dup(r->queue);
+         if (queuename.bytes == NULL) {
+            m_mmdagent->sendLogString(m_id, MLOG_ERROR, "out of memory while copying queue name");
+            m_active = false;
+            return;
+         }
+         amqp_queue_bind(conn, 1, queuename, amqp_cstring_bytes(m_exchangename), amqp_cstring_bytes(m_queuename), amqp_empty_table);
+         if (on_amqp_error(amqp_get_rpc_reply(conn), "Binding queue")) return;
+         amqp_basic_consume(conn, 1, queuename, amqp_empty_bytes, 0, 1, 0, amqp_empty_table);
+         if (on_amqp_error(amqp_get_rpc_reply(conn), "Consuming")) return;
+         m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: %s:%d: listen exchange=%s, bindingkey=%s", m_name, m_host, m_port, m_exchangename, m_queuename);
       }
-      amqp_queue_bind(conn, 1, queuename, amqp_cstring_bytes(exchange), amqp_cstring_bytes(bindingkey), amqp_empty_table);
-      if (on_amqp_error(amqp_get_rpc_reply(conn), "Binding queue")) return;
-      amqp_basic_consume(conn, 1, queuename, amqp_empty_bytes, 0, 1, 0, amqp_empty_table);
-      if (on_amqp_error(amqp_get_rpc_reply(conn), "Consuming")) return;
-      m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: listening %s:%d: exchange=%s, bindingkey=%s", m_name, m_host, m_port, m_exchangename, m_queuename);
-#endif
    }
 
-   if (RABBITMQ_PRODUCER_MODE) {
-      m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: publishing to %s:%d: exchange=%s, bindingkey=%s", m_name, m_host, m_port, m_exchangename, m_queuename);
+   if (m_mode == RABBITMQ_PRODUCER_MODE) {
+      m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: %s:%d: send exchange=%s, bindingkey=%s", m_name, m_host, m_port, m_exchangename, m_queuename);
    }
 
    /* main loop */
@@ -222,9 +227,8 @@ void RabbitMQ::run()
    }
 
    /* disconnect */
-#if 0
-   amqp_bytes_free(queuename);
-#endif
+   if (MMDAgent_strlen(m_exchangename) > 0)
+      amqp_bytes_free(queuename);
    if (on_amqp_error(amqp_channel_close(conn, 1, AMQP_REPLY_SUCCESS), "Closing channel")) return;
    if (on_amqp_error(amqp_connection_close(conn, AMQP_REPLY_SUCCESS), "Closing connection")) return;
    int ret = amqp_destroy_connection(conn);
