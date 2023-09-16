@@ -1,0 +1,23 @@
+{
+   "host" : "localhost",
+   "port" : 5672,
+   "connection_list" : [
+      {
+         "name" : "cons1",
+         "mode" : "consumer-basic",
+         "queue" : "hello"
+      },
+      {
+         "name" : "cons2",
+         "mode" : "consumer",
+         "exchange" : "",
+         "bindingkey" : "hello"
+      },
+      {
+         "name" : "prod1",
+         "mode" : "producer",
+         "exchange" : "",
+         "bindingkey" : "hello"
+      }
+   ]
+}

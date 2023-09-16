@@ -4,7 +4,7 @@
 /*           http://www.mmdagent.jp/                                 */
 /* ----------------------------------------------------------------- */
 /*                                                                   */
-/*  Copyright (c) 2009-2015  Nagoya Institute of Technology          */
+/*  Copyright (c) 2009-2023  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -39,72 +39,59 @@
 /* POSSIBILITY OF SUCH DAMAGE.                                       */
 /* ----------------------------------------------------------------- */
 
-#ifdef _WIN32
-#define EXPORT extern "C" __declspec(dllexport)
-#else
-#define EXPORT extern "C"
-#endif /* _WIN32 */
-
 /* headers */
-#include "MMDAgent.h"
-
-/* Plugin name, commands and events */
-#define PLUGIN_NAME "ErrorBlock"
-#define MAXBLOCKNUM 10
-#define BLOCKNAMEFMT "_ERRORBLOCK%d"
-#define BLOCKMODELFILE "errorblock.pmd"
-#define BLOCKMODELHEIGHTMARGIN 2.0
-#define BLOCKPOSITION_X 0.0f
-#define BLOCKPOSITION_Y 20.0f
-#define BLOCKPOSITION_Z 0.0f
-
-/* plugin status */
-static int mid;
-static int blocknum;
-
-/* extAppStart: initialize */
-EXPORT void extAppStart(MMDAgent *mmdagent)
-{
-   mid = mmdagent->getModuleId(PLUGIN_NAME);
-   blocknum = 0;
+extern "C" {
+#if defined(_WIN32) || defined(__APPLE__)
+#include <rabbitmq-c/amqp.h>
+#include <rabbitmq-c/tcp_socket.h>
+#else
+#include <amqp.h>
+#include <amqp_tcp_socket.h>
+#endif
 }
 
-/* extLog: process log string */
-EXPORT void extLog(MMDAgent *mmdagent, int id, unsigned int flag, const char *text, const char *fulltext)
+/* definitions */
+#define RABBITMQ_CONSUMER_MODE 0
+#define RABBITMQ_PRODUCER_MODE 1
+#define PLUGINRABBITMQ_COMMAND_SEND   "RABBITMQ_SEND"
+#define PLUGINRABBITMQ_EVENT_RECEIVED "RABBITMQ_EVENT_RECV"
+
+class RabbitMQ
 {
-   char buf[MMDAGENT_MAXBUFLEN];
-   float y;
-   btVector3 pos;
+private:
 
-   if (blocknum >= MAXBLOCKNUM)
-      return;
-   if (id != mid && flag == MLOG_ERROR) {
-      y = BLOCKPOSITION_Y + blocknum * 0.1f;
-      MMDAgent_snprintf(buf, MMDAGENT_MAXBUFLEN - 1, BLOCKNAMEFMT, blocknum);
-      mmdagent->sendMessage(mid, MMDAGENT_COMMAND_MODELADD, "%s|%s%c%s|%.2f,%.2f,%.2f", buf, mmdagent->getAppDirName(), MMDAGENT_DIRSEPARATOR, BLOCKMODELFILE, BLOCKPOSITION_X, y, BLOCKPOSITION_Z);
-      mmdagent->sendMessage(mid, "TEXTAREA_ADD", "%s|15,0|1,0.4,0|0,0,0,0|1,0,0,1|0,0,-0.76|180,0,0|%s", buf, buf);
-      mmdagent->sendMessage(mid, "TEXTAREA_SET", "%s|%s", buf, text);
-      blocknum++;
-   }
-}
+   MMDAgent* m_mmdagent;   // MMDAgent instance
+   int m_id;               // module id
+   char *m_name;           // name
+   int m_mode;             // RABBITMQ_{CONSUMER|PRODUCER}_MODE
+   char *m_host;           // RabbitMQ host to connect
+   int m_port;             // RabbitMQ port number to connect
+   char *m_exchangename;   // exchange name
+   char *m_queuename;      // queue name or routing key
+   Thread *m_thread;       // thread instance
+   bool m_active;          // true while active
 
-/* extAppEnd: end of application */
-EXPORT void extAppEnd(MMDAgent *mmdagent)
-{
-   char buf[MMDAGENT_MAXBUFLEN];
-   short i;
-   int j;
-   PMDObject *models;
+   /* on_amqp_error: check return code of amqp functions, and when error, issue error message and return true */
+   bool on_amqp_error(amqp_rpc_reply_t x, char const *context);
 
-   models = mmdagent->getModelList();
-   if (models == NULL)
-      return;
-   for (j = 0; j < blocknum; j++) {
-      MMDAgent_snprintf(buf, MMDAGENT_MAXBUFLEN - 1, BLOCKNAMEFMT, j);
-      for (i = 0; i < mmdagent->getNumModel(); i++) {
-         if (models[i].isEnable() && MMDAgent_strequal(models[i].getAlias(), buf)) {
-            mmdagent->sendMessage(mid, MMDAGENT_COMMAND_MODELDELETE, "%s", buf);
-         }
-      }
-   }
-}
+public:
+
+   /* constructor */
+   RabbitMQ(MMDAgent *mmdagent, int id, const char *name, int mode, const char *host, int port, const char *exchangename, const char *queuename);
+
+   /* destructor */
+   ~RabbitMQ();
+
+   /* getMode: get mode */
+   int getMode();
+
+   /* start: start processing thread */
+   void start();
+
+   /* run: thread main loop function */
+   void run();
+
+   /* enqueueMessage: enqueue message to be sent to server */
+   void enqueueMessage(const char *str);
+
+};

@@ -39,25 +39,95 @@
 /* POSSIBILITY OF SUCH DAMAGE.                                       */
 /* ----------------------------------------------------------------- */
 
-/* headers */
+#ifdef _WIN32
+#define CHILDPROCESS_WIN32
+#else
+#define CHILDPROCESS_UNIX
+#endif
 
+/* headers */
 #include "MMDAgent.h"
 #include "ChildProcess.h"
+#ifdef CHILDPROCESS_UNIX
+#include <stdio.h>
+#include <unistd.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#define READ  (0)
+#define WRITE (1)
+#endif
 
 /* definitions */
 #define PLUGINANYSCRIPT_PROCESSTERMINATEWAITMSEC 5000
+#define FILEDESCRIPTOR_UNDEFINED -1
+
+#ifdef CHILDPROCESS_UNIX
+#define CHILDPROCESS_ARG_MAX 100
+/* make argument list from string */
+static char **parse_args(const char *command)
+{
+   const char *cursor = command;
+   char **args = (char **)malloc(sizeof(char *) * CHILDPROCESS_ARG_MAX);
+   int arg_idx = 0;
+   char current_arg[CHILDPROCESS_ARG_MAX];
+   int current_arg_idx = 0;
+
+   while (*cursor) {
+      current_arg_idx = 0;
+
+      /* skip blank */
+      while (*cursor == ' ') cursor++;
+
+      if (*cursor == '"') {
+         /* process inside double quote */
+         cursor++;
+         while (*cursor && *cursor != '"') {
+            current_arg[current_arg_idx++] = *cursor++;
+         }
+         if (*cursor == '"') cursor++;
+      } else if (*cursor == '\'') {
+         /* process inside single qoute */
+         cursor++;
+         while (*cursor && *cursor != '\'') {
+            current_arg[current_arg_idx++] = *cursor++;
+         }
+         if (*cursor == '\'') cursor++;
+      } else {
+         /* read ungil space or end of line */
+         while (*cursor && *cursor != ' ') {
+            current_arg[current_arg_idx++] = *cursor++;
+         }
+      }
+
+      current_arg[current_arg_idx] = '\0';
+      args[arg_idx] = strdup(current_arg);
+      arg_idx++;
+   }
+   args[arg_idx] = NULL;
+
+   return args;
+}
+#endif /* CHILDPROCESS_UNIX */
 
 /* ChildProcess::initialize: initialize */
 void ChildProcess::initialize()
 {
    m_mmdagent = NULL;
    m_id = 0;
+#ifdef CHILDPROCESS_WIN32
    m_process_info.hProcess = NULL;
    m_job = NULL;
    m_hReadFromChild = INVALID_HANDLE_VALUE;
    m_hWriteToChild = INVALID_HANDLE_VALUE;
    m_hChildIn = INVALID_HANDLE_VALUE;
    m_hChildOut = INVALID_HANDLE_VALUE;
+#endif
+#ifdef CHILDPROCESS_UNIX
+   m_pid = 0;
+   m_fd_r = FILEDESCRIPTOR_UNDEFINED;
+   m_fd_w = FILEDESCRIPTOR_UNDEFINED;
+#endif
    m_threadId = GLFWTHREAD_UNDEF;
    m_kill = false;
 }
@@ -69,16 +139,12 @@ void ChildProcess::clear()
    initialize();
 }
 
-// ChildProcess::closeProcess: close process handlers
+/* ChildProcess::closeProcess: close process handlers */
 void ChildProcess::closeProcess()
 {
-   HANDLE h;
-
-   if (m_process_info.hProcess == NULL)
-      return;
-
    /* close receiving thread */
    m_kill = true;
+#ifdef CHILDPROCESS_WIN32
    if (m_hReadFromChild != INVALID_HANDLE_VALUE) {
       CloseHandle(m_hReadFromChild);
       m_hReadFromChild = INVALID_HANDLE_VALUE;
@@ -87,13 +153,27 @@ void ChildProcess::closeProcess()
       CloseHandle(m_hWriteToChild);
       m_hWriteToChild = INVALID_HANDLE_VALUE;
    }
+#endif
+#ifdef CHILDPROCESS_UNIX
+   if (m_fd_r != FILEDESCRIPTOR_UNDEFINED) {
+      close(m_fd_r);
+      m_fd_r = FILEDESCRIPTOR_UNDEFINED;
+   }
+   if (m_fd_w != FILEDESCRIPTOR_UNDEFINED) {
+      close(m_fd_w);
+      m_fd_w = FILEDESCRIPTOR_UNDEFINED;
+   }
+   m_pid = 0;
+#endif
+
    if (m_threadId >= 0) {
       glfwWaitThread(m_threadId, GLFW_WAIT);
       glfwDestroyThread(m_threadId);
       m_threadId = -1;
    }
 
-   h = m_process_info.hProcess;
+#ifdef CHILDPROCESS_WIN32
+   HANDLE h = m_process_info.hProcess;
    m_process_info.hProcess = NULL;
 
    /* get exit code */
@@ -106,9 +186,25 @@ void ChildProcess::closeProcess()
    /* close handles */
    CloseHandle(m_process_info.hThread);
    CloseHandle(h);
+#endif
 }
 
-// constructor
+/* ChildProcess::isRunning: return true when sub process is running */
+bool ChildProcess::isRunning()
+{
+#ifdef CHILDPROCESS_WIN32
+   if (m_process_info.hProcess == NULL)
+      return false;
+   return true;
+#endif
+#ifdef CHILDPROCESS_UNIX
+   if (m_pid == 0)
+      return false;
+   return true;
+#endif
+}
+
+/* constructor */
 ChildProcess::ChildProcess(MMDAgent *mmdagent, int m_id)
 {
    initialize();
@@ -116,7 +212,7 @@ ChildProcess::ChildProcess(MMDAgent *mmdagent, int m_id)
    m_id = m_id;
 }
 
-// destructor
+/* destructor */
 ChildProcess::~ChildProcess()
 {
    clear();
@@ -129,14 +225,15 @@ static void receivingThreadMain(void *param)
    c->receivingThreadRun();
 }
 
-// ChildProcess::runProcess: start process
+/* ChildProcess::runProcess: start process */
 bool ChildProcess::runProcess(const char *title, const char *execString)
 {
-   if (m_process_info.hProcess != NULL) {
+   if (isRunning()) {
       m_mmdagent->sendLogString(m_id, MLOG_ERROR, "a child process already running");
       return false;
    }
 
+#ifdef CHILDPROCESS_WIN32
    SECURITY_ATTRIBUTES s;
    s.nLength = sizeof(SECURITY_ATTRIBUTES);
    s.lpSecurityDescriptor = NULL;
@@ -214,6 +311,70 @@ bool ChildProcess::runProcess(const char *title, const char *execString)
    CloseHandle(m_hChildOut);
    m_hChildIn = m_hChildOut = INVALID_HANDLE_VALUE;
 
+#endif /* CHILDPROCESS_WIN32 */
+
+#ifdef CHILDPROCESS_UNIX
+   int pipe_child2parent[2];
+   int pipe_parent2child[2];
+   int pid;
+
+   /* create pipes */
+   if (pipe(pipe_child2parent) < 0) {
+      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "failed to create pipe: %s", execString);
+      return false;
+   }
+   if (pipe(pipe_parent2child) < 0) {
+      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "failed to create pipe: %s", execString);
+      close(pipe_child2parent[READ]);
+      close(pipe_child2parent[WRITE]);
+      return false;
+   }
+
+   /* fork */
+   if ((pid = fork()) < 0) {
+      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "failed to fork process: %s", execString);
+      close(pipe_child2parent[READ]);
+      close(pipe_child2parent[WRITE]);
+      close(pipe_parent2child[READ]);
+      close(pipe_parent2child[WRITE]);
+      return false;
+   }
+
+   if (pid == 0) {
+      /* this is child process */
+      /* close unused descpritors */
+      close(pipe_parent2child[WRITE]);
+      close(pipe_child2parent[READ]);
+
+      /* assign parent-to-child read descpritor to standard input */
+      dup2(pipe_parent2child[READ], 0);
+
+      /* assign child-to-parent write descriptor to standard output */
+      dup2(pipe_child2parent[WRITE], 1);
+
+      /* close original assigned descpritors since they are already duplicated */
+      close(pipe_parent2child[READ]);
+      close(pipe_child2parent[WRITE]);
+
+      /* switch process (never returns) */
+      char **parsed_args = parse_args(execString);
+      if (execv(parsed_args[0], parsed_args) < 0) {
+         m_mmdagent->sendLogString(m_id, MLOG_ERROR, "failed to exec process: %s", execString);
+         close(pipe_parent2child[READ]);
+         close(pipe_child2parent[WRITE]);
+         return false;
+      }
+   }
+
+   // this is parent process
+   close(pipe_parent2child[READ]);
+   close(pipe_child2parent[WRITE]);
+
+   m_fd_r = pipe_child2parent[READ];
+   m_fd_w = pipe_parent2child[WRITE];
+   m_pid = pid;
+#endif /* CHILDPROCESS_UNIX */
+
    /* start receiving thread */
    m_threadId = glfwCreateThread(receivingThreadMain, this);
    if (m_threadId == -1) {
@@ -229,32 +390,18 @@ bool ChildProcess::runProcess(const char *title, const char *execString)
 /* ChildProcess::stopProcess: stop process */
 bool ChildProcess::stopProcess()
 {
-
-   if (m_process_info.hProcess == NULL)
+   if (isRunning() == false)
       return true;
 
+#ifdef CHILDPROCESS_WIN32
    /* force stop child processes attached to the job object */
    CloseHandle(m_job);
-
-#if 0
-   /* wait till child process ends */
-   switch (WaitForSingleObject(m_process_info.hProcess, PLUGINANYSCRIPT_PROCESSTERMINATEWAITMSEC)) {
-   case WAIT_FAILED:
-      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "failed to wait child process to die");
-      return false;
-   case WAIT_ABANDONED:
-      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "abandoned to wait child process to die, proceed");
-      break;
-   case WAIT_OBJECT_0:
-      /* normal end */
-      break;
-   case WAIT_TIMEOUT:
-      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "time out waiting child process to die");
-      return false;
-   default:
-      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "error in waiting child process to die");
-      return false;
-   }
+#endif
+#ifdef CHILDPROCESS_UNIX
+   /* force stop child processes */
+   int wstatus;
+   kill(m_pid, SIGKILL);
+   waitpid(m_pid, &wstatus, 0);
 #endif
 
    /* close all */
@@ -265,41 +412,43 @@ bool ChildProcess::stopProcess()
    return true;
 }
 
-/* ChildProcess::isRunning: check if process is alive */
-bool ChildProcess::isRunning()
-{
-   return (m_process_info.hProcess != NULL ? true : false);
-}
-
 /* ChildProcess::update: update status */
 void ChildProcess::update()
 {
-   DWORD exitCode;
-
-   if (m_process_info.hProcess == NULL)
+   if (isRunning() == false)
       return;
 
+#ifdef CHILDPROCESS_WIN32
+   DWORD exitCode;
    GetExitCodeProcess(m_process_info.hProcess, &exitCode);
    if (exitCode != STILL_ACTIVE) {
       /* process already ends */
       m_mmdagent->sendLogString(m_id, MLOG_STATUS, "detected end of child process");
       closeProcess();
    }
+#endif
+#ifdef CHILDPROCESS_UNIX
+   int wstatus;
+   pid_t result = waitpid(m_pid, &wstatus, WNOHANG);
+   if (result == -1) {
+      /* child process does not exist */
+      m_mmdagent->sendLogString(m_id, MLOG_STATUS, "detected end of child process");
+      closeProcess();
+   }
+#endif
 }
 
-
-// ChildProcess::readFromProcess: read from process's stdout
+/* ChildProcess::readFromProcess: read from process's stdout */
 int ChildProcess::readFromProcess(char *buf, int buflen)
 {
+   if (isRunning() == false)
+      return -1;
+
+#ifdef CHILDPROCESS_WIN32
    DWORD nBytesRead;
    BOOL b;
    BYTE lpBuffer[1];
-   int numRead;
-
-   if (m_process_info.hProcess == NULL)
-      return -1;
-
-   numRead = 0;
+   int numRead = 0;
 
    while (1) {
       b = ReadFile(m_hReadFromChild, lpBuffer, 1, &nBytesRead, NULL);
@@ -319,27 +468,62 @@ int ChildProcess::readFromProcess(char *buf, int buflen)
    }
 
    return numRead;
+#endif /* CHILDPROCESS_WIN32 */
+
+#ifdef CHILDPROCESS_UNIX
+   ssize_t nBytesRead;
+   char buffer[1];
+   int numRead = 0;
+
+   while (1) {
+      nBytesRead = read(m_fd_r, buffer, 1);
+      if (nBytesRead == -1)
+         return -1;
+      if (nBytesRead == 0)
+         continue;
+      if (buffer[0] == 0x0a) {
+         buf[numRead] = '\0';
+         if (numRead > 0 && buf[numRead - 1] == 0x0d) {
+            numRead--;
+            buf[numRead] = '\0';
+         }
+         return numRead;
+      }
+      buf[numRead] = buffer[0];
+      numRead++;
+      if (numRead >= buflen) break;
+   }
+
+   return numRead;
+#endif /* CHILDPROCESS_UNIX */
 }
 
-// ChildProcess::writeToProcess: write to process's stdin
+/* ChildProcess::writeToProcess: write to process's stdin */
 void ChildProcess::writeToProcess(const char *buf)
 {
-   if (m_process_info.hProcess == NULL)
+   if (isRunning() == false)
       return;
 
+#ifdef CHILDPROCESS_WIN32
    DWORD len = 0;
    size_t textlen = MMDAgent_strlen(buf);
    WriteFile(m_hWriteToChild, (LPVOID)buf, textlen, &len, NULL);
    //FlushFileBuffers(m_hWriteToChild);
+#endif /* CHILDPROCESS_WIN32 */
+#ifdef CHILDPROCESS_UNIX
+   ssize_t nBytesWritten;
+   size_t textlen = MMDAgent_strlen(buf);
+   nBytesWritten = write(m_fd_w, buf, textlen);
+#endif /* CHILDPROCESS_UNIX */
 }
 
-// ChildProcess::receivingThreadRun: receiving thread main function
+/* ChildProcess::receivingThreadRun: receiving thread main function */
 void ChildProcess::receivingThreadRun()
 {
    char buff[MMDAGENT_MAXBUFLEN];
    int len;
 
-   if (m_process_info.hProcess == NULL)
+   if (isRunning() == false)
       return;
 
    while (m_kill == false) {
