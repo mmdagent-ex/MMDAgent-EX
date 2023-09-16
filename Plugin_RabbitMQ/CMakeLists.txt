@@ -4,6 +4,7 @@ project(Plugin_RabbitMQ)
 
 set(SOURCES
     Thread.cpp
+    RabbitMQ.cpp
     Plugin_RabbitMQ.cpp
 )
 
@@ -19,6 +20,8 @@ add_library(Plugin_RabbitMQ SHARED ${SOURCES})
 target_include_directories(Plugin_RabbitMQ PRIVATE ${INCLUDE_DIRS})
 
 target_compile_definitions(Plugin_RabbitMQ PRIVATE MMDAGENT)
+
+target_compile_options(Plugin_RabbitMQ PRIVATE -std=c++17)
 
 target_link_libraries(Plugin_RabbitMQ
     ${MMDAGENT_LINK_OPTIONS}
