@@ -1,0 +1,20 @@
+{
+   "host" : "localhost",
+   "port" : 5672,
+   "connection_list" : [
+      {
+         "mode" : "consumer-basic",
+         "queue" : "hello"
+      },
+      {
+         "mode" : "consumer",
+         "exchange" : "",
+         "bindingkey" : "hello"
+      },
+      {
+         "mode" : "publish",
+         "exchange" : "",
+         "bindingkey" : "hello"
+      }
+   ]
+}
