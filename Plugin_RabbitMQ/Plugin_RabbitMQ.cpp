@@ -111,6 +111,7 @@ EXPORT void extAppStart(MMDAgent *mmdagent)
       /* get values */
       const char *host;
       int port;
+      const char *name;
       const char *mode;
       const char *queue;
       const char *exchange;
@@ -124,21 +125,25 @@ EXPORT void extAppStart(MMDAgent *mmdagent)
       pluginList = (RabbitMQ **)malloc(sizeof(RabbitMQ *) * pluginNum);
       for (size_t i = 0; i < pluginNum; i++) {
          Poco::JSON::Object::Ptr connection = connectionList->getObject(i);
+         name = connection->getValue<std::string>("name").c_str();
          mode = connection->getValue<std::string>("mode").c_str();
          if (MMDAgent_strequal(mode, "consumer-basic")) {
             /* queue */
             queue = connection->getValue<std::string>("queue").c_str();
-            pluginList[i] = new RabbitMQ(mmdagent, mid, RABBITMQ_CONSUMER_MODE, host, port, "", queue);
+            pluginList[i] = new RabbitMQ(mmdagent, mid, name, RABBITMQ_CONSUMER_MODE, host, port, "", queue);
          } else if (MMDAgent_strequal(mode, "consumer")) {
             /* exchange and bindingkey */
             exchange = connection->getValue<std::string>("exchange").c_str();
             bindingkey = connection->getValue<std::string>("bindingkey").c_str();
-            pluginList[i] = new RabbitMQ(mmdagent, mid, RABBITMQ_CONSUMER_MODE, host, port, exchange, bindingkey);
+            pluginList[i] = new RabbitMQ(mmdagent, mid, name, RABBITMQ_CONSUMER_MODE, host, port, exchange, bindingkey);
          } else if (MMDAgent_strequal(mode, "producer")) {
             /* exchange and bindingkey */
             exchange = connection->getValue<std::string>("exchange").c_str();
             bindingkey = connection->getValue<std::string>("bindingkey").c_str();
-            pluginList[i] = new RabbitMQ(mmdagent, mid, RABBITMQ_PRODUCER_MODE, host, port, exchange, bindingkey);
+            pluginList[i] = new RabbitMQ(mmdagent, mid, name, RABBITMQ_PRODUCER_MODE, host, port, exchange, bindingkey);
+         } else {
+            mmdagent->sendLogString(mid, MLOG_ERROR, "error opening file: %s: unknown mode %s", config_file, mode);
+            return;
          }
       }
    } catch (const Poco::Exception& ex) {

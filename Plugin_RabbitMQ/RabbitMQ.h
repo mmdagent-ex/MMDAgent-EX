@@ -62,12 +62,13 @@ private:
 
    MMDAgent* m_mmdagent;   // MMDAgent instance
    int m_id;               // module id
-   Thread *m_thread;       // thread instance
+   char *m_name;           // name
+   int m_mode;             // RABBITMQ_{CONSUMER|PRODUCER}_MODE
    char *m_host;           // RabbitMQ host to connect
    int m_port;             // RabbitMQ port number to connect
    char *m_exchangename;   // exchange name
    char *m_queuename;      // queue name or routing key
-   int m_mode;             // RABBITMQ_{CONSUMER|PRODUCER}_MODE
+   Thread *m_thread;       // thread instance
    bool m_active;          // true while active
 
    /* on_amqp_error: check return code of amqp functions, and when error, issue error message and return true */
@@ -76,7 +77,7 @@ private:
 public:
 
    /* constructor */
-   RabbitMQ(MMDAgent *mmdagent, int id, int mode, const char *host, int port, const char *exchangename, const char *queuename);
+   RabbitMQ(MMDAgent *mmdagent, int id, const char *name, int mode, const char *host, int port, const char *exchangename, const char *queuename);
 
    /* destructor */
    ~RabbitMQ();

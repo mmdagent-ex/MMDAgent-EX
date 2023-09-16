@@ -73,27 +73,27 @@ bool RabbitMQ::on_amqp_error(amqp_rpc_reply_t x, char const *context)
       return false;
 
    case AMQP_RESPONSE_NONE:
-      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "%s: missing RPC reply type!", context);
+      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "%s: %s: missing RPC reply type!", m_name, context);
       break;
 
    case AMQP_RESPONSE_LIBRARY_EXCEPTION:
-      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "%s: %s", context, amqp_error_string2(x.library_error));
+      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "%s: %s: %s", m_name, context, amqp_error_string2(x.library_error));
       break;
 
    case AMQP_RESPONSE_SERVER_EXCEPTION:
       switch (x.reply.id) {
       case AMQP_CONNECTION_CLOSE_METHOD: {
          amqp_connection_close_t *m = (amqp_connection_close_t *)x.reply.decoded;
-         m_mmdagent->sendLogString(m_id, MLOG_ERROR, "%s: server connection error %uh, message: %.*s", context, m->reply_code, (int)m->reply_text.len, (char *)m->reply_text.bytes);
+         m_mmdagent->sendLogString(m_id, MLOG_ERROR, "%s: %s: server connection error %uh, message: %.*s", m_name, context, m->reply_code, (int)m->reply_text.len, (char *)m->reply_text.bytes);
          break;
       }
       case AMQP_CHANNEL_CLOSE_METHOD: {
          amqp_channel_close_t *m = (amqp_channel_close_t *)x.reply.decoded;
-         m_mmdagent->sendLogString(m_id, MLOG_ERROR, "%s: server channel error %uh, message: %.*s", context, m->reply_code, (int)m->reply_text.len, (char *)m->reply_text.bytes);
+         m_mmdagent->sendLogString(m_id, MLOG_ERROR, "%s: %s: server channel error %uh, message: %.*s", m_name, context, m->reply_code, (int)m->reply_text.len, (char *)m->reply_text.bytes);
          break;
       }
       default:
-         m_mmdagent->sendLogString(m_id, MLOG_ERROR, "%s: unknown server error, method id 0x%08X", context, x.reply.id);
+         m_mmdagent->sendLogString(m_id, MLOG_ERROR, "%s: %s: unknown server error, method id 0x%08X", m_name, context, x.reply.id);
          break;
       }
       break;
@@ -103,17 +103,17 @@ bool RabbitMQ::on_amqp_error(amqp_rpc_reply_t x, char const *context)
 }
 
 /* constructor */
-RabbitMQ::RabbitMQ(MMDAgent *mmdagent, int id, int mode, const char *host, int port, const char *exchangename, const char *queuename)
+RabbitMQ::RabbitMQ(MMDAgent *mmdagent, int id, const char *name, int mode, const char *host, int port, const char *exchangename, const char *queuename)
 {
    m_mmdagent = mmdagent;
    m_id = id;
-   m_thread = NULL;
-   m_active = false;
+   m_name = MMDAgent_strdup(name);
+   m_mode = mode;
    m_host = MMDAgent_strdup(host);
    m_port = port;
    m_exchangename = MMDAgent_strdup(exchangename);
    m_queuename = MMDAgent_strdup(queuename);
-   m_mode = mode;
+   m_active = false;
    m_thread = new Thread;
    m_thread->setup();
 }
@@ -126,6 +126,7 @@ RabbitMQ::~RabbitMQ()
    free(m_queuename);
    free(m_exchangename);
    free(m_host);
+   free(m_name);
 }
 
 /* RabbitMQ::getMode: get mode */
@@ -152,12 +153,12 @@ void RabbitMQ::run()
    amqp_connection_state_t conn = amqp_new_connection();
    amqp_socket_t *socket = amqp_tcp_socket_new(conn);
    if (socket == NULL) {
-      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "failed to create TCP socket");
+      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "%s: failed to create TCP socket", m_name);
       return;
    }
    int status = amqp_socket_open(socket, m_host, m_port);
    if (status) {
-      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "failed to connect to rabbitmq server %s:%d", m_host, m_port);
+      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "%s: failed to connect to rabbitmq server %s:%d", m_name, m_host, m_port);
       return;
    }
 
@@ -170,7 +171,7 @@ void RabbitMQ::run()
       // start listening to a queue as a consumer
       amqp_basic_consume(conn, 1, amqp_cstring_bytes(m_queuename), amqp_empty_bytes, 0, 0, 0, amqp_empty_table);
       if (on_amqp_error(amqp_get_rpc_reply(conn), "Consuming")) return;
-      m_mmdagent->sendLogString(m_id, MLOG_STATUS, "listening %s:%d: queue=%s", m_host, m_port, m_queuename);
+      m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: listening %s:%d: queue=%s", m_name, m_host, m_port, m_queuename);
 #else
       // declare a new queue for given exchange and binding key and connect to it as a consumer
       amqp_queue_declare_ok_t *r = amqp_queue_declare(conn, 1, amqp_empty_bytes, 0, 0, 0, 1, amqp_empty_table);
@@ -185,12 +186,12 @@ void RabbitMQ::run()
       if (on_amqp_error(amqp_get_rpc_reply(conn), "Binding queue")) return;
       amqp_basic_consume(conn, 1, queuename, amqp_empty_bytes, 0, 1, 0, amqp_empty_table);
       if (on_amqp_error(amqp_get_rpc_reply(conn), "Consuming")) return;
-      m_mmdagent->sendLogString(m_id, MLOG_STATUS, "listening %s:%d: exchange=%s, bindingkey=%s", m_host, m_port, m_exchangename, m_queuename);
+      m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: listening %s:%d: exchange=%s, bindingkey=%s", m_name, m_host, m_port, m_exchangename, m_queuename);
 #endif
    }
 
    if (RABBITMQ_PRODUCER_MODE) {
-      m_mmdagent->sendLogString(m_id, MLOG_STATUS, "publishing to %s:%d: exchange=%s, bindingkey=%s", m_host, m_port, m_exchangename, m_queuename);
+      m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: publishing to %s:%d: exchange=%s, bindingkey=%s", m_name, m_host, m_port, m_exchangename, m_queuename);
    }
 
    /* main loop */
@@ -228,9 +229,9 @@ void RabbitMQ::run()
    if (on_amqp_error(amqp_connection_close(conn, AMQP_REPLY_SUCCESS), "Closing connection")) return;
    int ret = amqp_destroy_connection(conn);
    if (ret < 0) {
-      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "Ending connection: %s", amqp_error_string2(ret));
+      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "%s: ending connection: %s", m_name, amqp_error_string2(ret));
    }
-   m_mmdagent->sendLogString(m_id, MLOG_STATUS, "channel closed");
+   m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: channel closed", m_name);
    m_active = false;
 }
 
