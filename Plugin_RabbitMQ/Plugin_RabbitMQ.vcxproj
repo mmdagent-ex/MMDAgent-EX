@@ -54,7 +54,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;MMDAGENT;AMQP_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Library_glew\include;..\Library_Bullet_physics\include;..\Library_MMDFiles\include;..\Library_Julius\include;..\Library_MMDAgent\include;..\Library_GLFW\include;..\Library_OpenCV\include;..\Library_rabbitmq\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Library_glew\include;..\Library_Bullet_physics\include;..\Library_MMDFiles\include;..\Library_Julius\include;..\Library_MMDAgent\include;..\Library_GLFW\include;..\Library_OpenCV\include;..\Library_rabbitmq\include;..\Library_Poco\include;..\Library_Poco\win32\include</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
@@ -74,7 +74,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;MMDAGENT;AMQP_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Library_glew\include;..\Library_Bullet_physics\include;..\Library_MMDFiles\include;..\Library_Julius\include;..\Library_MMDAgent\include;..\Library_GLFW\include;..\Library_OpenCV\include;..\Library_rabbitmq\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Library_glew\include;..\Library_Bullet_physics\include;..\Library_MMDFiles\include;..\Library_Julius\include;..\Library_MMDAgent\include;..\Library_GLFW\include;..\Library_OpenCV\include;..\Library_rabbitmq\include;..\Library_Poco\include;..\Library_Poco\win32\include</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
@@ -93,9 +93,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Plugin_RabbitMQ.cpp" />
+    <ClCompile Include="RabbitMQ.cpp" />
     <ClCompile Include="Thread.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="RabbitMQ.h" />
     <ClInclude Include="Thread.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
