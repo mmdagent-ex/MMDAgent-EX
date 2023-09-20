@@ -795,7 +795,7 @@ double Julius_Thread::getFrameIntervalMSec()
 /* Julius_Thread::processAudio: process audio */
 void Julius_Thread::processAudio(const char *data, int len)
 {
-   if (m_audio)
+   if (m_audio && m_running)
       m_audio->appendAudioData(data, len);
 }
 
