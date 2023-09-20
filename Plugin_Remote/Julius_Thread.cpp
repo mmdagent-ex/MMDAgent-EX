@@ -48,6 +48,13 @@
 #include "Avatar.h"
 #include "portaudio.h"
 
+#define MyOutputDebugString( str, ... ) \
+      { \
+        char c[256]; \
+        sprintf( c, str, __VA_ARGS__ ); \
+        OutputDebugString( c ); \
+      }
+
 // default total recorded duration time limit in minutes
 // 16kHz 16bit mono recording: 2 * 16000 * 60 = 1920000bytes = 1.83 MB/min
 // RECORDING_LIMIT_MINUTES * 1.83 MB = recorded file total size limit
@@ -63,6 +70,12 @@ static int audioPlayCallback(const void *inputBuffer, void *outputBuffer,
    SP16 *out = (SP16 *)outputBuffer;
    (void)inputBuffer; /* Prevent unused variable warning. */
    AudioProcess *d = (AudioProcess *)userData;
+
+   if (d->m_play_buffer_current > 0) {
+      int i;
+      i = 0;
+   }
+      
 
 #if 1
    if (d->m_play_buffer_current < framesPerBuffer) {
@@ -203,6 +216,8 @@ int AudioProcess::callback_read(SP16 *buf, int sampnum)
    unsigned long buflen;
    int num;
 
+   MyOutputDebugString("(B) %d bytes\n", m_receive_buffer_store_point);
+
    if (m_audio_open == false)
       return -2;
 
@@ -228,8 +243,11 @@ int AudioProcess::callback_read(SP16 *buf, int sampnum)
       Pa_Sleep(15);
       return 0;
    }
+   MyOutputDebugString("m_receive_buffer_store_point = %d\n", m_receive_buffer_store_point);
+
 
    glfwLockMutex(m_receive_mutex);
+   MyOutputDebugString("aaa\n");
 
    /* write at most sampnum samples at head of the buffer to audio recognition buf */
    buflen = m_receive_buffer_store_point;
@@ -239,6 +257,7 @@ int AudioProcess::callback_read(SP16 *buf, int sampnum)
 
    /* also store the new part to audio playing buffer */
    glfwLockMutex(m_play_mutex);
+   MyOutputDebugString("bbb\n");
    if (m_audio_open == false)
       return -2;
    num = m_receive_buffer_store_point - m_receive_buffer_last_point;
@@ -251,6 +270,7 @@ int AudioProcess::callback_read(SP16 *buf, int sampnum)
    if (len > 0) {
       memcpy(&(m_play_buffer[m_play_buffer_current]), &(m_receive_buffer[m_receive_buffer_last_point]), len * sizeof(SP16));
       m_play_buffer_current += len;
+      OutputDebugString("Written\n");
    }
    glfwUnlockMutex(m_play_mutex);
 
@@ -356,6 +376,7 @@ void AudioProcess::appendAudioData(const char *data, int len)
    memcpy(&(m_receive_buffer[m_receive_buffer_store_point]), data, len);
    m_receive_buffer_store_point += samples;
    glfwUnlockMutex(m_receive_mutex);
+   MyOutputDebugString("(A) %d bytes\n", m_receive_buffer_store_point);
 }
 
 /* AudioProcess::audioInitialize: initialize audio */
@@ -795,7 +816,7 @@ double Julius_Thread::getFrameIntervalMSec()
 /* Julius_Thread::processAudio: process audio */
 void Julius_Thread::processAudio(const char *data, int len)
 {
-   if (m_audio)
+   if (m_audio && m_running)
       m_audio->appendAudioData(data, len);
 }
 
