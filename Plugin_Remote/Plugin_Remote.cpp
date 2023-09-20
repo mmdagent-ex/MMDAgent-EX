@@ -151,14 +151,6 @@
 // duration frames for status string display in frames, for error (equals 1-day)
 #define STATUS_STRING_DISPLAY_DURATION_FRAMES_ERROR 2592000.0f
 
-
-#define MyOutputDebugString( str, ... ) \
-      { \
-        char c[256]; \
-        sprintf( c, str, __VA_ARGS__ ); \
-        OutputDebugString( c ); \
-      }
-
 static void mainThread(void *param);
 
 #ifdef _WIN32
@@ -698,7 +690,6 @@ public:
             // shrink buffer for next chunk and loop
             memmove(&(buff[0]), &(buff[7 + slen]), SOCKET_MAXBUFLEN - (7 + slen));
             m_len -= 7 + slen;
-            MyOutputDebugString("received %d bytes\n", slen + 7);
          } else {
             // process as text chunk
             char *lp, *lpsave;
