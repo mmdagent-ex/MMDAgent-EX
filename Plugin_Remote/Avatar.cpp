@@ -231,20 +231,20 @@ bool Avatar::assignModel(const char *alias)
    if (m_mmdagent == NULL)
       return false;
 
+   /* store specified model alias even if failed */
+   if (alias) {
+      if (m_name)
+         free(m_name);
+      m_name = MMDAgent_strdup(alias);
+   }
+
    modellist = m_mmdagent->getModelList();
-
-   resetBoneTarget();
-   resetFaceTarget();
-
-   m_arkit.setup();
-   m_exMorph.setup();
-   m_exBone.setup();
 
    obj = NULL;
    pmd = NULL;
 
    // find model of the given alias
-   id = m_mmdagent->findModelAlias(alias);
+   id = m_mmdagent->findModelAlias(m_name);
    if (id >= 0) {
       obj = &(modellist[id]);
       pmd = modellist[id].getPMDModel();
@@ -254,16 +254,18 @@ bool Avatar::assignModel(const char *alias)
    if (pmd == NULL) {
       m_obj = NULL;
       m_pmd = NULL;
-      if (m_name)
-         free(m_name);
-      m_name = NULL;
       return FALSE;
    }
 
    if (pmd->getNumBone() <= 0)
       return false;
 
-   m_name = MMDAgent_strdup(alias);
+   resetBoneTarget();
+   resetFaceTarget();
+
+   m_arkit.setup();
+   m_exMorph.setup();
+   m_exBone.setup();
 
    m_shapemap = obj->getShapeMap();
 
@@ -353,11 +355,15 @@ bool Avatar::processMessage(const char *AVString)
    if (AVString == NULL)
       return false;
 
-   // detect model change and re-assign if model change has occured
    if (m_obj) {
+      // detect model change and re-assign if model change has occured
       m_obj->lock();
       if (m_pmd != m_obj->getPMDModel())
-         assignModel(m_name);
+         assignModel(NULL);
+   } else {
+      // model was set but not loaded yet, try assigning
+      if (m_name)
+         assignModel(NULL);
    }
 
    // store arguments
@@ -673,11 +679,15 @@ void Avatar::update(float deltaFrame)
    float rate;
    float blendRate;
 
-   // detect model change and re-assign if model change has occured
    if (m_obj) {
+      // detect model change and re-assign if model change has occured
       m_obj->lock();
       if (m_pmd != m_obj->getPMDModel())
-         assignModel(m_name);
+         assignModel(NULL);
+   } else {
+      // model was set but not loaded yet, try assigning
+      if (m_name)
+         assignModel(NULL);
    }
 
    // update idle status
@@ -1080,6 +1090,9 @@ void Avatar::startJulius(const char *conffile, bool wantLocal, bool wantPassthro
 // Avatar::processSoundData: process sound data
 void Avatar::processSoundData(const char *data, int len)
 {
+   /* would not play&lipsync sent audio when no model is set up */
+   if (m_obj == NULL)
+      return;
    /* send the internally given audio chunk to Julius adin thread */
    m_julius_thread->processAudio(data, len);
 }
