@@ -55,6 +55,6 @@ if(APPLE)
     target_link_libraries(MMDFILES PUBLIC BulletPhysics GLFW LIBPNG -ljpeg -lminizip -lomp)
 else()
     target_compile_options(MMDFILES PRIVATE -fopenmp)
-    target_link_libraries(MMDFILES PUBLIC BulletPhysics GLFW LIBPNG -ljpeg -lminizip -lgomp)
+    target_link_libraries(MMDFILES PUBLIC BulletPhysics GLFW LIBPNG -ljpeg -lminizip -lgomp -ldl -lpthread)
 endif()
 
