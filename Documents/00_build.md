@@ -3,9 +3,9 @@
 本レポジトリは Git LFS を使っています。
 必ず Git LFS 対応のツールで clone するか git-lfs をインストールしてから clone 行ってください。
 
-## Windows 11
+## Windows
 
-Visual Studio 2022 でビルドする。Community Edition で動作を確認している。インストール時に「C++によるデスクトップ開発環境」をインストールしておく（既にインストール済みの場合はインストーラを起動して再設定）。
+Visual Studio 2022 でビルドする。Windows 11 + Visual Studio 2022 Community Edition で動作を確認している。インストール時に「C++によるデスクトップ開発環境」をインストールしておく（既にインストール済みの場合はインストーラを起動して再設定）。
 
 ビルド設定は `win32 Release` と `win32 Debug` が用意されている。通常は `Release` の利用を推奨する。`Debug` はデバッグ可能なオプションでビルドされるがレンダリング処理が非常に遅いため軽量なコンテンツでないと動作しない。
 
@@ -20,9 +20,9 @@ Visual Studio 2022 でビルドする。Community Edition で動作を確認し�
 
 実行時に、実行ファイルと同じディレクトリに `AppData` フォルダと `DLLs` フォルダが必要。`Plugins` フォルダの中は .dll ファイルのみ必要であり、他は消してしまって問題ない。別の場所で動かすときは `Release` フォルダの中身ごと移動・コピーすること。
 
-## Ubuntu 22.04
+## Ubuntu
 
-CMake でビルドする。Ubuntu-22.04 LTS で動作を確認している。
+Ubuntu-22.04 LTS で開発を行っている。また Ubuntu-20.04 でも動作を確認している。ビルドシステムは CMake である。
 
 ### 必要なパッケージのインストール
 
@@ -53,9 +53,9 @@ CMake でビルドする。Ubuntu-22.04 LTS で動作を確認している。
 
 実行時は実行ファイルと同じディレクトリに `AppData` フォルダが必要。別の場所で動かすときは `Release` フォルダの中身ごと移動・コピーする。
 
-## macOS Ventura
+## macOS
 
-CMake でビルド可能。M2 Macbook Air / macOS Ventura 13.5 で動作確認している。
+M2 Macbook Air / macOS Ventura 13.5 で開発および動作確認をしている。CMake でビルド可能。
 
 ### 必要なパッケージのインストール
 
