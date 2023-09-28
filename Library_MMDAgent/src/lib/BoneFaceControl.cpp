@@ -181,8 +181,10 @@ bool BoneFaceControl::setModel(PMDModel *pmd)
          return true;
       }
       m_face = pmd->getFace(m_targetName);
-      if (m_face == NULL) {
+      if (m_face) {
          if (m_keyName == NULL) m_val1 = m_face->getWeight();
+         return true;
+      } else {
          return false;
       }
    }

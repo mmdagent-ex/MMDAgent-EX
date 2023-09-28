@@ -6651,7 +6651,7 @@ double MMDAgent::getStartingFrameLeft()
 /* MMDAgent::setOptionalStatusString: set optional status string */
 void MMDAgent::setOptionalStatusString(const char *str)
 {
-   MMDAgent_snprintf(m_optionalStatusString, MMDAGENT_MAXBUFLEN, str);
+   MMDAgent_snprintf(m_optionalStatusString, MMDAGENT_MAXBUFLEN, "%s", str);
 }
 
 /* MMDAgent::getKeyHandler: get key handler */
