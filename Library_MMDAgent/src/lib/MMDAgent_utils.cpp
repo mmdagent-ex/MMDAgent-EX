@@ -1112,7 +1112,7 @@ bool MMDAgent_openExternal(const char *file, const char *app_path)
 /* MMDAgent_getlanguage: get language preference */
 const char *MMDAgent_getlanguage()
 {
-   static char *languages[] = { "ja", "en" };
+   static const char *languages[] = { "ja", "en" };
 
 #ifdef _WIN32
    if (GetUserDefaultUILanguage() == MAKELANGID(LANG_JAPANESE, SUBLANG_JAPANESE_JAPAN)) {
