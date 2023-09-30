@@ -820,19 +820,6 @@ REMOTEKEY_DOWN|(key code string)
 REMOTEKEY_UP|(key code string)
 ```
 
-## 動画送信
-
-**SCREENENCODE_START, SCREENENCODE_STOP**
-
-画面とWebカメラのキャプチャ動画を遠隔へ送信開始および終了する。
-
-```text
-SCREENENCODE_START|(ID of camera, -1 to disable)|bitrate|fps|base_width|base_height|camera_zoomrate
-SCREENENCODE_STOP
-SCREENENCODE_EVENT_START
-SCREENENCODE_EVENT_STOP
-```
-
 ## 操作ログ記録
 
 **AVATAR_LOGSAVE_START, AVATAR_LOGSAVE_STOP**
@@ -842,24 +829,6 @@ SCREENENCODE_EVENT_STOP
 ```text
 AVATAR_LOGSAVE_START|ファイル名
 AVATAR_LOGSAVE_STOP
-```
-
-## ファイル受信
-
-**REMOTE_TRANSFILE**
-
-**REMOTE_TRANSFILE_PREPARED**
-
-**REMOTE_TRANSFILE_FINISHED**
-
-リモートからのファイル受信（詳細は別途 Doc を参照のこと）
-
-```text
-## コマンド
-REMOTE_TRANSFILE|ファイル名
-## イベント
-REMOTE_TRANSFILE_PREPARED|送受信用チャネル名|ファイル名
-REMOTE_TRANSFILE_FINISHED|送受信用チャネル名|ファイル名
 ```
 
 # イベント通知

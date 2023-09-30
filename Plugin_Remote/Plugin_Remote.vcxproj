@@ -94,35 +94,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="adin_file.c" />
-    <ClCompile Include="AudioEncoder.cpp" />
     <ClCompile Include="Avatar.cpp" />
-    <ClCompile Include="BoneControl.cpp" />
     <ClCompile Include="Julius_Record.cpp" />
     <ClCompile Include="Julius_Thread.cpp" />
     <ClCompile Include="MorphControl.cpp" />
     <ClCompile Include="MouseQueue.cpp" />
     <ClCompile Include="Plugin_Remote.cpp" />
-    <ClCompile Include="ScreenEncoder.cpp" />
     <ClCompile Include="ServerClient.cpp" />
     <ClCompile Include="Speak.cpp" />
     <ClCompile Include="Thread.cpp" />
-    <ClCompile Include="TransFile.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="adin_file.h" />
-    <ClInclude Include="AudioEncoder.h" />
     <ClInclude Include="Avatar.h" />
-    <ClInclude Include="BoneControl.h" />
     <ClInclude Include="Julius_Record.h" />
     <ClInclude Include="Julius_Thread.h" />
     <ClInclude Include="MorphControl.h" />
     <ClInclude Include="MouseQueue.h" />
-    <ClInclude Include="ScreenEncoder.h" />
     <ClInclude Include="ServerClient.h" />
     <ClInclude Include="Speak.h" />
     <ClInclude Include="Thread.h" />
-    <ClInclude Include="TransFile.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -44,9 +44,6 @@
 // Plugin name
 #define PLUGIN_NAME "Remote"
 
-// commands
-#define PLUGIN_COMMAND_TRANSFER_FILE "REMOTE_TRANSFILE"
-
 // events
 #define PLUGIN_EVENT_CONNECTED "REMOTE_EVENT_CONNECTED"
 #define PLUGIN_EVENT_DISCONNECTED "REMOTE_EVENT_DISCONNECTED"
@@ -79,8 +76,6 @@
 #define PLUGIN_REMOTE_CONFIG_LISTENPORTNUMBER    "Plugin_Remote_ListenPort"
 // configuration key for send all log switch (false to send only message (default))
 #define PLUGIN_REMOTE_CONFIG_ALLLOG        "Plugin_Remote_AllLog"
-// configuration key for enable mirror mode
-#define PLUGIN_REMOTE_CONFIG_MIRROR        "Plugin_Remote_EnableMirrorMode"
 // configuration key to the number of re-connection trial on client mode
 #define PLUGIN_REMOTE_CONFIG_RETRY_COUNT         "Plugin_Remote_RetryCount"
 // configuration key for body rotation rate (default: BODY_ROTATION_COEF)
@@ -134,10 +129,7 @@
 #include "Thread.h"
 #include "ServerClient.h"
 #include "Avatar.h"
-#include "ScreenEncoder.h"
-#include "AudioEncoder.h"
 #include "Speak.h"
-#include "TransFile.h"
 #include <sndfile.h>
 #include <samplerate.h>
 #include <random>
@@ -159,9 +151,7 @@ static void mainThread(void *param);
 #define EXPORT extern "C"
 #endif /* _WIN32 */
 
-static bool mirror_mode = false;
 static int acceptModelUpdateForLocalLipsync = -1;
-
 
 /* generate 16 bytes of random binary data and encode to Base64 */
 static std::string makeRandomKey() {
@@ -225,20 +215,6 @@ private:
 
    Speak m_speak;
 
-   ScreenEncoder *m_encoder;
-   AudioEncoder *m_audioEncoder;
-   int m_cameraId;
-   int m_encoderBitrate;
-   int m_encoderFPS;
-   int m_encoderBaseWidth;
-   int m_encoderBaseHeight;
-   int m_encoderZoomRate;
-   bool m_encoderStartFlag;
-   bool m_encoderStopFlag;
-   double m_encoderFrameCount;
-   double m_encoderFrameStep;
-   GLFWmutex m_mutex;
-
    char m_statusString[MMDAGENT_MAXBUFLEN];
    bool m_statusStringUpdated;
    FTGLTextDrawElements m_elem;
@@ -246,10 +222,7 @@ private:
    double m_displayStatusDurationFrame;
    double m_displayStatusFrame;
 
-   TransFile m_transFile;
-
    float m_maxVol_speak;
-   float m_maxVol_camera;
    double m_maxVolUpdateFrame;
 
    // initialize
@@ -283,26 +256,12 @@ private:
       m_fpLog = NULL;
       m_len = 0;
       m_bp = 0;
-      m_encoder = NULL;
-      m_audioEncoder = NULL;
-      m_cameraId = -1;
-      m_encoderBitrate = 0;
-      m_encoderFPS = 0;
-      m_encoderBaseWidth = 0;
-      m_encoderBaseHeight = 0;
-      m_encoderZoomRate = 1;
-      m_encoderStartFlag = false;
-      m_encoderStopFlag = false;
-      m_encoderFrameCount = 0.0;
-      m_encoderFrameStep = 0.0;
-      m_mutex = NULL;
       m_statusStringUpdated = false;
       memset(&m_elem, 0, sizeof(FTGLTextDrawElements));
       memset(&m_elemOutline, 0, sizeof(FTGLTextDrawElements));
       m_displayStatusFrame = 0.0;
       m_displayStatusDurationFrame = 0.0;
       m_maxVol_speak = 0.0f;
-      m_maxVol_camera = 0.0f;
       m_maxVolUpdateFrame = 0.0;
    }
 
@@ -335,10 +294,6 @@ private:
          free(m_ws_dir);
       if (m_fpLog)
          fclose(m_fpLog);
-      if (m_encoder)
-         delete m_encoder;
-      if (m_mutex)
-         glfwDestroyMutex(m_mutex);
 
       initialize();
    }
@@ -425,15 +380,7 @@ private:
             }
          }
       }
-      m_avatar[c]->setup(m_mmdagent, m_id, mirror_mode, local_lipsync, local_passthrough);
-
-      m_avatar[c]->setRates(
-         k->exist(PLUGIN_REMOTE_CONFIG_ROTATION_RATE_BODY) ? MMDAgent_str2float(k->getString(PLUGIN_REMOTE_CONFIG_ROTATION_RATE_BODY, NULL)) : BODY_ROTATION_COEF,
-         k->exist(PLUGIN_REMOTE_CONFIG_ROTATION_RATE_NECK) ? MMDAgent_str2float(k->getString(PLUGIN_REMOTE_CONFIG_ROTATION_RATE_NECK, NULL)) : NECK_ROTATION_COEF,
-         k->exist(PLUGIN_REMOTE_CONFIG_ROTATION_RATE_HEAD) ? MMDAgent_str2float(k->getString(PLUGIN_REMOTE_CONFIG_ROTATION_RATE_HEAD, NULL)) : HEAD_ROTATION_COEF,
-         k->exist(PLUGIN_REMOTE_CONFIG_MOVE_RATE_UPDOWN) ? MMDAgent_str2float(k->getString(PLUGIN_REMOTE_CONFIG_MOVE_RATE_UPDOWN, NULL)) : CENTERBONE_ADDITIONALMOVECOEF_SCALE,
-         k->exist(PLUGIN_REMOTE_CONFIG_MOVE_RATE_SLIDE) ? MMDAgent_str2float(k->getString(PLUGIN_REMOTE_CONFIG_MOVE_RATE_SLIDE, NULL)) : CENTERBONE_ADDITIONALMOVECOEF_SCALE_RELATIVE_X
-         );
+      m_avatar[c]->setup(m_mmdagent, m_id, local_lipsync, local_passthrough);
 
       if (local_lipsync == true) {
          if (m_mmdagent->findModelAlias("0") >= 0) {
@@ -513,8 +460,6 @@ public:
       m_clientConnect = clientConnect;
       m_webSocketMode = webSocketMode;
 
-      m_mutex = glfwCreateMutex();
-
       if (m_clientConnect) {
          m_serverHostName = MMDAgent_strdup(m_mmdagent->getKeyValue()->getString(PLUGIN_REMOTE_CONFIG_HOSTNAME, PLUGIN_REMOVE_CLIENT_CONNECT_DEFAULT_HOSTNAME));
          portstr = m_mmdagent->getKeyValue()->getString(PLUGIN_REMOTE_CONFIG_PORTNUMBER, NULL);
@@ -545,7 +490,7 @@ public:
       m_thread = new Thread;
       m_thread->setup();
 
-      m_speak.setup(mmdagent, id, mirror_mode);
+      m_speak.setup(mmdagent, id);
    }
 
    // start main thread
@@ -882,21 +827,6 @@ public:
       return true;
    }
 
-   void stopEncoding()
-   {
-      ScreenEncoder *enc = m_encoder;
-
-      glfwLockMutex(m_mutex);
-      m_encoder = NULL;
-      if (enc)
-         delete enc;
-      if (m_audioEncoder) {
-         delete m_audioEncoder;
-         m_audioEncoder = NULL;
-      }
-      glfwUnlockMutex(m_mutex);
-   }
-
    // main processing loop
    bool process()
    {
@@ -984,27 +914,6 @@ public:
 
                readList.push_back(*ws);
 
-               if (m_encoderStopFlag == true) {
-                  stopEncoding();
-                  m_encoderStopFlag = false;
-               }
-               if (m_encoderStartFlag == true) {
-                  // prepare screen encoder
-                  if (m_encoder)
-                     delete m_encoder;
-                  m_encoderFrameStep = 30.0 / m_encoderFPS;
-                  m_encoder = new ScreenEncoder();
-                  m_encoder->setup(m_mmdagent, m_id, m_cameraId, m_encoderBitrate, m_encoderFPS, m_encoderBaseWidth, m_encoderBaseHeight, m_encoderZoomRate, ws, &m_stdmutex);
-                  if (m_cameraId >= 0) {
-                     if (m_audioEncoder)
-                        delete m_audioEncoder;
-                     m_audioEncoder = new AudioEncoder();
-                     m_audioEncoder->start(m_mmdagent, m_id, 16000, ws, &m_stdmutex);
-                  }
-                  m_encoder->start();
-                  m_encoderStartFlag = false;
-               }
-
                Poco::Timespan timeout(0, 10000);
                if (Poco::Net::Socket::select(readList, writeList, exceptList, timeout) > 0) {
                   if (std::find(readList.begin(), readList.end(), *ws) != readList.end()) {
@@ -1015,9 +924,7 @@ public:
                      }
                      if (m_len <= 0) {
                         // other end error (may be disconnected)
-                        stopEncoding();
                         removeClient(ws_c);
-                        m_transFile.stop();
                         ws->close();
                         // retry connection
                         sendLog(MLOG_STATUS, "lost connection, retrying %s:%d%s", m_ws_host, m_ws_portnum, m_ws_dir);
@@ -1032,7 +939,6 @@ public:
                            // peer disconnection notification
                            if (m_avatar[ws_c])
                               m_avatar[ws_c]->setEnableFlag(false);
-                           stopEncoding();
                         }
                         // process the received message
                         processMessageData(ws_c, buff);
@@ -1048,9 +954,7 @@ public:
             } catch (const std::exception& e) {
                // other end error (may be disconnected)
                m_mmdagent->sendLogString(m_id, MLOG_ERROR, "%s", e.what());
-               stopEncoding();
                removeClient(ws_c);
-               m_transFile.stop();
                ws->close();
                // retry connection
                sendLog(MLOG_STATUS, "lost connection, retrying %s:%d", m_serverHostName, m_portNum);
@@ -1172,19 +1076,6 @@ public:
          m_maxVol_speak = r;
       }
 
-      if (m_audioEncoder == NULL) {
-         m_maxVol_camera = 0.0f;
-      } else {
-         vmax = m_audioEncoder->getMaxVol();
-         float db = 10.0f * log10f((float)vmax / 32768);
-         float r = (db + 28.0f) / 28.0f;
-         if (r < 0.0f)
-            r = 0.0f;
-         if (r > 1.0f)
-            r = 1.0f;
-         m_maxVol_camera = r;
-      }
-
       m_maxVolUpdateFrame = PLUGIN_REMOTE_UPDATE_MAXVOL_FRAMES;
    }
 
@@ -1196,19 +1087,6 @@ public:
       }
       m_speak.update(frames);
       avatarUpdateMaxVol(frames);
-      if (m_mutex) {
-         glfwLockMutex(m_mutex);
-         if (m_webSocketMode && m_encoder && m_encoder->isReady()) {
-            m_encoderFrameCount += frames;
-            if (m_encoder->getIssueFrameFlag() == false && m_encoderFrameCount > m_encoderFrameStep) {
-               m_encoderFrameCount = 0.0;
-               m_encoder->setAudioVolumes(m_maxVol_speak, m_maxVol_camera);
-               if (m_encoder->captureFrame() == true)
-                  m_encoder->setIssueFrameFlag(true);
-            }
-         }
-         glfwUnlockMutex(m_mutex);
-      }
       updateDisplayStatus();
       if (m_displayStatusFrame > 0.0) {
          m_displayStatusFrame -= frames;
@@ -1249,25 +1127,6 @@ public:
    void speak(const char *modelName, const char *filename)
    {
       m_speak.startSpeakingThread(modelName, filename);
-   }
-
-   void startEncoding(int camera_id, int bitrate, int fps, int w, int h, int zoom)
-   {
-      if (m_encoderStartFlag == false) {
-         m_encoderStopFlag = true;
-         m_cameraId = camera_id;
-         m_encoderBitrate = bitrate;
-         m_encoderFPS = fps;
-         m_encoderBaseWidth = w;
-         m_encoderBaseHeight = h;
-         m_encoderZoomRate = zoom;
-         m_encoderStartFlag = true;
-      }
-   }
-
-   void setStopEncodingFlag()
-   {
-      m_encoderStopFlag = true;
    }
 
    void updateDisplayStatus()
@@ -1363,33 +1222,7 @@ public:
          strcat(buff, "  \xef\x94\x99");
       }
 
-      if (m_encoder) {
-         /* screen encoder enabled */
-         /* "display": unicode = e163 */
-         strcat(buff, "  \xee\x85\xa3");
-      }
-      if (m_encoder && m_encoder->isCameraCapturing()) {
-         /* web camera capture enabled */
-         /* "video": unicode = f03d */
-         /* "mic": unicode = f130 */
-         strcat(buff, "  \xef\x80\xbd\xef\x84\xb0");
-      }
-
       m_mmdagent->setOptionalStatusString(buff);
-   }
-
-   void startFileTransfer(const char *filename)
-   {
-      char buff[MMDAGENT_MAXBUFLEN];
-
-      /* only one download at a moment is allowed */
-      if (m_transFile.isRunning())
-         return;
-
-      std::string suffix = makeRandomString(8);
-
-      MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s-%s", m_ws_dir, suffix.c_str());
-      m_transFile.start(m_mmdagent, m_id, m_ws_host, m_ws_portnum, buff, filename);
    }
 
    /* enable local lipsync immediately before remote peer is starting communication */
@@ -1434,10 +1267,6 @@ EXPORT void extAppStart(MMDAgent *mmdagent)
 
    if (MMDAgent_strequal(mmdagent->getKeyValue()->getString(PLUGIN_REMOTE_CONFIG_ALLLOG, "false"), "false") == false) {
       send_log = true;
-   }
-
-   if (MMDAgent_strequal(mmdagent->getKeyValue()->getString(PLUGIN_REMOTE_CONFIG_MIRROR, "false"), "false") == false) {
-      mirror_mode = true;
    }
 
    if (MMDAgent_strequal(mmdagent->getKeyValue()->getString(PLUGIN_REMOTE_CONFIG_ENABLE_SERVER_OLD, "false"), "false") == false
@@ -1531,44 +1360,6 @@ EXPORT void extProcMessage(MMDAgent *mmdagent, const char *type, const char *arg
          }
          free(buff);
       }
-   } else if (MMDAgent_strequal(type, PLUGIN_COMMAND_SCREENENCODE_START)) {
-      mmdagent->sendLogString(mid, MLOG_MESSAGE_CAPTURED, "%s|%s", type, args);
-      if (enabled == true && args) {
-         char *buff = MMDAgent_strdup(args);
-         int camera_id, bitrate, fps, w, h, zoom;
-         char *p, *save;
-         p = MMDAgent_strtok(buff, "|\r\n", &save);
-         if (p) {
-            camera_id = MMDAgent_str2int(p);
-            bitrate = MMDAgent_str2int(MMDAgent_strtok(NULL, "|", &save));
-            if (bitrate != 0) {
-               fps = MMDAgent_str2int(MMDAgent_strtok(NULL, "|\r\n", &save));
-               if (fps != 0) {
-                  w = MMDAgent_str2int(MMDAgent_strtok(NULL, "|\r\n", &save));
-                  if (w != 0) {
-                     h = MMDAgent_str2int(MMDAgent_strtok(NULL, "|\r\n", &save));
-                     if (h != 0) {
-                        zoom = MMDAgent_str2int(MMDAgent_strtok(NULL, "|\r\n", &save));
-                        if (zoom != 0) {
-                           plugin.startEncoding(camera_id, bitrate, fps, w, h, zoom);
-                        }
-                     }
-                  }
-               }
-            }
-         }
-         free(buff);
-      }
-   } else if (MMDAgent_strequal(type, PLUGIN_COMMAND_SCREENENCODE_STOP)) {
-      mmdagent->sendLogString(mid, MLOG_MESSAGE_CAPTURED, "%s", type);
-      if (enabled == true) {
-         plugin.setStopEncodingFlag();
-      }
-   } else if (MMDAgent_strequal(type, PLUGIN_COMMAND_TRANSFER_FILE)) {
-      mmdagent->sendLogString(mid, MLOG_MESSAGE_CAPTURED, "%s|%s", type, args);
-      if (enabled == true) {
-         plugin.startFileTransfer(args);
-      }
    } else if (MMDAgent_strequal(type, MMDAGENT_EVENT_MODELADD)) {
       /* model is not set up for local lip sync, capture first model load and set up later */
       mmdagent->sendLogString(mid, MLOG_MESSAGE_CAPTURED, "%s|%s", type, args);
@@ -1580,7 +1371,7 @@ EXPORT void extProcMessage(MMDAgent *mmdagent, const char *type, const char *arg
          }
       }
    }
-   
+
    if (send_log == false) {
       // send message
       if (enabled == true) {
@@ -1648,7 +1439,6 @@ EXPORT void extAppEnd(MMDAgent *mmdagent)
    if (configured == false)
       return;
    enabled = false;
-   plugin.stopEncoding();
    plugin.stop();
    plugin.clearAll();
 }

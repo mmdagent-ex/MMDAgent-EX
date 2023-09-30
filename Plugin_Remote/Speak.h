@@ -54,7 +54,6 @@ private:
 
    MMDAgent *m_mmdagent;             /* MMDAgent-EX instance */
    int m_id;                         /* module id of instance */
-   bool m_mirrorMode;                /* flag for avatar control */
 
    Avatar *m_avatarForSpeak;         /* avatar controller for lip sync */
    char *m_avatarForSpeakModelName;  /* model name for lip sync */
@@ -83,7 +82,7 @@ public:
    void clear();
 
    /* setup: set up */
-   void setup(MMDAgent *mmdagent, int mid, bool mirror_mode);
+   void setup(MMDAgent *mmdagent, int mid);
 
    /* update: update */
    void update(float frames);
