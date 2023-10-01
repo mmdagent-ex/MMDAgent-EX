@@ -1,7 +1,7 @@
 # MMDAgent-EX
 
-[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/mmd-agent/MMDAgent-EX/blob/main/README.md)
-[![ja](https://img.shields.io/badge/lang-ja-blue.svg)](https://github.com/mmd-agent/MMDAgent-EX/blob/main/README.ja.md)
+[![en](https://img.shields.io/badge/lang-en-red.svg)](README.md)
+[![ja](https://img.shields.io/badge/lang-ja-blue.svg)](README.ja.md)
 
 ---
 

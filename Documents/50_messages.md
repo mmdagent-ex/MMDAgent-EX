@@ -783,13 +783,13 @@ LIPSYNC_EVENT_START|(model alias)
 LIPSYNC_EVENT_STOP|(model alias)
 ```
 
-# 遠隔操作 (Plugin_Remote)
+# 外部操作 (Plugin_Remote)
 
 ## 制御・操作
 
 **AVATAR|START, AVATAR|STOP**
 
-遠隔制御の開始コマンド `__AV_START` あるいは終了コマンド `__AV_END` を受信したときにそれぞれ発行されるメッセージ。
+外部制御APIからモデルの外部制御を開始するコマンドである `__AV_START` あるいは終了コマンド `__AV_END` を受信したときにそれぞれ発行されるメッセージ。
 
 ```text
 AVATAR|START
@@ -798,7 +798,7 @@ AVATAR|END
 
 **AVATAR_CONTROL**
 
-遠隔制御コマンドに基づいてモデルを制御するのを一時的に中断・再開する。処理後に **AVATAR_EVENT_CONTROL** を発行する。
+外部制御APIからのコマンドに基づいてモデルを制御するのを一時的に中断・再開する。処理後に **AVATAR_EVENT_CONTROL** を発行する。
 
 - **DISABLE**: 一時的に無効化
 - **ENABLE**: 無効化を終了して再開
@@ -812,7 +812,7 @@ AVATAR_EVENT_CONTROL|ENABLED
 
 **REMOTEKEY_CHAR, REMOTEKEY_DOWN, REMOTEKEY_UP**
 
-キーボード入力をメッセージから送りこむ。
+キーボード入力を外部から送りこむメッセージ。
 
 ```text
 REMOTEKEY_CHAR|(character)
@@ -824,7 +824,7 @@ REMOTEKEY_UP|(key code string)
 
 **AVATAR_LOGSAVE_START, AVATAR_LOGSAVE_STOP**
 
-遠隔からの制御コマンドを全てファイルに記録する。**AVATAR_LOGSAVE_START**で開始、**AVATAR_LOGSAVE_STOP**で終了。
+外部からの制御コマンドを全てファイルに記録する。**AVATAR_LOGSAVE_START**で開始、**AVATAR_LOGSAVE_STOP**で終了。
 
 ```text
 AVATAR_LOGSAVE_START|ファイル名
