@@ -5,23 +5,23 @@
 
 ---
 
-(注意事項)
+Short Notice:
 
-- This repository contains no content assets (3D model, dialogue script, etc.).
+This repository contains no content assets (3D model, dialogue script, etc.).
 
 ---
 
 ## What is this?
 
-MMDAgent-EX is an open-source R&D platform for spoken dialogue systems and avatar communication.  This system consists of built-in CG rendering engine with speech processing modules and controllers, that enables building an interactive, multi-modal spoken dialogue systems of your own. The system can also be operated as a CG avatar in that one can remotely control CG avatar, by transmitting his voice and face-tracking information from remote site.
+MMDAgent-EX is an open-source platform for voice dialogue systems and avatar communication. It is a standalone system that combines the display and control of CG characters with speech and language processing, allowing you to create various voice dialogue systems. By adding various modules, you can build diverse multimodal dialogue systems. Additionally, it supports features such as lip-synced speech playback and motion playback/control from external software, making it possible to operate as a human-agent frontend for a dialogue system.
 
-History: the original MMDAgent was developed at the Nagoya Institute of Technology (NITech) at 2011 as an open source toolkit for spoken dialogue research. After its development, MMDAgent-EX has been developed at Lee Lab in NITech, with improved preformance, lots of enhancements, network support and much more. On December 2020, this software development has been assited by the moonshot R&D "Avatar Symbiomic Society" project, which aims to integrate avatar communication with spoken dialogue system to realize "Autonomous and Remote Fusion Dialogue Platform".
+MMDAgent was developed at Nagoya Institute of Technology since 2011 as an open-source toolkit for research and development in voice interaction.  Besides the its original version, it has been internally developed continuously for research purposes: support various formats, network capabilities, UI improvements, external control functions, and more.  Since December 2020, its research and development have been progressing in the "Avatar Symbiosis Society" JST moonshot program, as the platform for CG avatar communication. Here, we release some of the research and development results as open source.
 
-MMDAgent-EX has an OpenGL-based rendering engine compatible to MMD (MikuMikuDance) software.  It can play MMD format 3D models and motions in real time.  It has its own speech recognition and speech synthesis engine, as well as a primitive dialogue scripting function, making it possible to build a spoken dialogue system with this sytem.  It can also be fully controllable from other process, thus one can connect MMDAgent-EX with Python and other tools, thus can easily incorporate cloud-based services like speech-to-text, text-to-speech and LLM chatbots.
+MMDAgent-EX has its own OpenGL-based rendering engine compatible with MMD (MikuMikuDance), and can create interactive characters using 3D models and motion data in MMD format. It also includes speech recognition and synthesis engines developed at Nagoya Institute of Technology, such as Julius and Open JTalk, as well as an embedded FST-based state-transition primitive dialogue scripting feature, allowing you to build voice dialogue systems independently. Aside from the internal engines, it can be easily connected to other scripts like Python, so you can add another modules such as cloud-based speech recognition, speech synthesis engines, or large language models like ChatGPT with this system. Furthermore, it supports external control via socket connections, making it suitable for use as the input/output frontend for existing dialogue systems.
 
 ## Documents
 
-Documents are located under the "Documents" folder.
+See the "Documents" folder for tool documents.
 
 - Set up
 - How to build
@@ -38,7 +38,7 @@ This repository just contains the system (main app + plugins).  Contents (3D mod
 
 MMDAgent-EX is distributed under Simplified BSD License.
 
-Also MMDAgent-EX depends on various open-source softwares and libraries. Some of them are also included in this repository.  For licensing issues, please consult each license of the software:
+MMDAgent-EX depends on various open-source softwares and libraries. Some of them are also included in this repository.  For licensing issues, please consult each license of the software:
 
 - Bullet Physics
 - FreeType
@@ -63,11 +63,15 @@ When using materials in this system, i.e. MMD 3D model, music, motions etc., ple
 
 ## Disclaimer
 
-This software has been developed since 2010 by essentially one university professor, who is in their 50s as of 2023. It was originally designed for research purposes, and it does not guarantee the existence of a complete specification or documentation. Some functions might not be documented or may not behave as expected.
+(The content in this section represents the author's opinion and is not the software's terms of use)
+
+This software has been developed since 2010 by essentially one, rather old-aged university professor. It was originally designed for research purposes, and it does not guarantee the existence of a complete specification or documentation. Some functions might not be documented or may not behave as expected.
 
 The coding style is somewhat dated, deprecated functions are often used (you will see tons of warnings during the build process). Some implementations are based on non-standard way.  The code is not particularly well-organized, and its readability may be considered low.
 
 As with most open-source software, this software is provided "AS IS". Please be aware of the aforementioned points and use it at your own discretion.
+
+Furthermore, this software is also related to the culture of MMD. Users are encouraged to understand and respect the culture of MMD at using the materials. When using materials such as 3D models, motions, sounds, and images with this system, it is our sincere hope that users not only comply with the terms of use specified by their respective authors (rights holders) but also use them in a manner that shows deep respect for the creators and their creative worlds.
 
 ## Acknowledgments
 
