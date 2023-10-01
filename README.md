@@ -5,9 +5,40 @@
 
 ---
 
-Short Notice:
+## Cloning the Project
 
-This repository contains no content assets (3D model, dialogue script, etc.).
+This project uses Git LFS (Large File Storage) to manage binary files. If Git LFS is not installed in your environment, this project would not be cloned correctly.
+
+Before cloning the project, **please make sure to install Git LFS**. Or you should use some **LFS-enabled Git app** such as [GitHub Desktop](https://desktop.github.com/).
+
+### Installing Git LFS on Linux/Ubuntu
+
+```shell
+sudo apt install git-lfs
+```
+
+Verify:
+
+```shell
+git lfs version
+```
+
+### Installing Git LFS on macOS
+
+```shell
+brew install git-lfs
+```
+
+Verify:
+
+```shell
+git lfs version
+```
+
+###  Installing Git LFS onWindows
+
+1. Download the Git LFS installer for Windows from the [Git LFS download page](https://git-lfs.github.com/) and run it.
+2. Follow the installer instructions to install Git LFS.
 
 ---
 
@@ -18,6 +49,11 @@ MMDAgent-EX is an open-source platform for voice dialogue systems and avatar com
 MMDAgent was developed at Nagoya Institute of Technology since 2011 as an open-source toolkit for research and development in voice interaction.  Besides the its original version, it has been internally developed continuously for research purposes: support various formats, network capabilities, UI improvements, external control functions, and more.  Since December 2020, its research and development have been progressing in the "Avatar Symbiosis Society" JST moonshot program, as the platform for CG avatar communication. Here, we release some of the research and development results as open source.
 
 MMDAgent-EX has its own OpenGL-based rendering engine compatible with MMD (MikuMikuDance), and can create interactive characters using 3D models and motion data in MMD format. It also includes speech recognition and synthesis engines developed at Nagoya Institute of Technology, such as Julius and Open JTalk, as well as an embedded FST-based state-transition primitive dialogue scripting feature, allowing you to build voice dialogue systems independently. Aside from the internal engines, it can be easily connected to other scripts like Python, so you can add another modules such as cloud-based speech recognition, speech synthesis engines, or large language models like ChatGPT with this system. Furthermore, it supports external control via socket connections, making it suitable for use as the input/output frontend for existing dialogue systems.
+
+Short Notice:
+
+- This repository contains no content assets (3D model, dialogue script, etc.).
+
 
 ## Documents
 
