@@ -133,6 +133,7 @@
 #include <sndfile.h>
 #include <samplerate.h>
 #include <random>
+#include <mutex>
 
 #define SOCKET_MAXBUFLEN 8192
 
