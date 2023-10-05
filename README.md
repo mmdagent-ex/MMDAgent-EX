@@ -54,7 +54,6 @@ Short Notice:
 
 - This repository contains no content assets (3D model, dialogue script, etc.).
 
-
 ## Documents
 
 See the "Documents" folder for tool documents.
@@ -72,10 +71,11 @@ This repository just contains the system (main app + plugins).  Contents (3D mod
 
 ## License
 
-MMDAgent-EX is distributed under Simplified BSD License.
+MMDAgent-EX is distributed under the Apache License, Version 2.0.
 
 MMDAgent-EX depends on various open-source softwares and libraries. Some of them are also included in this repository.  For licensing issues, please consult each license of the software:
 
+- MMDAgent
 - Bullet Physics
 - FreeType
 - GLFW
