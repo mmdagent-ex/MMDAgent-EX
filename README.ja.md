@@ -75,7 +75,7 @@ MMDAgent-EX は MMD (MikuMikuDance) 互換の独自のOpenGLベースの描画�
 
 ## ライセンス
 
-MMDAgent-EX のコードは Modified BSD License で提供されています。
+MMDAgent-EX のコードは Apache License, Version 2.0 で提供されています。
 
 また、MMDAgent-EX は多くのソフトウェアを利用して構成されています。利用においては各ソフトウェアのライセンスにも留意してください。以下は利用しているライブラリの一覧です（これのみであることを保証するものではありません）。
 
