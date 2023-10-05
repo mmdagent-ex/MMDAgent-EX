@@ -42,7 +42,6 @@
 /* headers */
 
 #include "MMDAgent.h"
-#include "CameraImage.h"
 #include "TextArea.h"
 
 /* definitions */

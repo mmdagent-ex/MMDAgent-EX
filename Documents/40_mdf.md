@@ -194,6 +194,8 @@ light_color=1.0,1.0,1.0
 
 ディフュージョンフィルター： `diffusion_postfilter=true` で有効化
 
+※ Windows, Linux のみ　macOS では利用不可
+
 ```text
 diffusion_postfilter=false
 diffusion_postfilter_intensity=0.6
@@ -238,21 +240,21 @@ shadow_density=0.5
 bullet_fps=120
 ```
 
-## 遠隔操作
+## 外部操作
 
-`yes` を指定するとリップシンクのソースをローカル音声入力にする
+外部操作中のリップシンクをリモート音声からマイク入力に切りかえる（`yes` 指定時）
 
 ```text
 Plugin_Remote_EnableLocalLipsync=no
 ```
 
-`yes` を指定するとリップシンクソースの音声をローカル音声出力へパススルーする
+上記が `yes` のとき、さらに以下を `yes` を指定するとマイク入力を音声出力へパススルーする
 
 ```text
 Plugin_Remote_EnableLocalPassthrough=no
 ```
 
-`directory` 付きで指定するとリップシンク対象の音声を指定ディレクトリ以下に発話単位で録音する。指定しない場合のデフォルトは録音しない。および録音する場合の時間上限（単位：分、デフォルト120）
+リップシンクの音声を指定ディレクトリ以下に発話単位で録音する。録音時間の上限を分で指定可能（デフォルト: 120分）
 
 ```text
 Plugin_Remote_Record_Wave_Dir=directory
@@ -263,27 +265,6 @@ Plugin_Remote_Record_Wave_Limit=120
 
 ```text
 motion_capture_max_minutes=10
-```
-
-`true` を指定するとトラッキング時にモーションの左右を反転する
-
-```text
-Plugin_Remote_EnableMirrorMode=false
-```
-
-トラッキング時動作の動作調整パラメータ
-
-```text
-# 頭部回転に対する「上半身2」ボーンの回転係数
-Plugin_Remote_RotationRateBody=0.5
-# 頭部回転に対する「首」ボーンの回転係数
-Plugin_Remote_RotationRateNeck=0.5
-# 頭部回転に対する「頭」ボーンの回転係数
-Plugin_Remote_RotationRateHead=0.6
-# 頭部回転から上下移動への変換スケール
-Plugin_Remote_MoveRateUpDown=3.0
-# 頭部回転から左右移動への変換スケール
-Plugin_Remote_MoveRateSlide=0.7
 ```
 
 ## その他の調整項目

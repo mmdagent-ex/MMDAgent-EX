@@ -41,7 +41,6 @@
 
 /* headers */
 #include "MMDAgent.h"
-#include "CameraImage.h"
 #include "TextArea.h"
 
 /* TextArea::initialize: initialize */
@@ -79,7 +78,6 @@ void TextArea::initialize()
    memset(&(m_elemOut[0]), 0, sizeof(FTGLTextDrawElements));
    memset(&(m_elemOut[1]), 0, sizeof(FTGLTextDrawElements));
    m_imageTexture[0] = m_imageTexture[1] = NULL;
-   m_cameraImage[0] = m_cameraImage[1] = NULL;
    m_bid = 0;
    m_enableTrans = false;
 }
@@ -109,10 +107,6 @@ void TextArea::clear()
       delete m_imageTexture[0];
    if (m_imageTexture[1])
       delete m_imageTexture[1];
-   if (m_cameraImage[0])
-      delete m_cameraImage[0];
-   if (m_cameraImage[1])
-      delete m_cameraImage[1];
    m_active = false;
 
    initialize();
@@ -281,7 +275,6 @@ void TextArea::setText(const char *text)
 {
    char *buff, *p, *save;
    bool is_image;
-   bool is_camera;
    int i, j;
    char c;
    float old_width, old_height;
@@ -292,17 +285,13 @@ void TextArea::setText(const char *text)
    if (m_active == false) return;
 
    /* is there is previous context, enable transition */
-   if (m_imageTexture[m_bid] != NULL || m_elem[m_bid].textLen != 0 || m_cameraImage[m_bid] != NULL) {
+   if (m_imageTexture[m_bid] != NULL || m_elem[m_bid].textLen != 0) {
       m_enableTrans = true;
    } else {
       m_enableTrans = false;
    }
    old_width = m_width;
    old_height = m_height;
-
-   /* stop camera capturing */
-   if (m_cameraImage[m_bid])
-      m_cameraImage[m_bid]->stop();
 
    /* store to another buffer */
    if (m_bid == 0)
@@ -318,16 +307,11 @@ void TextArea::setText(const char *text)
       delete m_imageTexture[m_bid];
       m_imageTexture[m_bid] = NULL;
    }
-   if (m_cameraImage[m_bid]) {
-      delete m_cameraImage[m_bid];
-      m_cameraImage[m_bid] = NULL;
-   }
 
    buff = MMDAgent_strdup(text);
    p = MMDAgent_strtok(buff, "|", &save);
    p = MMDAgent_strtok(NULL, "|", &save);
 
-   is_camera = false;
    is_image = false;
 
    /* first try as image path */
@@ -342,23 +326,8 @@ void TextArea::setText(const char *text)
          delete m_imageTexture[m_bid];
          m_imageTexture[m_bid] = NULL;
       }
-   } else if (MMDAgent_strheadmatch(p, "__camera")) {
-      /* if text is "__cameraNN", open camera with id = NN */
-      int id = MMDAgent_str2int(p + 8);
-      if (id >= 0) {
-         m_cameraImage[m_bid] = new CameraImage();
-         m_cameraImage[m_bid]->setup(m_mmdagent, m_id);
-         if (m_cameraImage[m_bid]->start(id) == true) {
-            m_mmdagent->sendLogString(m_id, MLOG_STATUS, "opening web camera #%d...", id);
-            is_camera = true;
-         } else {
-            m_mmdagent->sendLogString(m_id, MLOG_ERROR, "failed to open web camera #%d", id);
-            delete m_cameraImage[m_bid];
-            m_cameraImage[m_bid] = NULL;
-         }
-      }
    }
-   if (is_image == false && is_camera == false) {
+   if (is_image == false) {
       /* text */
       /* text re-formatting */
       for (j = 0, i = 0; i < MMDAgent_strlen(p); i++) {
@@ -409,11 +378,6 @@ void TextArea::setText(const char *text)
          else
             m_height = m_height_set;
       }
-   } else if (is_camera) {
-      /* live camera */
-      /* exact width and height will be set later when web camera has been fully opened */
-      m_width = m_height = 0.0f;
-
    } else {
       /* get text elements */
       m_font->getTextDrawElements(m_text[m_bid], &(m_elem[m_bid]), m_elem[m_bid].textLen, 0.0f, 0.0f, m_linespace);
@@ -466,7 +430,7 @@ void TextArea::updateVertices()
 
    w = m_width * 0.5f;
    h = m_height * 0.5f;
-   if (m_imageTexture[m_bid] == NULL && m_cameraImage[m_bid] == NULL) {
+   if (m_imageTexture[m_bid] == NULL) {
       /* set elements for background box */
       m_elem[m_bid].vertices[0] = -w;
       m_elem[m_bid].vertices[1] = -h;
@@ -544,9 +508,6 @@ void TextArea::update(double frame)
    if (m_transFrame == 0.0)
       return;
 
-   if (m_cameraImage[m_bid] && m_cameraImage[m_bid]->isCameraCapturing() == false)
-      return;
-
    m_transFrame -= frame;
    if (m_transFrame <= 0.0)
       m_transFrame = 0.0;
@@ -563,33 +524,6 @@ void TextArea::render()
    if (m_active == false) return;
 
    if (m_elem[0].textLen == 0 && m_elem[1].textLen == 0) return;
-
-   /* update camera status */
-   if (m_cameraImage[m_bid]) {
-      if (m_cameraImage[m_bid]->isCameraCapturing() == false)
-         return;
-      if (m_width == 0.0f && m_height == 0.0f) {
-         // set image size
-         float aspect = (float)m_cameraImage[m_bid]->getHeight() / (float)m_cameraImage[m_bid]->getWidth();
-         if (m_width_set <= 0.0f) {
-            if (m_height_set <= 0.0f) {
-               m_width = (float)m_cameraImage[m_bid]->getWidth();
-               m_height = m_width * aspect;
-            } else {
-               m_height = m_height_set;
-               m_width = m_height / aspect;
-            }
-         } else {
-            m_width = m_width_set;
-            if (m_height_set <= 0.0f)
-               m_height = m_width * aspect;
-            else
-               m_height = m_height_set;
-         }
-         updateVertices();
-      }
-      m_cameraImage[m_bid]->updateTexture();
-   }
 
    glPushMatrix();
 
@@ -608,9 +542,9 @@ void TextArea::render()
 
    bid = (m_bid + 1) % 2;
 
-   if (m_imageTexture[m_bid] != NULL || m_cameraImage[m_bid] != NULL) {
+   if (m_imageTexture[m_bid] != NULL) {
       /* draw image */
-      if (m_enableTrans && (m_imageTexture[bid] != NULL || m_cameraImage[bid] != NULL) && m_transFrame != 0.0) {
+      if (m_enableTrans && (m_imageTexture[bid] != NULL) && m_transFrame != 0.0) {
          /* draw old image as background while transition */
 #ifdef MMDAGENT_DEPTHFUNC_DEFAULT_LESS
          glDepthFunc(GL_LEQUAL);
@@ -620,8 +554,6 @@ void TextArea::render()
          glTexCoordPointer(2, GL_FLOAT, 0, m_elem[bid].texcoords);
          if (m_imageTexture[bid])
             glBindTexture(GL_TEXTURE_2D, m_imageTexture[bid]->getID());
-         else if (m_cameraImage[bid])
-            glBindTexture(GL_TEXTURE_2D, m_cameraImage[bid]->getTextureId());
          glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
          glDrawElements(GL_TRIANGLES, 6, GL_INDICES, (const GLvoid *)m_elem[bid].indices);
       }
@@ -630,8 +562,6 @@ void TextArea::render()
       glTexCoordPointer(2, GL_FLOAT, 0, m_elem[m_bid].texcoords);
       if (m_imageTexture[m_bid])
          glBindTexture(GL_TEXTURE_2D, m_imageTexture[m_bid]->getID());
-      else if (m_cameraImage[m_bid])
-         glBindTexture(GL_TEXTURE_2D, m_cameraImage[m_bid]->getTextureId());
       glColor4f(1.0f, 1.0f, 1.0f, 1.0f - transRate);
       glDrawElements(GL_TRIANGLES, 6, GL_INDICES, (const GLvoid *)m_elem[m_bid].indices);
 #ifdef MMDAGENT_DEPTHFUNC_DEFAULT_LESS

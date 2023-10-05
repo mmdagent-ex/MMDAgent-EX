@@ -81,9 +81,6 @@ private:
    int m_bid;                      /* current id of the double-buffer */
    bool m_enableTrans;             /* enable Transition when true */
 
-   CameraImage *m_cameraImage[2];   /* camera image handler */
-
-
    /* initialize: initialize variables */
    void initialize();
 

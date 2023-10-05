@@ -69,4 +69,4 @@ MODEL_UNBINDFACE|(model alias)|(face name)
 
 ### MS版のみ
 
-`Avatar_mode` 通常 0.0、遠隔操作中のみ 1.0 の値になる
+`Avatar_mode` 通常 0.0、外部操作中のみ 1.0 の値になる
