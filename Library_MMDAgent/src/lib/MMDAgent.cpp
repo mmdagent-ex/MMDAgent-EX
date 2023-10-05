@@ -3145,7 +3145,6 @@ bool MMDAgent::renderScene()
       }
    }
 
-#ifndef MMDAGENT_MOONSHOT
    /* top-right indicator */
    if (m_hasExtModel) {
       /* show using ext model mark */
@@ -3154,9 +3153,7 @@ bool MMDAgent::renderScene()
          m_elem.textLen = 0; /* reset */
          m_elem.numIndices = 0;
       }
-
    }
-#endif /* ~MMDAGENT_MOONSHOT */
 
    if (m_showUsageFrame > 0.0 && m_argc <= 1 && m_loadHome == false) {
       /* start up message */
