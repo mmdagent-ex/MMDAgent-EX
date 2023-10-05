@@ -92,12 +92,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="CameraImage.cpp" />
     <ClCompile Include="Plugin_TextArea.cpp" />
     <ClCompile Include="TextArea.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CameraImage.h" />
     <ClInclude Include="TextArea.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

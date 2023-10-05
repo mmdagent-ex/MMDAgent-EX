@@ -96,16 +96,6 @@ static const char *lipNames[] = {
    "LIP_O"
 };
 
-// shapemap entry name for tracking bones
-static const char *boneNames[] = {
-   "TRACK_HEAD",
-   "TRACK_LEFTEYE",
-   "TRACK_RIGHTEYE",
-   "TRACK_BOTHEYE",
-   "TRACK_NECK",
-   "TRACK_BODY"
-};
-
 // Avatar::initialize: initialize instance
 void Avatar::initialize()
 {
@@ -117,14 +107,6 @@ void Avatar::initialize()
    m_messageBuf = NULL;
    m_messageBufMaxNum = 0;
 
-   m_mirror = false;
-   m_both_eye_mode = false;
-   m_allow_far_close_move = true;
-   m_rotation_rate_body = BODY_ROTATION_COEF;
-   m_rotation_rate_neck = NECK_ROTATION_COEF;
-   m_rotation_rate_head = HEAD_ROTATION_COEF;
-   m_move_scale_up = CENTERBONE_ADDITIONALMOVECOEF_SCALE;
-   m_move_scale_relative_down = CENTERBONE_ADDITIONALMOVECOEF_SCALE_RELATIVE_X;
    m_leavingFrameLeft = 0.0f;
    m_issueLeaveEvent = false;
    m_mouseAgingFrameLeft = 0.0f;
@@ -145,10 +127,7 @@ void Avatar::initialize()
 
    m_arkit.setup();
    m_exMorph.setup();
-   m_exBone.setup();
 
-   for (int i = 0; i < TRACK_NUM; i++)
-      m_boneControl[i].clear();
    for (int i = 0; i < LIP_NUM; i++)
       m_lipControl[i].clear();
    for (int i = 0; i < NUMACTIONUNITS; i++)
@@ -175,15 +154,6 @@ void Avatar::clear()
    initialize();
 }
 
-// Avatar::resetBoneTarget: reset bone target
-void Avatar::resetBoneTarget()
-{
-   for (int i = 0; i < TRACK_NUM; i++)
-      m_boneControl[i].resetTarget();
-   m_centerAddControl.resetTarget();
-   m_exBone.resetTargets();
-}
-
 // Avatar::resetFaceTarget: reset face target
 void Avatar::resetFaceTarget()
 {
@@ -193,13 +163,6 @@ void Avatar::resetFaceTarget()
       m_auControl[i].resetTarget();
    m_arkit.resetTargets();
    m_exMorph.resetTargets();
-}
-
-// Avatar::getCurrent: get current
-void Avatar::getCurrent()
-{
-   for (int i = 0; i < TRACK_NUM; i++)
-      m_boneControl[i].fetchCurrentRotation();
 }
 
 /* Avatar::Avatar: constructor */
@@ -260,31 +223,12 @@ bool Avatar::assignModel(const char *alias)
    if (pmd->getNumBone() <= 0)
       return false;
 
-   resetBoneTarget();
    resetFaceTarget();
 
    m_arkit.setup();
    m_exMorph.setup();
-   m_exBone.setup();
 
    m_shapemap = obj->getShapeMap();
-
-   for (int i = 0; i < TRACK_NUM; i++)
-      m_boneControl[i].clear();
-   m_centerAddControl.clear();
-
-   if (m_shapemap) {
-      // pick bones to be controlled
-      PMDBone *b;
-      for (int i = 0; i < TRACK_NUM; i++) {
-         b = m_shapemap->getTrackBone(boneNames[i]);
-         if (b)
-            m_boneControl[i].setup(b, true);
-      }
-      b = m_shapemap->getTrackBone("TRACK_CENTER");
-      if (b)
-         m_centerAddControl.setup(b, true);
-   }
 
    for (int i = 0; i < LIP_NUM; i++)
       m_lipControl[i].clear();
@@ -309,13 +253,11 @@ bool Avatar::assignModel(const char *alias)
    m_obj = obj;
    m_pmd = pmd;
 
-   getCurrent();
-
    return true;
 }
 
 // Avatar::setup: setup avatar control for a model
-bool Avatar::setup(MMDAgent *mmdagent, int id, bool mirror_mode, bool wantLocal, bool wantPassthrough)
+bool Avatar::setup(MMDAgent *mmdagent, int id, bool wantLocal, bool wantPassthrough)
 {
    m_mmdagent = mmdagent;
    m_id = id;
@@ -328,9 +270,6 @@ bool Avatar::setup(MMDAgent *mmdagent, int id, bool mirror_mode, bool wantLocal,
 #endif /* LIPSYNC_JULIUS */
 
    /* send udp Port num to remote end */
-
-   m_mirror = mirror_mode;
-
    if (m_mq)
       delete m_mq;
    m_mq = new MouthQueue();
@@ -401,13 +340,6 @@ bool Avatar::processMessage(const char *AVString)
       setEnableFlagInternal(false);
       if (m_obj) m_obj->unlock();
       return true;
-   } else if (MMDAgent_strequal(m_messageBuf[0], "__AV_RECALIBRATE")) {
-      // trigger adjustment
-      for (int i = 0; i < TRACK_NUM; i++)
-         m_boneControl[i].resetCalibration();
-      m_centerAddControl.resetCalibration();
-      if (m_obj) m_obj->unlock();
-      return true;
    } else if (MMDAgent_strequal(m_messageBuf[0], "__AV_SETMODEL")) {
       if (n != 2) {
          if (m_obj) m_obj->unlock();
@@ -416,193 +348,6 @@ bool Avatar::processMessage(const char *AVString)
       bool ret = assignModel(m_messageBuf[1]);
       if (m_obj) m_obj->unlock();
       return ret;
-   } else if (MMDAgent_strequal(m_messageBuf[0], "__AVCONF_ALLOWFARCLOSEMOVE")) {
-      if (n != 2) {
-         if (m_obj) m_obj->unlock();
-         return false;
-      }
-      if (MMDAgent_strequal(m_messageBuf[1], "true"))
-         m_allow_far_close_move = true;
-      else
-         m_allow_far_close_move = false;
-      return true;
-   } else if (MMDAgent_strequal(m_messageBuf[0], "__AV_TRACK") && m_enable == true) {
-      if (n != 14) {
-         if (m_obj) m_obj->unlock();
-         return false;
-      }
-      // head
-      pos.setX(MMDAgent_str2float(m_messageBuf[1]) * MM2MMD_COEF);
-      pos.setY(MMDAgent_str2float(m_messageBuf[2]) * MM2MMD_COEF);
-      pos.setZ(-MMDAgent_str2float(m_messageBuf[3]) * MM2MMD_COEF);
-      m_boneControl[TRACK_HEAD].setTargetPosition(pos);
-      rx = MMDAgent_str2float(m_messageBuf[4]);
-      ry = MMDAgent_str2float(m_messageBuf[5]);
-      rz = MMDAgent_str2float(m_messageBuf[6]);
-      /* OpenFace = left-handed, rotation around x-axis is inverted  Bulletphysics = right handed */
-      rot.setEuler(btScalar(-ry), btScalar(rx), btScalar(-rz));
-      m_boneControl[TRACK_HEAD].setTargetRotation(rot);
-      /* save ogirinal rotation for later eye gaze computation */
-      rotSave.setEulerZYX(btScalar(rz), btScalar(ry), btScalar(rx));
-      // eyes
-      rx = MMDAgent_str2float(m_messageBuf[7]);
-      ry = MMDAgent_str2float(m_messageBuf[8]);
-      rz = MMDAgent_str2float(m_messageBuf[9]);
-      rx2 = MMDAgent_str2float(m_messageBuf[10]);
-      ry2 = MMDAgent_str2float(m_messageBuf[11]);
-      rz2 = MMDAgent_str2float(m_messageBuf[12]);
-      if (MMDAgent_str2int(m_messageBuf[13]) == 1) {
-         // perform OpenFace-Webcam specific conversion
-         // 1. eye rotation is global, convert to local
-         // 2. use only both-eye bone: apply mean
-         btVector3 axis;
-         btVector3 front = btTransform(rotSave) * btVector3(0, 0, -1);
-         btVector3 target = btVector3(rx, ry, rz);
-         if (target.fuzzyZero() == false) {
-            target.normalize();
-            axis = target.cross(front);
-            axis.normalize();
-            rot.setRotation(axis, front.angle(target));
-         } else {
-            rot.setValue(btScalar(0.0f), btScalar(0.0f), btScalar(0.0f), btScalar(1.0f));
-         }
-         target = btVector3(rx2, ry2, rz2);
-         if (target.fuzzyZero() == false) {
-            target.normalize();
-            axis = target.cross(front);
-            axis.normalize();
-            rot2.setRotation(axis, front.angle(target));
-         } else {
-            rot2.setValue(btScalar(0.0f), btScalar(0.0f), btScalar(0.0f), btScalar(1.0f));
-         }
-         // convert to right-handed
-         rot.setX(-rot.getX());
-         rot.setZ(-rot.getZ());
-         rot2.setX(-rot2.getX());
-         rot2.setZ(-rot2.getZ());
-         // make both-eye rotation as average of left eye and right eye
-         m_boneControl[TRACK_BOTHEYE].setTargetRotation(rot.slerp(rot2, btScalar(0.5f)));
-         // reset individual rotation for both eyes
-         m_boneControl[TRACK_LEFTEYE].setTargetRotation(norot);
-         m_boneControl[TRACK_RIGHTEYE].setTargetRotation(norot);
-         m_both_eye_mode = true;
-      } else {
-         if (m_obj && m_shapemap) {
-            float p = m_shapemap->getEyeRotationCoef();
-            ry *= p; rx *= p; rz *= p;
-            ry2 *= p; rx2 *= p; rz2 *= p;
-         }
-         rot.setEuler(btScalar(-ry), btScalar(rx), btScalar(-rz));
-         rot2.setEuler(btScalar(-ry2), btScalar(rx2), btScalar(-rz2));
-         m_boneControl[TRACK_LEFTEYE].setTargetRotation(rot);
-         m_boneControl[TRACK_RIGHTEYE].setTargetRotation(rot2);
-         m_both_eye_mode = false;
-      }
-
-      // set neck and body rotation from head rotation
-      m_boneControl[TRACK_HEAD].getTargetRotation(&rot);
-      m_boneControl[TRACK_NECK].setTargetRotation(norot.slerp(rot, btScalar(m_rotation_rate_neck)));
-      m_boneControl[TRACK_BODY].setTargetRotation(norot.slerp(rot, btScalar(m_rotation_rate_body)));
-      m_boneControl[TRACK_HEAD].setTargetRotation(norot.slerp(rot, btScalar(m_rotation_rate_head)));
-
-      // additional XYZ-axis move on center bone form head rotation for dynamic leaning
-      {
-         m_boneControl[TRACK_HEAD].getTargetPosition(&pos);
-         m_boneControl[TRACK_HEAD].getTargetRotation(&rot);
-         btVector3 v = btTransform(rot) * btVector3(0.0f, 0.0f, m_move_scale_up);
-         m_centerAddControl.setTargetPosition(btVector3(v.getX()*  m_move_scale_relative_down, v.getY(), m_allow_far_close_move ? pos.getZ() : 0.0f));
-      }
-
-      // adjust and add rotation from relative head position
-      {
-         m_boneControl[TRACK_HEAD].getTargetPosition(&pos);
-         float r = pos.getZ() * POS2TAN_COEF;
-         float r2 = 0.0f;
-         if (m_allow_far_close_move) {
-            /* allow more back leaning */
-            if (r < -BACK_LEANING_MAXIMUM_RAD * 2.0f)
-               r = -BACK_LEANING_MAXIMUM_RAD * 2.0f;
-            r2 = pos.getX() * 0.2f;
-         } else {
-            if (r < -BACK_LEANING_MAXIMUM_RAD)
-               r = -BACK_LEANING_MAXIMUM_RAD;
-         }
-         m_boneControl[TRACK_BODY].getTargetRotation(&rot);
-         m_boneControl[TRACK_BODY].setTargetRotation(btQuaternion(0.0f, r, -r2) * rot);
-         m_boneControl[TRACK_NECK].getTargetRotation(&rot);
-         m_boneControl[TRACK_NECK].setTargetRotation(btQuaternion(0.0f, -r, 0.0f) * rot);
-      }
-      if (m_mirror) {
-         for (int i = 0; i < TRACK_NUM; i++)
-            m_boneControl[i].doMirror();
-         m_centerAddControl.doMirror();
-      }
-      // calibration
-      for (int i = 0; i < TRACK_NUM; i++)
-         m_boneControl[i].doCalibrateTarget();
-      m_centerAddControl.doCalibrateTarget();
-      // reset face tracking last frame count
-      m_faceTrackingFrameLeft = FACETRACKINGLEAVINGFRAMES + LEAVINGFRAMES;
-   } else if (MMDAgent_strequal(m_messageBuf[0], "__AV_ARKIT") && m_enable == true) {
-      char *p2, *p3, *save2;
-      for (int i = 1; i < n; i++) {
-         strcpy(buff2, m_messageBuf[i]);
-         p2 = MMDAgent_strtok(buff2, "=", &save2);
-         p3 = MMDAgent_strtok(NULL, "=", &save2);
-         if (p2 != NULL && p3 != NULL) {
-            if (m_obj && m_shapemap) {
-               PMDFaceInterface *f = m_shapemap->getARKitMorph(p2);
-               m_arkit.set(p2, f, MMDAgent_str2float(p3));
-            }
-         }
-      }
-      // set autolip flag
-      if (m_disableAutoLipFlag == DAL_ARKIT || m_disableAutoLipFlag == DAL_ARKITANDAU) {
-         m_autoLipFlag = false;
-      }
-      // reset face tracking last frame count
-      m_faceTrackingFrameLeft = FACETRACKINGLEAVINGFRAMES + LEAVINGFRAMES;
-   } else if (MMDAgent_strequal(m_messageBuf[0], "__AV_AU") && m_enable == true) {
-      char *p2, *p3, *save2;
-      for (int i = 1; i < n; i++) {
-         strcpy(buff2, m_messageBuf[i]);
-         p2 = MMDAgent_strtok(buff2, "=", &save2);
-         p3 = MMDAgent_strtok(NULL, "=", &save2);
-         if (p2 != NULL && p3 != NULL) {
-            int auidx = MMDAgent_str2int(p2) - 1;
-            if (0 <= auidx && auidx < NUMACTIONUNITS) {
-               float v = MMDAgent_str2float(p3);
-               if (v < 0.0f) v = 0.0f;
-               if (v > 1.0f) v = 1.0f;
-               m_auControl[auidx].setTarget(v);
-            }
-         }
-      }
-      // set autolip flag
-      if (m_disableAutoLipFlag == DAL_AU || m_disableAutoLipFlag == DAL_ARKITANDAU) {
-         m_autoLipFlag = false;
-      }
-      // reset face tracking last frame count
-      m_faceTrackingFrameLeft = FACETRACKINGLEAVINGFRAMES + LEAVINGFRAMES;
-   } else if (MMDAgent_strequal(m_messageBuf[0], "__AV_EXBONE") && m_enable == true) {
-      PMDBone *b;
-      if (m_obj && m_shapemap) {
-         for (int i = 1; i + 7 < n; i += 8) {
-            strcpy(buff2, "EXBONE_");
-            strcat(buff2, m_messageBuf[i]);
-            b = m_shapemap->getExBone(buff2);
-            if (b == NULL) continue;
-            pos.setX(MMDAgent_str2float(m_messageBuf[i + 1]) * MM2MMD_COEF);
-            pos.setY(MMDAgent_str2float(m_messageBuf[i + 2]) * MM2MMD_COEF);
-            pos.setZ(-MMDAgent_str2float(m_messageBuf[i + 3]) * MM2MMD_COEF);
-            rot = btQuaternion(btScalar(-MMDAgent_str2float(m_messageBuf[i + 4])), btScalar(MMDAgent_str2float(m_messageBuf[i + 5])), btScalar(-MMDAgent_str2float(m_messageBuf[i + 6])), btScalar(MMDAgent_str2float(m_messageBuf[i + 7])));
-            m_exBone.set(m_messageBuf[i], b, pos, rot, false);
-         }
-         if (m_mirror)
-            m_exBone.doMirrors();
-      }
-      // reset face tracking last frame count
-      m_faceTrackingFrameLeft = FACETRACKINGLEAVINGFRAMES + LEAVINGFRAMES;
    } else if (MMDAgent_strequal(m_messageBuf[0], "__AV_EXMORPH") && m_enable == true) {
       char *p2, *p3, *save2;
       for (int i = 1; i < n; i++) {
@@ -706,7 +451,6 @@ void Avatar::update(float deltaFrame)
       if (m_faceTrackingFrameLeft <= LEAVINGFRAMES) {
          // FACETRACKINGLEAVINGFRAMES frames has been passed since last ARKIT or AU message, leaving calmly
          m_faceTrackingFrameLeft = LEAVINGFRAMES;
-         resetBoneTarget();
          resetFaceTarget();
       }
    } else if (m_faceTrackingFrameLeft > 0.0f) {
@@ -724,7 +468,7 @@ void Avatar::update(float deltaFrame)
    if (rate > 1.0f) rate = 1.0f;
    if (rate < 0.0f) rate = 0.0f;
 
-   // set mouth shape from auto lipsync queue 
+   // set mouth shape from auto lipsync queue
    setCurrentMouthShape(deltaFrame);
 
    // leaving avatar control
@@ -800,24 +544,6 @@ void Avatar::update(float deltaFrame)
    if (rate > 1.0f) rate = 1.0f;
    if (rate < 0.0f) rate = 0.0f;
 
-   // control bone rotations to the target rotation at the rate
-   for (int i = 0; i < TRACK_NUM; i++) {
-      if (i == TRACK_BOTHEYE && m_both_eye_mode == false)
-         continue;
-      m_boneControl[i].applyRotation(rate, blendRate);
-   }
-   m_exBone.applyPositions(rate, blendRate);
-   m_exBone.applyRotations(rate, blendRate);
-
-   // control bone movement to the target at the rate
-   m_centerAddControl.addPosition(rate);
-
-   // update bone
-   m_centerAddControl.update();
-   for (int i = 0; i < TRACK_NUM; i++)
-      m_boneControl[i].update();
-   m_exBone.updates();
-
    // update while bone for dependent bones
    m_pmd->updateBone(false);
 
@@ -838,10 +564,6 @@ void Avatar::setEnableFlagInternal(bool flag)
 {
    m_enable = flag;
    if (m_enable) {
-      // trigger adjustment
-      for (int i = 0; i < TRACK_NUM; i++)
-         m_boneControl[i].resetCalibration();
-      m_centerAddControl.resetCalibration();
       m_leavingFrameLeft = 0.0f;
       // send "AVATAR|START" message
       m_mmdagent->sendMessage(m_id, AVATAR_MESSAGE, "START");
@@ -850,7 +572,6 @@ void Avatar::setEnableFlagInternal(bool flag)
    } else {
       // leaving
       m_leavingFrameLeft = LEAVINGFRAMES;
-      resetBoneTarget();
       resetFaceTarget();
       // send "AVATAR|END" message
       m_mmdagent->sendMessage(m_id, AVATAR_MESSAGE, "END");
@@ -1058,16 +779,6 @@ void Avatar::setCurrentMouthShape(double ellapsedFrame)
 
 }
 
-// Avatar::setRates: set motion rates
-void Avatar::setRates(float body_rotate, float neck_rotate, float head_rotate, float move_up, float move_down)
-{
-   m_rotation_rate_body = body_rotate;
-   m_rotation_rate_neck = neck_rotate;
-   m_rotation_rate_head = head_rotate;
-   m_move_scale_up = move_up;
-   m_move_scale_relative_down = move_down;
-}
-
 #ifdef LIPSYNC_JULIUS
 
 // Avatar::startJulius: start Julius thread
@@ -1085,7 +796,6 @@ void Avatar::startJulius(const char *conffile, bool wantLocal, bool wantPassthro
 }
 
 #endif /* LIPSYNC_JULIUS */
-
 
 // Avatar::processSoundData: process sound data
 void Avatar::processSoundData(const char *data, int len)

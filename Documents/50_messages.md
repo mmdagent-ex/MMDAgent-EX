@@ -453,23 +453,11 @@ TEXTAREA_EVENT_ADD|alias
 
 - **文字列を記述**すると、その文字列を表示。空白を含む場合は文字列を "" で囲む。"\n" で改行もできる。
 - **画像ファイルのパスを記述**すると、その画像を表示。
-- **`__camera0`"のように記述**することで Webカメラを開き映像をリアルタイムに表示する。数字はカメラ番号（0=デフォルト）で、`__camera1`, `__camera2` のようにすることで複数のWebカメラがあるときに指定可能。
 
 ```text
 TEXTAREA_SET|(textarea alias)|(string or image path)
 TEXTAREA_EVENT_SET|alias
 ```
-
-Webカメラ映像表示の例：座標 (3,16,2) に幅3.5・高さ自動のエリアを定義し、そこにWebカメラ映像を表示
-
-```text
-<eps>                  TEXTAREA_ADD|img|3.5,-1|1,1,0|1,1,1,1|0,0,0,1|3,16,2
-TEXTAREA_EVENT_ADD|img TEXTAREA_SET|img|__camera0
-```
-
-![textarea with camera](./images/textarea_camera.png)
-
-（※ OpenCVの仕様で一部のWebカメラで表示に時間がかかる場合があります。その場合は環境変数 `OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS` に `0` を指定してから起動してみてください）
 
 **TEXTAREA_DELETE**
 
@@ -783,13 +771,13 @@ LIPSYNC_EVENT_START|(model alias)
 LIPSYNC_EVENT_STOP|(model alias)
 ```
 
-# 遠隔操作 (Plugin_Remote)
+# 外部操作 (Plugin_Remote)
 
 ## 制御・操作
 
 **AVATAR|START, AVATAR|STOP**
 
-遠隔制御の開始コマンド `__AV_START` あるいは終了コマンド `__AV_END` を受信したときにそれぞれ発行されるメッセージ。
+外部制御APIからモデルの外部制御を開始するコマンドである `__AV_START` あるいは終了コマンド `__AV_END` を受信したときにそれぞれ発行されるメッセージ。
 
 ```text
 AVATAR|START
@@ -798,7 +786,7 @@ AVATAR|END
 
 **AVATAR_CONTROL**
 
-遠隔制御コマンドに基づいてモデルを制御するのを一時的に中断・再開する。処理後に **AVATAR_EVENT_CONTROL** を発行する。
+外部制御APIからのコマンドに基づいてモデルを制御するのを一時的に中断・再開する。処理後に **AVATAR_EVENT_CONTROL** を発行する。
 
 - **DISABLE**: 一時的に無効化
 - **ENABLE**: 無効化を終了して再開
@@ -812,7 +800,7 @@ AVATAR_EVENT_CONTROL|ENABLED
 
 **REMOTEKEY_CHAR, REMOTEKEY_DOWN, REMOTEKEY_UP**
 
-キーボード入力をメッセージから送りこむ。
+キーボード入力を外部から送りこむメッセージ。
 
 ```text
 REMOTEKEY_CHAR|(character)
@@ -820,46 +808,15 @@ REMOTEKEY_DOWN|(key code string)
 REMOTEKEY_UP|(key code string)
 ```
 
-## 動画送信
-
-**SCREENENCODE_START, SCREENENCODE_STOP**
-
-画面とWebカメラのキャプチャ動画を遠隔へ送信開始および終了する。
-
-```text
-SCREENENCODE_START|(ID of camera, -1 to disable)|bitrate|fps|base_width|base_height|camera_zoomrate
-SCREENENCODE_STOP
-SCREENENCODE_EVENT_START
-SCREENENCODE_EVENT_STOP
-```
-
 ## 操作ログ記録
 
 **AVATAR_LOGSAVE_START, AVATAR_LOGSAVE_STOP**
 
-遠隔からの制御コマンドを全てファイルに記録する。**AVATAR_LOGSAVE_START**で開始、**AVATAR_LOGSAVE_STOP**で終了。
+外部からの制御コマンドを全てファイルに記録する。**AVATAR_LOGSAVE_START**で開始、**AVATAR_LOGSAVE_STOP**で終了。
 
 ```text
 AVATAR_LOGSAVE_START|ファイル名
 AVATAR_LOGSAVE_STOP
-```
-
-## ファイル受信
-
-**REMOTE_TRANSFILE**
-
-**REMOTE_TRANSFILE_PREPARED**
-
-**REMOTE_TRANSFILE_FINISHED**
-
-リモートからのファイル受信（詳細は別途 Doc を参照のこと）
-
-```text
-## コマンド
-REMOTE_TRANSFILE|ファイル名
-## イベント
-REMOTE_TRANSFILE_PREPARED|送受信用チャネル名|ファイル名
-REMOTE_TRANSFILE_FINISHED|送受信用チャネル名|ファイル名
 ```
 
 # イベント通知

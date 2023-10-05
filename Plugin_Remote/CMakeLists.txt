@@ -11,13 +11,9 @@ set(SOURCES
     ServerClient.cpp
     MouseQueue.cpp
     MorphControl.cpp
-    BoneControl.cpp
     Julius_Thread.cpp
     Julius_Record.cpp
     Speak.cpp
-    ScreenEncoder.cpp
-    AudioEncoder.cpp
-    TransFile.cpp
 )
 
 set(INCLUDE_DIRS

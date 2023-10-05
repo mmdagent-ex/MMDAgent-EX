@@ -60,8 +60,6 @@ void Speak::initialize()
    m_mmdagent = NULL;
    m_id = 0;
 
-   m_mirrorMode = false;
-
    m_avatarForSpeak = NULL;
    m_avatarForSpeakModelName = NULL;
    m_givenModelName = NULL;
@@ -101,11 +99,10 @@ Speak::~Speak()
 }
 
 /* Speak::setup: set up */
-void Speak::setup(MMDAgent *mmdagent, int mid, bool mirror_mode)
+void Speak::setup(MMDAgent *mmdagent, int mid)
 {
    m_mmdagent = mmdagent;
    m_id = mid;
-   m_mirrorMode = mirror_mode;
 }
 
 /* Speak::update: update */
@@ -140,7 +137,7 @@ bool Speak::speakAudio(const char *modelName, const char *audio, unsigned int le
    if (m_avatarForSpeak == NULL) {
       // newly assign avatar instance for lip sync
       av = new Avatar();
-      av->setup(m_mmdagent, m_id, m_mirrorMode, false, false);
+      av->setup(m_mmdagent, m_id, false, false);
       av->processMessage("__AV_START\n");
       av->waitAudioThreadStart();
    } else {

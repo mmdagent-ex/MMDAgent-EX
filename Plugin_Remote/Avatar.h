@@ -43,7 +43,6 @@
 
 #include "MouseQueue.h"
 #include "MorphControl.h"
-#include "BoneControl.h"
 
 // avatar message type string
 #define AVATAR_MESSAGE "AVATAR"
@@ -126,24 +125,11 @@ private:
    char **m_messageBuf;
    int m_messageBufMaxNum;
 
-   bool m_mirror;    /* mirror mode */
-   bool m_both_eye_mode;
-   bool m_allow_far_close_move;
-
-   float m_rotation_rate_body;
-   float m_rotation_rate_neck;
-   float m_rotation_rate_head;
-   float m_move_scale_up;
-   float m_move_scale_relative_down;
-
    ShapeMap *m_shapemap;
-   BoneControl m_boneControl[TRACK_NUM];
-   BoneControl m_centerAddControl;
    MorphControl m_lipControl[LIP_NUM];
    MorphControl m_auControl[NUMACTIONUNITS];
    MorphControlSet m_arkit;
    MorphControlSet m_exMorph;
-   BoneControlSet m_exBone;
 
    float m_leavingFrameLeft;
    bool m_issueLeaveEvent;
@@ -173,14 +159,8 @@ private:
    // clear: clear instance
    void clear();
 
-   // resetBoneTarget: reset bone target
-   void resetBoneTarget();
-
    // resetFaceTarget: reset face target
    void resetFaceTarget();
-
-   // getCurrent: get current
-   void getCurrent();
 
    // assignModel: assign model
    bool assignModel(const char *alias);
@@ -199,7 +179,7 @@ public:
    ~Avatar();
 
    // setup: setup avatar instance
-   bool setup(MMDAgent *mmdagent, int id, bool mirror_mode, bool wantLocal, bool wantPassthrough);
+   bool setup(MMDAgent *mmdagent, int id, bool wantLocal, bool wantPassthrough);
 
    // processMessage: process message from openface
    bool processMessage(const char *AVString);
@@ -221,9 +201,6 @@ public:
 
    // setCurrentMouthShape: set current mouth shape
    void setCurrentMouthShape(double ellapsedFrame);
-
-   // setRates: set motion rates
-   void setRates(float body_rotate, float neck_rotate, float head_rotate, float move_up, float move_down);
 
    // processSoundData: process sound data
    void processSoundData(const char *data, int len);
