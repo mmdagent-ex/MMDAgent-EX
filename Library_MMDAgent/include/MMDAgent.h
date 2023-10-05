@@ -168,8 +168,6 @@
 #define MMDAGENT_CURRENTTIME
 #define MMDAGENT_TAPPED
 
-#define MMDAGENT_MOONSHOT
-
 /* headers */
 
 #ifdef _WIN32
