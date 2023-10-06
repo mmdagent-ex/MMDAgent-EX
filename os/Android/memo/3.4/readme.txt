@@ -1,1 +1,0 @@
-Please see the build instruction section in MMDAgent-EX document on the web.
