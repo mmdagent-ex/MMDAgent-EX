@@ -121,18 +121,6 @@ Disallowed usage of our software:
   - Ignoring guidelines set by the copyright holders.
   - Unauthorized redistribution, plagiarism, and impersonation of the original creators.
 
-## Disclaimer
-
-(The content in this section represents the author's opinion and is not the software's terms of use)
-
-This software has been developed since 2010 by essentially one, rather old-aged university professor. It was originally designed for research purposes, and it does not guarantee the existence of a complete specification or documentation. Some functions might not be documented or may not behave as expected.
-
-The coding style is somewhat dated, deprecated functions are often used (you will see tons of warnings during the build process). Some implementations are based on non-standard way.  The code is not particularly well-organized, and its readability may be considered low.
-
-As with most open-source software, this software is provided "AS IS". Please be aware of the aforementioned points and use it at your own discretion.
-
-Furthermore, this software is also related to the culture of MMD. Users are encouraged to understand and respect the culture of MMD at using the materials. When using materials such as 3D models, motions, sounds, and images with this system, it is our sincere hope that users not only comply with the terms of use specified by their respective authors (rights holders) but also use them in a manner that shows deep respect for the creators and their creative worlds.
-
 ## Acknowledgments
 
 MMDAgent-EX:
