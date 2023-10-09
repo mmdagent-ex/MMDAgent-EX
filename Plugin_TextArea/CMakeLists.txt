@@ -6,7 +6,6 @@ find_package(OpenCV REQUIRED)
 
 set(SOURCES
     TextArea.cpp
-    CameraImage.cpp
     Plugin_TextArea.cpp
 )
 
