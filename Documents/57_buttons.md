@@ -1,5 +1,6 @@
-
-# Buttons
+---
+title: ボタン
+---
 
 You can define buttons at each content.  When playing the content, they will appear to the screen by long tap or pressing `q` key.  You can define various content-dependent actions for them.
 
