@@ -1,6 +1,8 @@
-# 外部操作API (Plugin_Remote)
+---
+title: 外部連携
+---
 
-`MMDAgent-EX` を制御するコマンドメッセージの仕様。
+Plugin_Remote を用いた外部連携について。
 
 ## 仕様一覧
 
