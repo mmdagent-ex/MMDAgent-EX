@@ -1,4 +1,6 @@
-# グローバル変数
+---
+title: KeyValue
+---
 
 MMDAgent-EX はグローバル変数領域（キーと値のペア）を内部に持っており、コンテンツやプログラムから任意のキー名と値（文字列）を代入・参照可能である。以下、利用方法のサマリー。
 
@@ -12,20 +14,24 @@ KeyName=String
 
 ## .fst で参照・代入
 
-任意のフィールドでグローバル変数を `${%KeyName}` の形で値を参照できる。
+任意のフィールドでグローバル変数を {% raw %} `${%KeyName}` {% endraw %}の形で値を参照できる。
 値はロード時ではなく実行するタイミングで評価される。
 
+{% raw %}
 ```text
 10 20:
     <eps> MODEL_ADD|${%KeyName}|...
 ```
+{% endraw %}
 
 以下のように条件に使うことも可能。
 
+{% raw %}
 ```text
 10 20:
     ${%KeyName}==string SYNTH_START|mei|...
 ```
+{% endraw %}
 
 値の代入は `KEYVALUE_SET` メッセージでできる。
 
@@ -35,9 +41,11 @@ KeyName=String
 
 あるいは第5フィールドを使っても行える。
 
+{% raw %}
 ```text
 10 20  <eps>  MODEL_ADD|mei|... ${%KeyName}=String
 ```
+{% endraw %}
 
 ## メッセージで代入
 

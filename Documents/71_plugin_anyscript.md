@@ -1,4 +1,6 @@
-# 外部プログラム連携
+---
+title: Python連携
+---
 
 Python スクリプト等の任意のプログラムと MMDAgent-EX を直接つなぐことができる。
 これには Plugin_AnyScript プラグインを使う。
