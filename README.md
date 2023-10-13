@@ -56,18 +56,9 @@ Short Notice:
 
 ## Documents
 
-See the "Documents" folder for tool documents.
+All up-to-date documents are at the [development site](https://mmdagent-ex.dev/).
 
-- Set up
-- How to build
-- Tutorial
-- How to use
-- Configuration
-- Communication
-- External app
-- Command references
-
-This repository just contains the system (main app + plugins).  Contents (3D model, dialogue script, etc.) is not included in this system.
+This repository just contains the system. Content asset (3D model, dialogue script, etc.) is not included in this system.
 
 ## License
 
