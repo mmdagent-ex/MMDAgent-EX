@@ -1,3 +1,18 @@
+/*
+  Copyright 2022-2023  Nagoya Institute of Technology
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
 /* ----------------------------------------------------------------- */
 /*           The Toolkit for Building Voice Interaction Systems      */
 /*           "MMDAgent" developed by MMDAgent Project Team           */
@@ -282,7 +297,7 @@ void Julius_Logger::updateMaxVol(SP16 *buf, int len)
 
 /* updateLevelThres: update level threshold */
 void Julius_Logger::updateLevelThres(int thres)
-{ 
+{
    if (m_levelThres != thres) {
       m_levelThres = thres;
       m_levelSize = (logval(m_levelThres) - m_levelMin) / (m_levelMax - m_levelMin);
@@ -470,7 +485,7 @@ void Julius_Logger::update(double frame)
       if (face != NULL)
          face->setWeight((float)d);
    }
-   
+
    /* update caption */
    for (i = 0; i < 2; i++) {
       if (m_ccFrame[i] != 0.0) {
