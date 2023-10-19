@@ -18,6 +18,7 @@
 
 #include "MMDAgent.h"
 #include "Thread.h"
+#include "AudioLipSync.h"
 #include "RabbitMQ.h"
 #include <iostream>
 #include <fstream>
@@ -45,13 +46,17 @@
 #endif /* _WIN32 */
 
 /* Plugin name, commands and events */
-#define PLUGINRABBITMQ_NAME           "RabbitMQ"
-#define PLUGINRABBITMQ_CONFIG_FILE    "Plugin_RabbitMQ_ConfigFile"
+#define PLUGINRABBITMQ_NAME                "RabbitMQ"
+#define PLUGINRABBITMQ_CONFIG_FILE         "Plugin_RabbitMQ_ConfigFile"
+#define PLUGINRABBITMQ_CONFIG_MODELALIAS   "Plugin_RabbitMQ_ModelAlias"
+#define PLUGINRABBITMQ_CONFIG_MODELDEFAULT "0"
 
 static int mid;
 static bool enable = false;
 static int pluginNum = 0;
 static RabbitMQ **pluginList = NULL;
+static AudioLipSync *m_sync = NULL;
+static char *modelAlias = NULL;
 
 /* extAppStart: initialize */
 EXPORT void extAppStart(MMDAgent *mmdagent)
@@ -59,6 +64,15 @@ EXPORT void extAppStart(MMDAgent *mmdagent)
    const char *config_file = NULL;
 
    mid = mmdagent->getModuleId(PLUGINRABBITMQ_NAME);
+
+   if (mmdagent->getKeyValue()->exist(PLUGINRABBITMQ_CONFIG_MODELALIAS)) {
+      modelAlias = MMDAgent_strdup(mmdagent->getKeyValue()->getString(PLUGINRABBITMQ_CONFIG_MODELALIAS, NULL));
+   }
+   if (MMDAgent_strlen(modelAlias) == 0) {
+      if (modelAlias)
+         free(modelAlias);
+      modelAlias = MMDAgent_strdup(PLUGINRABBITMQ_CONFIG_MODELDEFAULT);
+   }
 
    /* check if config file is given */
    if (mmdagent->getKeyValue()->exist(PLUGINRABBITMQ_CONFIG_FILE)) {
@@ -68,11 +82,16 @@ EXPORT void extAppStart(MMDAgent *mmdagent)
       return;
 
    /* read json config file */
-    std::ifstream inFile(config_file);
-    if (!inFile.is_open()) {
-        mmdagent->sendLogString(mid, MLOG_ERROR, "error opening file: %s", config_file);
-        return;
-    }
+   std::ifstream inFile(config_file);
+   if (!inFile.is_open()) {
+      mmdagent->sendLogString(mid, MLOG_ERROR, "error opening file: %s", config_file);
+      return;
+   }
+
+   /* set up audio lip sync module */
+   m_sync = new AudioLipSync();
+   m_sync->setup(mmdagent, mid, false /*local_lipsync*/, true /*local_passthrough*/);
+   m_sync->start();
 
    try {
       std::string jsonStr((std::istreambuf_iterator<char>(inFile)), std::istreambuf_iterator<char>());
@@ -84,15 +103,16 @@ EXPORT void extAppStart(MMDAgent *mmdagent)
       Poco::JSON::Object::Ptr jsonObject = parsedResult.extract<Poco::JSON::Object::Ptr>();
 
       /* get values */
-      const char *host;
+      std::string hostStr;
       int port;
-      const char *name;
-      const char *mode;
-      const char *queue;
-      const char *exchange;
-      const char *bindingkey;
+      std::string nameStr;
+      std::string typeStr;
+      std::string modeStr;
+      std::string queueStr;
+      std::string exchangeStr;
+      std::string bindingkeyStr;
 
-      host = jsonObject->getValue<std::string>("host").c_str();
+      hostStr = jsonObject->getValue<std::string>("host");
       port = jsonObject->getValue<int>("port");
 
       Poco::JSON::Array::Ptr connectionList = jsonObject->getArray("connection_list");
@@ -100,24 +120,27 @@ EXPORT void extAppStart(MMDAgent *mmdagent)
       pluginList = (RabbitMQ **)malloc(sizeof(RabbitMQ *) * pluginNum);
       for (size_t i = 0; i < pluginNum; i++) {
          Poco::JSON::Object::Ptr connection = connectionList->getObject(i);
-         name = connection->getValue<std::string>("name").c_str();
-         mode = connection->getValue<std::string>("mode").c_str();
-         if (MMDAgent_strequal(mode, "consumer-basic")) {
+         nameStr = connection->getValue<std::string>("name");
+         modeStr = connection->getValue<std::string>("mode");
+         if (MMDAgent_strlen(nameStr.c_str()) == 0) continue;
+         if (MMDAgent_strequal(modeStr.c_str(), "consumer-basic")) {
             /* queue */
-            queue = connection->getValue<std::string>("queue").c_str();
-            pluginList[i] = new RabbitMQ(mmdagent, mid, name, RABBITMQ_CONSUMER_MODE, host, port, "", queue);
-         } else if (MMDAgent_strequal(mode, "consumer")) {
+            queueStr = connection->getValue<std::string>("queue");
+            pluginList[i] = new RabbitMQ(mmdagent, mid, nameStr.c_str(), RABBITMQ_CONSUMER_MODE, hostStr.c_str(), port, "", "", queueStr.c_str(), m_sync);
+         } else if (MMDAgent_strequal(modeStr.c_str(), "consumer")) {
             /* exchange and bindingkey */
-            exchange = connection->getValue<std::string>("exchange").c_str();
-            bindingkey = connection->getValue<std::string>("bindingkey").c_str();
-            pluginList[i] = new RabbitMQ(mmdagent, mid, name, RABBITMQ_CONSUMER_MODE, host, port, exchange, bindingkey);
-         } else if (MMDAgent_strequal(mode, "producer")) {
+            typeStr = connection->getValue<std::string>("type");
+            exchangeStr = connection->getValue<std::string>("exchange");
+            bindingkeyStr = connection->getValue<std::string>("bindingkey");
+            pluginList[i] = new RabbitMQ(mmdagent, mid, nameStr.c_str(), RABBITMQ_CONSUMER_MODE, hostStr.c_str(), port, exchangeStr.c_str(), typeStr.c_str(), bindingkeyStr.c_str(), m_sync);
+         } else if (MMDAgent_strequal(modeStr.c_str(), "producer")) {
             /* exchange and bindingkey */
-            exchange = connection->getValue<std::string>("exchange").c_str();
-            bindingkey = connection->getValue<std::string>("bindingkey").c_str();
-            pluginList[i] = new RabbitMQ(mmdagent, mid, name, RABBITMQ_PRODUCER_MODE, host, port, exchange, bindingkey);
+            typeStr = connection->getValue<std::string>("type");
+            exchangeStr = connection->getValue<std::string>("exchange");
+            bindingkeyStr = connection->getValue<std::string>("bindingkey");
+            pluginList[i] = new RabbitMQ(mmdagent, mid, nameStr.c_str(), RABBITMQ_PRODUCER_MODE, hostStr.c_str(), port, exchangeStr.c_str(), typeStr.c_str(), bindingkeyStr.c_str(), m_sync);
          } else {
-            mmdagent->sendLogString(mid, MLOG_ERROR, "error opening file: %s: unknown mode %s", config_file, mode);
+            mmdagent->sendLogString(mid, MLOG_ERROR, "error opening file: %s: unknown mode %s", config_file, modeStr.c_str());
             return;
          }
       }
@@ -147,8 +170,26 @@ EXPORT void extProcMessage(MMDAgent *mmdagent, const char *type, const char *arg
             pluginList[i]->enqueueMessage(args);
          }
       }
+   } else if (MMDAgent_strequal(type, MMDAGENT_EVENT_MODELADD)) {
+      /* model is not set up for local lip sync, capture first model load and set up later */
+      mmdagent->sendLogString(mid, MLOG_MESSAGE_CAPTURED, "%s|%s", type, args);
+      if (modelAlias) {
+         if (mmdagent->findModelAlias(modelAlias) >= 0) {
+            m_sync->assignModel(modelAlias);
+         }
+      }
    }
 }
+
+/* extUpdate: update */
+EXPORT void extUpdate(MMDAgent *mmdagent, double deltaFrame)
+{
+   if (enable == false)
+      return;
+   if (m_sync)
+      m_sync->update(deltaFrame);
+}
+
 
 /* extAppEnd: end of application */
 EXPORT void extAppEnd(MMDAgent *mmdagent)
@@ -160,5 +201,10 @@ EXPORT void extAppEnd(MMDAgent *mmdagent)
    free(pluginList);
    pluginList = NULL;
    pluginNum = 0;
+   if (modelAlias)
+      free(modelAlias);
+   modelAlias = NULL;
    enable = false;
 }
+
+

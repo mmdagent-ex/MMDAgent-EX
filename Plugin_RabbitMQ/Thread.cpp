@@ -75,6 +75,7 @@ void Thread::initialize()
    m_thread = -1;
    m_count = 0;
    m_kill = false;
+   m_terminate = false;
 }
 
 void Thread::clear()
@@ -89,7 +90,8 @@ void Thread::clear()
 
    if(m_mutex_buf != NULL || m_mutex != NULL || m_cond != NULL || m_thread >= 0) {
       if(m_thread >= 0) {
-         glfwWaitThread(m_thread, GLFW_WAIT);
+         if (m_terminate == false)
+            glfwWaitThread(m_thread, GLFW_WAIT);
          glfwDestroyThread(m_thread);
       }
       if(m_cond != NULL)
@@ -138,6 +140,13 @@ void Thread::addThread(GLFWthread thread)
 
 void Thread::stop()
 {
+   m_terminate = false;
+   clear();
+}
+
+void Thread::terminate()
+{
+   m_terminate = true;
    clear();
 }
 
