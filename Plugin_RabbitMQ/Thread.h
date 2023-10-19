@@ -65,6 +65,7 @@ private:
    GLFWthread m_thread; // thread ID
    int m_count;         // number of messages in the queue
    bool m_kill;         // kill flag
+   bool m_terminate;
 
    /* initialize */
    void initialize();
@@ -88,6 +89,9 @@ public:
 
    // stop thread and clear
    void stop();
+
+   // terminate thread and clear
+   void terminate();
 
    // return if thread is running
    bool isRunning();

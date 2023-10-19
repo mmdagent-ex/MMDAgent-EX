@@ -38,6 +38,7 @@ private:
    MMDAgent* m_mmdagent;   // MMDAgent instance
    int m_id;               // module id
    char *m_name;           // name
+   char *m_type;           // type
    int m_mode;             // RABBITMQ_{CONSUMER|PRODUCER}_MODE
    char *m_host;           // RabbitMQ host to connect
    int m_port;             // RabbitMQ port number to connect
@@ -46,13 +47,18 @@ private:
    Thread *m_thread;       // thread instance
    bool m_active;          // true while active
 
+   AudioLipSync *m_sync;   // pointer to audio lip sync module
+
    /* on_amqp_error: check return code of amqp functions, and when error, issue error message and return true */
    bool on_amqp_error(amqp_rpc_reply_t x, char const *context);
+
+   /* parse_received_data: parse received data */
+   void parse_received_data(char *buf, int len);
 
 public:
 
    /* constructor */
-   RabbitMQ(MMDAgent *mmdagent, int id, const char *name, int mode, const char *host, int port, const char *exchangename, const char *queuename);
+   RabbitMQ(MMDAgent *mmdagent, int id, const char *name, int mode, const char *host, int port, const char *exchangename, const char *type, const char *queuename, AudioLipSync *sync);
 
    /* destructor */
    ~RabbitMQ();

@@ -4,17 +4,20 @@
    "connection_list" : [
       {
          "name" : "cons1",
+         "type" : "direct",
          "mode" : "consumer-basic",
          "queue" : "hello"
       },
       {
          "name" : "cons2",
+         "type" : "direct",
          "mode" : "consumer",
          "exchange" : "",
          "bindingkey" : "hello"
       },
       {
          "name" : "prod1",
+         "type" : "direct",
          "mode" : "producer",
          "exchange" : "",
          "bindingkey" : "hello"
