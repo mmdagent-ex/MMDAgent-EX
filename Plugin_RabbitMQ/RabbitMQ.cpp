@@ -18,10 +18,21 @@
 
 #include "MMDAgent.h"
 #include "Thread.h"
+#include "AudioLipSync.h"
 #include "RabbitMQ.h"
 
+#define POCO_NO_AUTOMATIC_LIBS
+#ifdef _WIN32
+#define POCO_STATIC
+#endif
+#include <Poco/JSON/Parser.h>
+#include <Poco/Dynamic/Var.h>
+#include <Poco/Base64Decoder.h>
+
+#include <sstream>
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 /*
 *
@@ -78,10 +89,11 @@ bool RabbitMQ::on_amqp_error(amqp_rpc_reply_t x, char const *context)
 }
 
 /* constructor */
-RabbitMQ::RabbitMQ(MMDAgent *mmdagent, int id, const char *name, int mode, const char *host, int port, const char *exchangename, const char *queuename)
+RabbitMQ::RabbitMQ(MMDAgent *mmdagent, int id, const char *name, int mode, const char *host, int port, const char *exchangename, const char *type, const char *queuename, AudioLipSync *sync)
 {
    m_mmdagent = mmdagent;
    m_id = id;
+   m_type = MMDAgent_strdup(type);
    m_name = MMDAgent_strdup(name);
    m_mode = mode;
    m_host = MMDAgent_strdup(host);
@@ -89,6 +101,7 @@ RabbitMQ::RabbitMQ(MMDAgent *mmdagent, int id, const char *name, int mode, const
    m_exchangename = MMDAgent_strdup(exchangename);
    m_queuename = MMDAgent_strdup(queuename);
    m_active = false;
+   m_sync = sync;
    m_thread = new Thread;
    m_thread->setup();
 }
@@ -97,11 +110,12 @@ RabbitMQ::RabbitMQ(MMDAgent *mmdagent, int id, const char *name, int mode, const
 RabbitMQ::~RabbitMQ()
 {
    m_active = false;
+   m_thread->terminate();
    delete m_thread;
-   free(m_queuename);
-   free(m_exchangename);
-   free(m_host);
-   free(m_name);
+   if (m_queuename) free(m_queuename);
+   if (m_exchangename) free(m_exchangename);
+   if (m_host) free(m_host);
+   if (m_name) free(m_name);
 }
 
 /* RabbitMQ::getMode: get mode */
@@ -153,6 +167,9 @@ void RabbitMQ::run()
          if (on_amqp_error(amqp_get_rpc_reply(conn), "Consuming")) return;
          m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: %s:%d: listen queue=%s", m_name, m_host, m_port, m_queuename);
       } else {
+         // declare exchange on server
+         amqp_exchange_declare(conn, 1, amqp_cstring_bytes(m_exchangename), amqp_cstring_bytes(m_type), 0, 0, 0, 0, amqp_empty_table);
+         if (on_amqp_error(amqp_get_rpc_reply(conn), "Declaring exchange")) return;
          // declare a queue for given exchange and binding key and connect to it as a consumer
          amqp_queue_declare_ok_t *r = amqp_queue_declare(conn, 1, amqp_empty_bytes, 0, 0, 0, 1, amqp_empty_table);
          if (on_amqp_error(amqp_get_rpc_reply(conn), "Declaring queue")) return;
@@ -162,16 +179,27 @@ void RabbitMQ::run()
             m_active = false;
             return;
          }
-         amqp_queue_bind(conn, 1, queuename, amqp_cstring_bytes(m_exchangename), amqp_cstring_bytes(m_queuename), amqp_empty_table);
+         amqp_queue_bind(conn, 1, queuename, amqp_cstring_bytes(m_exchangename),
+            (MMDAgent_strlen(m_queuename) == 0) ? amqp_empty_bytes : amqp_cstring_bytes(m_queuename),
+            amqp_empty_table);
          if (on_amqp_error(amqp_get_rpc_reply(conn), "Binding queue")) return;
          amqp_basic_consume(conn, 1, queuename, amqp_empty_bytes, 0, 1, 0, amqp_empty_table);
          if (on_amqp_error(amqp_get_rpc_reply(conn), "Consuming")) return;
-         m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: %s:%d: listen exchange=%s, bindingkey=%s", m_name, m_host, m_port, m_exchangename, m_queuename);
+         if (MMDAgent_strlen(m_queuename) == 0) {
+            m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: %s:%d: listen exchange=%s (%s)", m_name, m_host, m_port, m_exchangename, m_type);
+         } else {
+            m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: %s:%d: listen exchange=%s (%s), bindingkey=%s", m_name, m_host, m_port, m_exchangename, m_type, m_queuename);
+         }
       }
    }
 
    if (m_mode == RABBITMQ_PRODUCER_MODE) {
-      m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: %s:%d: send exchange=%s, bindingkey=%s", m_name, m_host, m_port, m_exchangename, m_queuename);
+      if (MMDAgent_strlen(m_exchangename) > 0) {
+         // declare exchange on server
+         amqp_exchange_declare(conn, 1, amqp_cstring_bytes(m_exchangename), amqp_cstring_bytes(m_type), 0, 0, 0, 0, amqp_empty_table);
+         if (on_amqp_error(amqp_get_rpc_reply(conn), "Declaring exchante")) return;
+      }
+      m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: %s:%d: send exchange=%s (%s), bindingkey=%s", m_name, m_host, m_port, m_exchangename, m_type, m_queuename);
    }
 
    /* main loop */
@@ -185,9 +213,7 @@ void RabbitMQ::run()
          res = amqp_consume_message(conn, &envelope, NULL, 0);
          if (AMQP_RESPONSE_NORMAL != res.reply_type)
             break;
-         MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%*s", (int)envelope.message.body.len, (char *)envelope.message.body.bytes);
-         buff[(int)envelope.message.body.len] = '\0';
-         m_mmdagent->sendMessage(m_id, PLUGINRABBITMQ_EVENT_RECEIVED, "%s", buff);
+         parse_received_data((char *)envelope.message.body.bytes, (int)envelope.message.body.len);
          amqp_destroy_envelope(&envelope);
       }
       if (m_mode == RABBITMQ_PRODUCER_MODE) {
@@ -198,6 +224,8 @@ void RabbitMQ::run()
             message_bytes.len = MMDAgent_strlen(buff);
             amqp_basic_publish(conn, 1, amqp_cstring_bytes(m_exchangename), amqp_cstring_bytes(m_queuename), 0, 0, NULL, message_bytes);
          }
+         /* busy wait */
+         MMDAgent_sleep(0.05);
       }
    }
 
@@ -219,4 +247,57 @@ void RabbitMQ::enqueueMessage(const char *str)
 {
    if (m_active == true && m_thread->isRunning() && m_mode == RABBITMQ_PRODUCER_MODE)
       m_thread->enqueueBuffer(1, str, NULL);
+}
+
+/* RabbitMQ::parse_received_data: parse received data */
+void RabbitMQ::parse_received_data(char *buf, int len)
+{
+   char *buff;
+
+   buff = (char *)malloc(len + 1);
+   strncpy(buff, buf, len);
+   buff[len] = '\0';
+
+   /* parse json string with Poco::JSON parser */
+   Poco::JSON::Parser parser;
+   Poco::Dynamic::Var result = parser.parse(buff);
+   Poco::JSON::Object::Ptr object = result.extract<Poco::JSON::Object::Ptr>();
+
+   std::string timestamp = object->getValue<std::string>("timestamp");
+   std::string id = object->getValue<std::string>("id");
+   std::string producer = object->getValue<std::string>("producer");
+   std::string update_type = object->getValue<std::string>("update_type");
+   std::string data_type = object->getValue<std::string>("data_type");
+   std::string body = object->getValue<std::string>("body");
+
+   m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: %s, %s, %s", m_name, id.c_str(), producer.c_str(), data_type.c_str());
+
+   if (m_sync) {
+      if (data_type == "audio") {
+         /* decode audio and send to Julius for lip sync and play */
+         std::istringstream istr(body);
+         Poco::Base64Decoder decoder(istr);
+         std::vector<char> decodedData;
+
+         char ch;
+         while (decoder.get(ch)) {
+            decodedData.push_back(ch);
+         }
+
+         int len = decodedData.size();
+         char *buf = (char *)malloc(len);
+         if (buf) {
+            for (int i = 0; i < len; i++)
+               buf[i] = decodedData[i];
+            m_sync->processSoundData(buf, len);
+            m_sync->segmentSoundData();
+            m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: audio len = %d", m_name, len);
+            free(buf);
+         }
+      }
+   }
+
+   // execute motions
+
+   free(buff);
 }
