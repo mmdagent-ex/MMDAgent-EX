@@ -20,6 +20,10 @@ project(Plugin_RabbitMQ)
 
 set(SOURCES
     Thread.cpp
+    Julius_Thread.cpp
+    MorphControl.cpp
+    MouseQueue.cpp
+    AudioLipSync.cpp
     RabbitMQ.cpp
     Plugin_RabbitMQ.cpp
 )
@@ -29,6 +33,7 @@ set(INCLUDE_DIRS
     ../Library_GLFW/include
     ../Library_MMDFiles/include
     ../Library_MMDAgent/include
+    ../Library_Julius/include
 )
 
 add_library(Plugin_RabbitMQ SHARED ${SOURCES})
@@ -41,6 +46,7 @@ target_compile_options(Plugin_RabbitMQ PRIVATE -std=c++17)
 
 target_link_libraries(Plugin_RabbitMQ
     ${MMDAGENT_LINK_OPTIONS}
+    JULIUS
     -lrabbitmq
 )
 
