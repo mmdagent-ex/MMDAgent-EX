@@ -34,15 +34,88 @@
 #include <fstream>
 #include <vector>
 
-/*
-*
-* This module currently supports only basic usage.
-*
-* In consumer mode, connect to the queue of the name [queuename]
-*
-* In producer mode, connect to the exchange of the name [exchangename] with routing key [queuename]
-*
-*/
+#define ACTION_MOTION_MAXNUM 10
+
+/* constructor */
+RabbitMQMotionConfig::RabbitMQMotionConfig(std::string jsonstr)
+{
+   try {
+
+      Poco::JSON::Parser parser;
+      Poco::Dynamic::Var result = parser.parse(jsonstr);
+      Poco::JSON::Object::Ptr object = result.extract<Poco::JSON::Object::Ptr>();
+      std::string s;
+
+      m_param = new KeyValue();
+      m_param->setup();
+      s = object->getValue<std::string>("target_model_alias");
+      m_param->setString("target_model_alias", s.c_str());
+      s = object->getValue<std::string>("motion_expression_alias");
+      m_param->setString("motion_expression_alias", s.c_str());
+      s = object->getValue<std::string>("motion_action_alias");
+      m_param->setString("motion_action_alias", s.c_str());
+
+      m_expression2motion = new KeyValue();
+      m_expression2motion->setup();
+      Poco::JSON::Array::Ptr expressionList = object->getArray("expression_list");
+      for (int i = 0; i < expressionList->size(); i++) {
+         Poco::JSON::Object::Ptr item = expressionList->getObject(i);
+         std::string key = item->getValue<std::string>("name");
+         std::string val = item->getValue<std::string>("motion");
+         m_expression2motion->setString(key.c_str(), "%s", val.c_str());
+      }
+      m_action2motion = new KeyValue();
+      m_action2motion->setup();
+      Poco::JSON::Array::Ptr actionList = object->getArray("action_list");
+      for (int i = 0; i < actionList->size(); i++) {
+         Poco::JSON::Object::Ptr item = actionList->getObject(i);
+         std::string key = item->getValue<std::string>("name");
+         std::string val = item->getValue<std::string>("motion");
+         m_action2motion->setString(key.c_str(), "%s", val.c_str());
+      }
+   }
+   catch (const Poco::Exception &ex) {
+      return;
+   }
+}
+
+/* destructor */
+RabbitMQMotionConfig::~RabbitMQMotionConfig()
+{
+   if (m_action2motion)
+      delete m_action2motion;
+   if (m_expression2motion)
+      delete m_expression2motion;
+   if (m_param)
+      delete m_param;
+}
+
+/* RabbitMQMotionConfig::getParam: get parameter string */
+const char *RabbitMQMotionConfig::getParam(const char *name)
+{
+   if (m_param == NULL)
+      return NULL;
+   return m_param->getString(name, NULL);
+}
+
+/* RabbitMQMotionConfig::getExpressionPath: get expression motion path */
+const char *RabbitMQMotionConfig::getExpressionPath(const char *name)
+{
+   if (m_expression2motion == NULL)
+      return NULL;
+   return m_expression2motion->getString(name, NULL);
+
+}
+
+/* RabbitMQMotionConfig::getActionPath: get action motion path */
+const char *RabbitMQMotionConfig::getActionPath(const char *name)
+{
+   if (m_action2motion == NULL)
+      return NULL;
+   return m_action2motion->getString(name, NULL);
+}
+
+/************************************************************************/
 
 /* main thread function, just call RemotePlugin::run() */
 static void mainThread(void *param)
@@ -89,7 +162,7 @@ bool RabbitMQ::on_amqp_error(amqp_rpc_reply_t x, char const *context)
 }
 
 /* constructor */
-RabbitMQ::RabbitMQ(MMDAgent *mmdagent, int id, const char *name, int mode, const char *host, int port, const char *exchangename, const char *type, const char *queuename, AudioLipSync *sync)
+RabbitMQ::RabbitMQ(MMDAgent *mmdagent, int id, const char *name, int mode, const char *host, int port, const char *exchangename, const char *type, const char *queuename, AudioLipSync *sync, RabbitMQMotionConfig *motion_config)
 {
    m_mmdagent = mmdagent;
    m_id = id;
@@ -102,6 +175,7 @@ RabbitMQ::RabbitMQ(MMDAgent *mmdagent, int id, const char *name, int mode, const
    m_queuename = MMDAgent_strdup(queuename);
    m_active = false;
    m_sync = sync;
+   m_motion_config = motion_config;
    m_thread = new Thread;
    m_thread->setup();
 }
@@ -249,6 +323,40 @@ void RabbitMQ::enqueueMessage(const char *str)
       m_thread->enqueueBuffer(1, str, NULL);
 }
 
+/* RabbitMQ::play_motion: play motion */
+void RabbitMQ::play_motion(const char *motionAlias, const char *motionFileName)
+{
+   char buff[MMDAGENT_MAXBUFLEN];
+   const char *modelAlias = m_motion_config->getParam("target_model_alias");
+
+   // find target model
+   int id = m_mmdagent->findModelAlias(modelAlias);
+   if (id < 0)
+      return;
+
+   // search for unused motion alias slot
+   int i;
+   for (i = 0; i < ACTION_MOTION_MAXNUM; i++) {
+      MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%d", motionAlias, i);
+      if (m_mmdagent->getModelList()[id].getMotionManager()->getRunning(buff) == NULL)
+         break;
+   }
+   if (i >= ACTION_MOTION_MAXNUM)
+      return;
+
+   // issue MOTION_ADD for the slot
+   m_mmdagent->sendMessage(m_id, MMDAGENT_COMMAND_MOTIONADD, "%s|%s|%s|PART|ONCE|ON|OFF", modelAlias, buff, motionFileName);
+
+   // issue MOTION_DELETE for already running motions other than above
+   for (int k = 0; k < ACTION_MOTION_MAXNUM; k++) {
+      if (i == k)
+         continue;
+      MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%d", motionAlias, k);
+      if (m_mmdagent->getModelList()[id].getMotionManager()->getRunning(buff))
+         m_mmdagent->sendMessage(m_id, MMDAGENT_COMMAND_MOTIONDELETE, "%s|%s", modelAlias, buff);
+   }
+}
+
 /* RabbitMQ::parse_received_data: parse received data */
 void RabbitMQ::parse_received_data(char *buf, int len)
 {
@@ -298,6 +406,25 @@ void RabbitMQ::parse_received_data(char *buf, int len)
    }
 
    // execute motions
+   if (data_type == "expression_and_action") {
+      Poco::JSON::Parser parser;
+      Poco::Dynamic::Var result = parser.parse(body);
+      Poco::JSON::Object::Ptr obj = result.extract<Poco::JSON::Object::Ptr>();
+
+      if (obj->has("expression")) {
+         std::string s = obj->getValue<std::string>("expression");
+         const char *motionFile = m_motion_config->getExpressionPath(s.c_str());
+         if (motionFile)
+            play_motion(m_motion_config->getParam("motion_expression_alias"), motionFile);
+      }
+      if (obj->has("action")) {
+         std::string s = obj->getValue<std::string>("action");
+         const char *motionFile = m_motion_config->getActionPath(s.c_str());
+         if (motionFile)
+            play_motion(m_motion_config->getParam("motion_action_alias"), motionFile);
+      }
+
+   }
 
    free(buff);
 }
