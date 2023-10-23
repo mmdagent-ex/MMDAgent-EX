@@ -48,15 +48,13 @@
 /* Plugin name, commands and events */
 #define PLUGINRABBITMQ_NAME                "RabbitMQ"
 #define PLUGINRABBITMQ_CONFIG_FILE         "Plugin_RabbitMQ_ConfigFile"
-#define PLUGINRABBITMQ_CONFIG_MODELALIAS   "Plugin_RabbitMQ_ModelAlias"
-#define PLUGINRABBITMQ_CONFIG_MODELDEFAULT "0"
 
 static int mid;
 static bool enable = false;
 static int pluginNum = 0;
 static RabbitMQ **pluginList = NULL;
 static AudioLipSync *m_sync = NULL;
-static char *modelAlias = NULL;
+static RabbitMQMotionConfig *m_motion_config = NULL;
 
 /* extAppStart: initialize */
 EXPORT void extAppStart(MMDAgent *mmdagent)
@@ -64,15 +62,6 @@ EXPORT void extAppStart(MMDAgent *mmdagent)
    const char *config_file = NULL;
 
    mid = mmdagent->getModuleId(PLUGINRABBITMQ_NAME);
-
-   if (mmdagent->getKeyValue()->exist(PLUGINRABBITMQ_CONFIG_MODELALIAS)) {
-      modelAlias = MMDAgent_strdup(mmdagent->getKeyValue()->getString(PLUGINRABBITMQ_CONFIG_MODELALIAS, NULL));
-   }
-   if (MMDAgent_strlen(modelAlias) == 0) {
-      if (modelAlias)
-         free(modelAlias);
-      modelAlias = MMDAgent_strdup(PLUGINRABBITMQ_CONFIG_MODELDEFAULT);
-   }
 
    /* check if config file is given */
    if (mmdagent->getKeyValue()->exist(PLUGINRABBITMQ_CONFIG_FILE)) {
@@ -96,6 +85,8 @@ EXPORT void extAppStart(MMDAgent *mmdagent)
    try {
       std::string jsonStr((std::istreambuf_iterator<char>(inFile)), std::istreambuf_iterator<char>());
       inFile.close();
+
+      m_motion_config = new RabbitMQMotionConfig(jsonStr);
 
       /* parse json string with Poco::JSON parser */
       Poco::JSON::Parser parser;
@@ -126,19 +117,19 @@ EXPORT void extAppStart(MMDAgent *mmdagent)
          if (MMDAgent_strequal(modeStr.c_str(), "consumer-basic")) {
             /* queue */
             queueStr = connection->getValue<std::string>("queue");
-            pluginList[i] = new RabbitMQ(mmdagent, mid, nameStr.c_str(), RABBITMQ_CONSUMER_MODE, hostStr.c_str(), port, "", "", queueStr.c_str(), m_sync);
+            pluginList[i] = new RabbitMQ(mmdagent, mid, nameStr.c_str(), RABBITMQ_CONSUMER_MODE, hostStr.c_str(), port, "", "", queueStr.c_str(), m_sync, m_motion_config);
          } else if (MMDAgent_strequal(modeStr.c_str(), "consumer")) {
             /* exchange and bindingkey */
             typeStr = connection->getValue<std::string>("type");
             exchangeStr = connection->getValue<std::string>("exchange");
             bindingkeyStr = connection->getValue<std::string>("bindingkey");
-            pluginList[i] = new RabbitMQ(mmdagent, mid, nameStr.c_str(), RABBITMQ_CONSUMER_MODE, hostStr.c_str(), port, exchangeStr.c_str(), typeStr.c_str(), bindingkeyStr.c_str(), m_sync);
+            pluginList[i] = new RabbitMQ(mmdagent, mid, nameStr.c_str(), RABBITMQ_CONSUMER_MODE, hostStr.c_str(), port, exchangeStr.c_str(), typeStr.c_str(), bindingkeyStr.c_str(), m_sync, m_motion_config);
          } else if (MMDAgent_strequal(modeStr.c_str(), "producer")) {
             /* exchange and bindingkey */
             typeStr = connection->getValue<std::string>("type");
             exchangeStr = connection->getValue<std::string>("exchange");
             bindingkeyStr = connection->getValue<std::string>("bindingkey");
-            pluginList[i] = new RabbitMQ(mmdagent, mid, nameStr.c_str(), RABBITMQ_PRODUCER_MODE, hostStr.c_str(), port, exchangeStr.c_str(), typeStr.c_str(), bindingkeyStr.c_str(), m_sync);
+            pluginList[i] = new RabbitMQ(mmdagent, mid, nameStr.c_str(), RABBITMQ_PRODUCER_MODE, hostStr.c_str(), port, exchangeStr.c_str(), typeStr.c_str(), bindingkeyStr.c_str(), m_sync, m_motion_config);
          } else {
             mmdagent->sendLogString(mid, MLOG_ERROR, "error opening file: %s: unknown mode %s", config_file, modeStr.c_str());
             return;
@@ -173,7 +164,8 @@ EXPORT void extProcMessage(MMDAgent *mmdagent, const char *type, const char *arg
    } else if (MMDAgent_strequal(type, MMDAGENT_EVENT_MODELADD)) {
       /* model is not set up for local lip sync, capture first model load and set up later */
       mmdagent->sendLogString(mid, MLOG_MESSAGE_CAPTURED, "%s|%s", type, args);
-      if (modelAlias) {
+      if (m_motion_config) {
+         const char *modelAlias = m_motion_config->getParam("target_model_alias");
          if (mmdagent->findModelAlias(modelAlias) >= 0) {
             m_sync->assignModel(modelAlias);
          }
@@ -201,9 +193,6 @@ EXPORT void extAppEnd(MMDAgent *mmdagent)
    free(pluginList);
    pluginList = NULL;
    pluginNum = 0;
-   if (modelAlias)
-      free(modelAlias);
-   modelAlias = NULL;
    enable = false;
 }
 
