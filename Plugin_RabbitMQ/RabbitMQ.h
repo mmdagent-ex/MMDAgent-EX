@@ -25,11 +25,39 @@ extern "C" {
 #endif
 }
 
+#include <string>
+
 /* definitions */
 #define RABBITMQ_CONSUMER_MODE 0
 #define RABBITMQ_PRODUCER_MODE 1
 #define PLUGINRABBITMQ_COMMAND_SEND   "RABBITMQ_SEND"
 #define PLUGINRABBITMQ_EVENT_RECEIVED "RABBITMQ_EVENT_RECV"
+
+class RabbitMQMotionConfig
+{
+private:
+   KeyValue *m_param;
+   KeyValue *m_expression2motion;
+   KeyValue *m_action2motion;
+
+public:
+
+   /* constructor */
+   RabbitMQMotionConfig(std::string jsonstr);
+
+   /* destructor */
+   ~RabbitMQMotionConfig();
+
+   /* getParam: get parameter string */
+   const char *getParam(const char *name);
+
+   /* getExpressionPath: get expression motion path */
+   const char *getExpressionPath(const char *name);
+
+   /* getActionPath: get action motion path */
+   const char *getActionPath(const char *name);
+
+};
 
 class RabbitMQ
 {
@@ -48,6 +76,7 @@ private:
    bool m_active;          // true while active
 
    AudioLipSync *m_sync;   // pointer to audio lip sync module
+   RabbitMQMotionConfig *m_motion_config; // motion config
 
    /* on_amqp_error: check return code of amqp functions, and when error, issue error message and return true */
    bool on_amqp_error(amqp_rpc_reply_t x, char const *context);
@@ -55,10 +84,13 @@ private:
    /* parse_received_data: parse received data */
    void parse_received_data(char *buf, int len);
 
+   /* play_motion: play motion */
+   void play_motion(const char *motionAlias, const char *motionFileName);
+
 public:
 
    /* constructor */
-   RabbitMQ(MMDAgent *mmdagent, int id, const char *name, int mode, const char *host, int port, const char *exchangename, const char *type, const char *queuename, AudioLipSync *sync);
+   RabbitMQ(MMDAgent *mmdagent, int id, const char *name, int mode, const char *host, int port, const char *exchangename, const char *type, const char *queuename, AudioLipSync *sync, RabbitMQMotionConfig *motion_config);
 
    /* destructor */
    ~RabbitMQ();
