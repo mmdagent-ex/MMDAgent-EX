@@ -1,0 +1,19 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: MMDAgent-EX
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Akinobu
+    family-names: Lee
+    email: ri@nitech.ac.jp
+    affiliation: Nagoya Institute of Technology
+repository-code: 'https://github.com/mmdagent-ex/MMDAgent-EX'
+url: 'https://mmdagent-ex.dev/'
+license: Apache-2.0
+version: 1.0.0
+date-released: '2023-12-10'
