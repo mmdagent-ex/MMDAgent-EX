@@ -176,7 +176,7 @@ void MotionController::calcBoneAt(MotionControllerBoneElement *mc, float frameNo
       /* lerp with the initial position/rotation at the time of starting motion */
       w = (float) (m_noBoneSmearFrame / MOTIONCONTROLLER_BONESTARTMARGINFRAME);
       mc->pos = mc->pos.lerp(mc->snapPos, btScalar(w));
-      mc->rot = btTransform(btTransform(mc->rot).getBasis() * (1.0f - w) + btTransform(mc->snapRot).getBasis() * w).getRotation();
+      mc->rot = mc->rot.slerp(mc->snapRot, btScalar(w));
    }
 }
 
