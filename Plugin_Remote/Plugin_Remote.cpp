@@ -898,6 +898,13 @@ public:
                         std::lock_guard<std::mutex> lock(m_stdmutex);
                         m_len = ws->receiveFrame(&(buff[m_bp]), SOCKET_MAXBUFLEN - 1 - m_bp, flags);
                      }
+                     if ((flags & Poco::Net::WebSocket::FRAME_OP_BITMASK) == Poco::Net::WebSocket::FRAME_OP_PING) {
+                        ws->sendFrame(&(buff[m_bp]), m_len == 0 ? 1 : m_len, Poco::Net::WebSocket::FRAME_OP_PONG | Poco::Net::WebSocket::FRAME_FLAG_FIN);
+                        continue;
+                     }
+                     if ((flags & Poco::Net::WebSocket::FRAME_OP_BITMASK) == Poco::Net::WebSocket::FRAME_OP_PONG) {
+                        continue;
+                     }
                      if (m_len <= 0) {
                         // other end error (may be disconnected)
                         removeClient(ws_c);
