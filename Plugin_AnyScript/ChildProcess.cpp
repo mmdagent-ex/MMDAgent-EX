@@ -180,11 +180,11 @@ bool ChildProcess::isRunning()
 }
 
 /* constructor */
-ChildProcess::ChildProcess(MMDAgent *mmdagent, int m_id)
+ChildProcess::ChildProcess(MMDAgent *mmdagent, int mid)
 {
    initialize();
    m_mmdagent = mmdagent;
-   m_id = m_id;
+   m_id = mid;
 }
 
 /* destructor */
@@ -327,13 +327,9 @@ bool ChildProcess::runProcess(const char *title, const char *execString)
       /* assign child-to-parent write descriptor to standard output */
       dup2(pipe_child2parent[WRITE], 1);
 
-      /* close original assigned descpritors since they are already duplicated */
-      close(pipe_parent2child[READ]);
-      close(pipe_child2parent[WRITE]);
-
       /* switch process (never returns) */
       char **parsed_args = parse_args(execString);
-      if (execv(parsed_args[0], parsed_args) < 0) {
+      if (execvp(parsed_args[0], parsed_args) < 0) {
          m_mmdagent->sendLogString(m_id, MLOG_ERROR, "failed to exec process: %s", execString);
          close(pipe_parent2child[READ]);
          close(pipe_child2parent[WRITE]);
