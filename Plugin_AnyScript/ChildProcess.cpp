@@ -266,14 +266,10 @@ bool ChildProcess::runProcess(const char *title, const char *execString)
    }
 
    /* start process*/
-   char *path = MMDAgent_pathdup_from_application_to_system_locale(m_mmdagent->getSystemDirName());
-   if (path == NULL)
-      return false;
-   if (!CreateProcessA(NULL, (LPTSTR)execString, NULL, NULL, TRUE, CREATE_NEW_CONSOLE, NULL, path, &si, &m_process_info)) {
+   if (!CreateProcessA(NULL, (LPTSTR)execString, NULL, NULL, TRUE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &m_process_info)) {
       m_mmdagent->sendLogString(m_id, MLOG_ERROR, "failed to create process: %s", execString);
       return false;
    }
-   free(path);
 
    /* assign the process to the job object */
    if (!AssignProcessToJobObject(m_job, m_process_info.hProcess)) {
