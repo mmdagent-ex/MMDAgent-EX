@@ -232,6 +232,7 @@ class LogToFile;
 #include "RenderOffScreen.h"
 #include "KeyHandler.h"
 #include "Caption.h"
+#include "HttpServer.h"
 
 /* MMDAgent: MMDAgent class */
 class MMDAgent
@@ -353,6 +354,8 @@ private:
    RenderOffScreen *m_offscreen;   /* off-screen rendering class */
    KeyHandler m_keyHandler;        /* key input handler */
    Caption *m_caption;
+
+   HttpServer *m_httpServer;       /* local http server */
 
    char m_errorMessages[MMDAGENT_MAXBUFLEN];
    FTGLTextDrawElements m_elemErrorMessage;

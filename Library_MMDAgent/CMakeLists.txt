@@ -29,6 +29,7 @@ set(LIB_SOURCES
     src/lib/ContentUpload.cpp
     src/lib/FileBrowser.cpp
     src/lib/FreeTypeGL.cpp
+    src/lib/HttpServer.cpp
     src/lib/InfoText.cpp
     src/lib/KeyHandler.cpp
     src/lib/KeyValue.cpp
@@ -63,6 +64,7 @@ set(INCLUDE_DIRS
     ../Library_MMDFiles/include
     ../Library_GLFW/include
     ../Library_libpng/include
+    ../Library_cpphttplib/include
     src/include
     /usr/X11/include
 )
