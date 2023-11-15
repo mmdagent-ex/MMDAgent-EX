@@ -156,6 +156,9 @@ void Option::initialize()
    m_diffusionFilterScale = OPTION_DIFFUSIONFILTERSCALE_DEF;
 
    m_parallelSkinningNumThreads = OPTION_PARALLELSKINNING_DEF;
+
+   m_useHttpServer = OPTION_HTTPSERVER_DEF;
+   m_httpServerPortNumber = OPTION_HTTPSERVERPORT_DEF;
 }
 
 /* Option::Option: constructor */
@@ -341,6 +344,10 @@ bool Option::load(const char *file, ZFileKey *key, char **errstr)
          setDiffusionFilterScale(MMDAgent_str2float(p1));
       } else if (MMDAgent_strequal(buf, OPTION_PARALLELSKINNING_STR)) {
          setParallelSkinningNumthreads(MMDAgent_str2int(p1));
+      } else if (MMDAgent_strequal(buf, OPTION_HTTPSERVER_STR)) {
+         setUseHttpServer(MMDAgent_str2bool(p1));
+      } else if (MMDAgent_strequal(buf, OPTION_HTTPSERVERPORT_STR)) {
+         setHttpServerPortNumber(MMDAgent_str2int(p1));
       }
    }
 
@@ -1189,4 +1196,33 @@ void Option::setParallelSkinningNumthreads(int i)
       m_parallelSkinningNumThreads = OPTION_PARALLELSKINNING_MIN;
    else
       m_parallelSkinningNumThreads = i;
+}
+
+/* Option::getUseHttpServer: get use of http server */
+bool Option::getUseHttpServer()
+{
+   return m_useHttpServer;
+}
+
+/* Option::setUseHttpServer: set use of http server */
+void Option::setUseHttpServer(bool b)
+{
+   m_useHttpServer = b;
+}
+
+/* Option::getHttpServerPortNumber: get http server port number */
+int Option::getHttpServerPortNumber()
+{
+   return m_httpServerPortNumber;
+}
+
+/* Option::setHttpServerPortNumber: set http server port number */
+void Option::setHttpServerPortNumber(int i)
+{
+   if (OPTION_HTTPSERVERPORT_MAX < i)
+      m_httpServerPortNumber = OPTION_HTTPSERVERPORT_MAX;
+   else if (OPTION_HTTPSERVERPORT_MIN > i)
+      m_httpServerPortNumber = OPTION_HTTPSERVERPORT_MIN;
+   else
+      m_httpServerPortNumber = i;
 }
