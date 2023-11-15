@@ -293,6 +293,15 @@
 #define OPTION_PARALLELSKINNING_MAX 4
 #define OPTION_PARALLELSKINNING_MIN 1
 
+#define OPTION_HTTPSERVER_STR "http_server"
+#define OPTION_HTTPSERVER_DEF true
+
+#define OPTION_HTTPSERVERPORT_STR "http_server_port"
+#define OPTION_HTTPSERVERPORT_DEF 50000
+#define OPTION_HTTPSERVERPORT_MAX 65535
+#define OPTION_HTTPSERVERPORT_MIN 0
+
+
 /* Option: user options */
 class Option
 {
@@ -391,6 +400,10 @@ private:
 
    /* parallel skinning */
    int m_parallelSkinningNumThreads;
+
+   /* http server */
+   bool m_useHttpServer;
+   int m_httpServerPortNumber;
 
    /* initialize: initialize options */
    void initialize();
@@ -687,4 +700,16 @@ public:
 
    /* setParallelSkinningNumthreads: set parallel skinning numthreads */
    void setParallelSkinningNumthreads(int i);
+
+   /* getUseHttpServer: get use of http server */
+   bool getUseHttpServer();
+
+   /* setUseHttpServer: set use of http server */
+   void setUseHttpServer(bool b);
+
+   /* getHttpServerPortNumber: get http server port number */
+   int getHttpServerPortNumber();
+
+   /* setHttpServerPortNumber: set http server port number */
+   void setHttpServerPortNumber(int i);
 };

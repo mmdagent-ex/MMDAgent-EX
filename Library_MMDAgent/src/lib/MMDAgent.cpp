@@ -1662,6 +1662,7 @@ void MMDAgent::initialize()
    m_offscreen = NULL;
    m_keyHandler.setup(this);
    m_caption = NULL;
+   m_httpServer = NULL;
 
    m_errorMessages[0] = '\0';
    memset(&m_elemErrorMessage, 0, sizeof(FTGLTextDrawElements));
@@ -1815,6 +1816,9 @@ void MMDAgent::clear()
 
    if (m_caption)
       delete m_caption;
+
+   if (m_httpServer)
+      delete m_httpServer;
 
    if (m_elemErrorMessage.vertices) free(m_elemErrorMessage.vertices);
    if (m_elemErrorMessage.texcoords) free(m_elemErrorMessage.texcoords);
@@ -2371,6 +2375,12 @@ bool MMDAgent::setupWorld()
    /* set parallel skinning thread num */
    omp_set_num_threads(m_option->getParallelSkinningNumthreads());
    sendLogString(m_moduleId, MLOG_STATUS, "numthreads for skinning = %d", m_option->getParallelSkinningNumthreads());
+
+   /* setup http server */
+   if (m_option->getUseHttpServer() == true) {
+      m_httpServer = new HttpServer(this, m_option->getHttpServerPortNumber());
+      m_httpServer->start();
+   }
 
    return true;
 }

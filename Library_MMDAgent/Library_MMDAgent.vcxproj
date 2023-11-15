@@ -21,6 +21,7 @@
     <ClInclude Include="src\include\ContentUpload.h" />
     <ClInclude Include="src\include\FileBrowser.h" />
     <ClInclude Include="src\include\FreeTypeGL.h" />
+    <ClInclude Include="src\include\HttpServer.h" />
     <ClInclude Include="src\include\InfoText.h" />
     <ClInclude Include="src\include\KeyHandler.h" />
     <ClInclude Include="src\include\KeyValue.h" />
@@ -58,6 +59,7 @@
     <ClCompile Include="src\lib\ContentUpload.cpp" />
     <ClCompile Include="src\lib\FileBrowser.cpp" />
     <ClCompile Include="src\lib\FreeTypeGL.cpp" />
+    <ClCompile Include="src\lib\HttpServer.cpp" />
     <ClCompile Include="src\lib\InfoText.cpp" />
     <ClCompile Include="src\lib\KeyHandler.cpp" />
     <ClCompile Include="src\lib\KeyValue.cpp" />
@@ -129,7 +131,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_DEBUG;_LIB;MMDAGENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Library_Bullet_Physics\include;..\Library_MMDFiles\include;..\Library_glew\include;src\include;..\Library_GLFW\include;..\Library_FreeType\include;..\Library_UTF8-CPP\include;..\Library_zlib\include;..\Library_Poco\include;..\Library_Poco\win32\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Library_Bullet_Physics\include;..\Library_MMDFiles\include;..\Library_glew\include;src\include;..\Library_GLFW\include;..\Library_FreeType\include;..\Library_UTF8-CPP\include;..\Library_zlib\include;..\Library_Poco\include;..\Library_Poco\win32\include;..\Library_cpphttplib\include</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <Link>
@@ -150,7 +152,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\Library_Bullet_Physics\include;..\Library_MMDFiles\include;..\Library_glew\include;src\include;..\Library_GLFW\include;..\Library_FreeType\include;..\Library_UTF8-CPP\include;..\Library_zlib\include;..\Library_Poco\include;..\Library_Poco\win32\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Library_Bullet_Physics\include;..\Library_MMDFiles\include;..\Library_glew\include;src\include;..\Library_GLFW\include;..\Library_FreeType\include;..\Library_UTF8-CPP\include;..\Library_zlib\include;..\Library_Poco\include;..\Library_Poco\win32\include;..\Library_cpphttplib\include</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
