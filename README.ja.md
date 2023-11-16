@@ -90,6 +90,7 @@ MMDAgent-EX のコードは Apache License, Version 2.0 で提供されていま
 - OpenCV
 - FFmpeg
 - RabbitMQ
+- cpp-httplib
 
 また、本ツールで3Dモデルやモーション、音や画像等の素材を利用する場合は、それらの作者（権利者）が定める利用規約に従ってください。
 
