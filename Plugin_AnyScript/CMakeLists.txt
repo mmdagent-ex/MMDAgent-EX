@@ -16,28 +16,45 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+# project name
 project(Plugin_AnyScript)
 
+# packages required to build this project
+#find_package()
+
+# list of source files
 set(SOURCES
     ChildProcess.cpp
     Plugin_AnyScript.cpp
 )
 
-set(INCLUDE_DIRS
+# add this project as shared library
+add_library(Plugin_AnyScript SHARED ${SOURCES})
+
+# include dirs to build this project
+target_include_directories(Plugin_AnyScript PRIVATE
     ../Library_Bullet_Physics/include
     ../Library_GLFW/include
     ../Library_MMDFiles/include
     ../Library_MMDAgent/include
 )
 
-add_library(Plugin_AnyScript SHARED ${SOURCES})
+# compiler definitions (-D) for build
+target_compile_definitions(Plugin_AnyScript PRIVATE
+    MMDAGENT
+)
 
-target_include_directories(Plugin_AnyScript PRIVATE ${INCLUDE_DIRS})
+# compiler options for build
+target_compile_options(Plugin_AnyScript PRIVATE
+   -Wno-deprecated-declarations
+)
 
-target_compile_definitions(Plugin_AnyScript PRIVATE MMDAGENT)
+# library linking
+target_link_libraries(Plugin_AnyScript
+    ${MMDAGENT_LINK_OPTIONS}
+)
 
-target_link_libraries(Plugin_AnyScript ${MMDAGENT_LINK_OPTIONS})
-
+# custom command to copy binaries
 add_custom_command(
     TARGET Plugin_AnyScript
     POST_BUILD

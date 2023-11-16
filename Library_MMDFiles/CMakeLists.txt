@@ -16,9 +16,28 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+# project name
 project(MMDFILES)
 
-set(LIB_SOURCES
+# packages required to build this project
+find_package(OpenMP REQUIRED)
+find_package(JPEG REQUIRED)
+find_package(GLEW REQUIRED)
+if(APPLE)
+    # homebrew minizip has no cmake config
+    if(IS_DIRECTORY /opt/homebrew)
+        set(MINIZIP_LIBRARIES /opt/homebrew/lib/libminizip.dylib)
+    else()
+        if(IS_DIRECTORY /usr/local)
+            set(MINIZIP_LIBRARIES /opt/homebrew/lib/libminizip.dylib)
+        endif()
+    endif()
+else()
+    find_package(minizip REQUIRED)
+endif()
+
+# list of source files
+set(SOURCES
     src/lib/BulletPhysics.cpp
     src/lib/CameraController.cpp
     src/lib/KinematicMotionState.cpp
@@ -48,29 +67,71 @@ set(LIB_SOURCES
     src/lib/ZFile.cpp
 )
 
-set(INCLUDE_DIRS
+# add this project as static library
+add_library(MMDFILES STATIC ${SOURCES})
+
+# private include dirs to build this project
+target_include_directories(MMDFILES BEFORE PRIVATE
     ../Library_Bullet_Physics/include
     ../Library_libpng/include
     src/include
 )
 
-set(PRIVATE_COMPILER_OPTIONS
-    -DGL_GLEXT_PROTOTYPES
-    -DMMDFILES_DONTUPDATEMATRICESFORIK
-    -DMMDFILES_DONTSORTORDERFORALPHARENDERING
+# compiler definitions (-D) for private build
+target_compile_definitions(MMDFILES PRIVATE
+    GL_GLEXT_PROTOTYPES
+    MMDFILES_DONTUPDATEMATRICESFORIK
+    MMDFILES_DONTSORTORDERFORALPHARENDERING
 )
 
-add_library(MMDFILES STATIC ${LIB_SOURCES})
+# compiler options for private build
+target_compile_options(MMDFILES PRIVATE
+    -Wno-deprecated-declarations
+)
+#if(APPLE)
+#    target_compile_options(MMDFILES PRIVATE
+#        -Xpreprocessor
+#        -fopenmp
+#    )
+#else()
+#    target_compile_options(MMDFILES PRIVATE
+#        -fopenmp
+#    )
+#endif()
 
-target_include_directories(MMDFILES BEFORE PRIVATE ${INCLUDE_DIRS})
+##############
+# public compiler definitions (-D) required to link with this project
+#target_compile_definitions(MMDFILES PUBLIC
+#)
 
-target_compile_definitions(MMDFILES PRIVATE GL_GLEXT_PROTOTYPES MMDFILES_DONTUPDATEMATRICESFORIK MMDFILES_DONTSORTORDERFORALPHARENDERING)
+# public compiler options required to link with this project
+#target_compile_options(MMDFILES PUBLIC
+#)
 
+# public link libraries to be linked with this project
 if(APPLE)
-    target_compile_options(MMDFILES PRIVATE -Xpreprocessor -fopenmp)
-    target_link_libraries(MMDFILES PUBLIC BulletPhysics GLFW LIBPNG -ljpeg -lminizip -lomp)
+    target_link_libraries(MMDFILES PUBLIC
+        BulletPhysics
+        GLFW
+        LIBPNG
+        ${JPEG_LIBRARIES}
+        ${MINIZIP_LIBRARIES}
+        OpenMP::OpenMP_CXX
+        GLEW::GLEW
+    )
 else()
-    target_compile_options(MMDFILES PRIVATE -fopenmp)
-    target_link_libraries(MMDFILES PUBLIC BulletPhysics GLFW LIBPNG -ljpeg -lminizip -lgomp -ldl -lpthread)
+    target_link_libraries(MMDFILES PUBLIC
+        BulletPhysics
+        GLFW
+        LIBPNG
+        ${JPEG_LIBRARIES}
+        -lminizip
+        OpenMP::OpenMP_CXX
+        GLEW::GLEW
+        -ldl
+        -lpthread
+    )
 endif()
+
+
 

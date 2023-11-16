@@ -16,8 +16,16 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+# packages required to build this project
+find_package(rabbitmq-c)
+
+# project name
 project(Plugin_RabbitMQ)
 
+# packages required to build this project
+find_package(rabbitmq-c)
+
+# list of source files
 set(SOURCES
     Thread.cpp
     Julius_Thread.cpp
@@ -28,7 +36,11 @@ set(SOURCES
     Plugin_RabbitMQ.cpp
 )
 
-set(INCLUDE_DIRS
+# add this project as shared library
+add_library(Plugin_RabbitMQ SHARED ${SOURCES})
+
+# include dirs to build this project
+target_include_directories(Plugin_RabbitMQ PRIVATE
     ../Library_Bullet_Physics/include
     ../Library_GLFW/include
     ../Library_MMDFiles/include
@@ -36,20 +48,25 @@ set(INCLUDE_DIRS
     ../Library_Julius/include
 )
 
-add_library(Plugin_RabbitMQ SHARED ${SOURCES})
+# compiler definitions (-D) for build
+target_compile_definitions(Plugin_RabbitMQ PRIVATE
+    MMDAGENT
+)
 
-target_include_directories(Plugin_RabbitMQ PRIVATE ${INCLUDE_DIRS})
+# compiler options for build
+target_compile_options(Plugin_RabbitMQ PRIVATE
+    -std=c++17
+    -Wno-deprecated-declarations
+)
 
-target_compile_definitions(Plugin_RabbitMQ PRIVATE MMDAGENT)
-
-target_compile_options(Plugin_RabbitMQ PRIVATE -std=c++17)
-
+# library linking
 target_link_libraries(Plugin_RabbitMQ
     ${MMDAGENT_LINK_OPTIONS}
     JULIUS
-    -lrabbitmq
+    rabbitmq::rabbitmq
 )
 
+# custom command to copy binaries
 add_custom_command(
     TARGET Plugin_RabbitMQ
     POST_BUILD

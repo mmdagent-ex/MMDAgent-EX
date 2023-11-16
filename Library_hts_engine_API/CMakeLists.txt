@@ -16,9 +16,14 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+# project name
 project(HTSENGINEAPI)
 
-set(LIB_SOURCES
+# packages required to build this project
+#find_package(portaudio REQUIRED)
+
+# list of source files
+set(SOURCES
     src/lib/HTS_audio.c
     src/lib/HTS_engine.c
     src/lib/HTS_gstream.c
@@ -30,20 +35,37 @@ set(LIB_SOURCES
     src/lib/HTS_vocoder.c
 )
 
-set(INCLUDE_DIRS
-    ../Library_PortAudio/include
+# add this project as static library
+add_library(HTSENGINEAPI STATIC ${SOURCES})
+
+# private include dirs to build this project
+target_include_directories(HTSENGINEAPI PRIVATE
+    ${PORTAUDIO_INCLUDE_DIR}
     src/include
 )
 
-add_library(HTSENGINEAPI STATIC ${LIB_SOURCES})
-
-target_include_directories(HTSENGINEAPI PRIVATE ${INCLUDE_DIRS})
-
-target_compile_definitions(HTSENGINEAPI PUBLIC MMDAGENT AUDIO_PLAY_PORTAUDIO)
-
-target_compile_options(HTSENGINEAPI PRIVATE
-   -Wno-tautological-compare
-   -Wno-empty-body
+# compiler definitions (-D) for private build
+target_compile_definitions(HTSENGINEAPI PRIVATE
+    MMDAGENT
+    AUDIO_PLAY_PORTAUDIO
 )
 
-target_link_libraries(HTSENGINEAPI PUBLIC -lportaudio)
+# compiler options for private build
+target_compile_options(HTSENGINEAPI PRIVATE
+    -Wno-tautological-compare
+    -Wno-empty-body
+)
+
+##############
+# public compiler definitions (-D) required to link with this project
+target_compile_definitions(HTSENGINEAPI PUBLIC
+)
+
+# public compiler options required to link with this project
+target_compile_options(HTSENGINEAPI PUBLIC
+)
+
+# public link libraries to be linked with this project
+target_link_libraries(HTSENGINEAPI PUBLIC
+    ${PORTAUDIO_LIBRARIES}
+)

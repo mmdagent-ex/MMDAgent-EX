@@ -16,8 +16,13 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+# project name
 project(Plugin_VIManager)
 
+# packages required to build this project
+find_package(re2 REQUIRED)
+
+# list of source files
 set(SOURCES
     Plugin_VIManager.cpp
     VIManager.cpp
@@ -25,23 +30,35 @@ set(SOURCES
     VIManager_Thread.cpp
 )
 
-set(INCLUDE_DIRS
+# add this project as shared library
+add_library(Plugin_VIManager SHARED ${SOURCES})
+
+# include dirs to build this project
+target_include_directories(Plugin_VIManager PRIVATE
     ../Library_Bullet_Physics/include
     ../Library_GLFW/include
     ../Library_MMDFiles/include
     ../Library_MMDAgent/include
 )
 
-add_library(Plugin_VIManager SHARED ${SOURCES})
+# compiler definitions (-D) for build
+target_compile_definitions(Plugin_VIManager PRIVATE
+    MMDAGENT
+)
 
-target_include_directories(Plugin_VIManager PRIVATE ${INCLUDE_DIRS})
+# compiler options for build
+target_compile_options(Plugin_VIManager PRIVATE
+    -std=c++17
+    -Wno-deprecated-declarations
+)
 
-target_compile_definitions(Plugin_VIManager PRIVATE MMDAGENT)
+# library linking
+target_link_libraries(Plugin_VIManager
+    ${MMDAGENT_LINK_OPTIONS}
+    re2::re2
+)
 
-target_compile_options(Plugin_VIManager PRIVATE -std=c++17)
-
-target_link_libraries(Plugin_VIManager ${MMDAGENT_LINK_OPTIONS} -lre2)
-
+# custom command to copy binaries
 add_custom_command(
     TARGET Plugin_VIManager
     POST_BUILD

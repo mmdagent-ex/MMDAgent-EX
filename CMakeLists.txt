@@ -22,28 +22,50 @@ project(MMDAgent-EX)
 #  set(CMAKE_BUILD_TYPE "Release")
 #endif()
 
+# deal with libraries that has no cmake config
 if(APPLE)
-    set(BREW_DIR "/opt/homebrew")
-    include_directories(${BREW_DIR}/include)
-    link_directories(${BREW_DIR}/lib)
+    if(IS_DIRECTORY /opt/homebrew)
+        set(MINIZIP_INCLUDE_DIR /opt/homebrew/include)
+        set(MINIZIP_LIBRARIES /opt/homebrew/lib/libminizip.dylib)
+        set(PORTAUDIO_INCLUDE_DIR /opt/homebrew/include)
+        set(PORTAUDIO_LIBRARIES /opt/homebrew/lib/libportaudio.dylib)
+        set(LIBRDKAFKA_INCLUDE_DIR /opt/homebrew/include)
+        set(LIBRDKAFKA_LIBRARIES /opt/homebrew/lib/librdkafka.dylib)
+    else()
+        if(IS_DIRECTORY /usr/local)
+            set(MINIZIP_INCLUDE_DIR /usr/local/nclude)
+            set(MINIZIP_LIBRARIES /usr/local/lib/libminizip.dylib)
+            set(PORTAUDIO_INCLUDE_DIR /usr/local/nclude)
+            set(PORTAUDIO_LIBRARIES /usr/local/lib/ibportaudio.dylib)
+            set(LIBRDKAFKA_INCLUDE_DIR /usr/local/include)
+            set(LIBRDKAFKA_LIBRARIES /usr/local/lib/librdkafka.dylib)
+            endif()
+    endif()
+else()
+    find_package(minizip REQUIRED)
+    set(MINIZIP_INCLUDE_DIR minizip::cxx)
+    set(MINIZIP_LIBRARIES minizip::minizip)
+    find_package(portaudio REQUIRED)
+    set(PORTAUDIO_INCLUDE_DIR portaudio::cxx)
+    set(PORTAUDIO_LIBRARIES portaudio::portaudio)
+    find_package(librdkafka REQUIRED)
+    set(LIBRDKAFKA_INCLUDE_DIR librdkafka::cxx)
+    set(LIBRDKAFKA_LIBRARIES librdkafka::librdkafka)
+endif()
+
+if(APPLE)
+    # brew path of Apple Silicon Mac
+    list(APPEND CMAKE_PREFIX_PATH "/opt/homebrew")
+    # brew path of Intel Mac
+    list(APPEND CMAKE_PREFIX_PATH "/usr/local")
+    # global definitions
     add_compile_definitions(
       TARGET_OS_IPHONE=0
       GL_SILENCE_DEPRECATION=1
     )
-    find_package(OpenGL REQUIRED)
     set(MMDAGENT_LINK_OPTIONS
-        BulletPhysics
-        FlitePlusHTSEngine
-        FreeType
-        MMDFILES
         MMDAGENT
-        LIBPNG
         -lstdc++
-        -lGLEW
-        -lssl
-        -lcrypto
-        -lPocoCrypto -lPocoFoundation -lPocoNet -lPocoNetSSL -lPocoUtil -lPocoXML -lPocoZip -lPocoJSON
-        ${OPENGL_LIBRARIES}
         "-framework AGL"
         "-framework Cocoa"
         "-framework OpenGL"
@@ -51,17 +73,7 @@ if(APPLE)
     )
 else()
     set(MMDAGENT_LINK_OPTIONS
-        BulletPhysics
-        FlitePlusHTSEngine
-        FreeType
-        MMDFILES
         MMDAGENT
-        LIBPNG
-        ${OpenCV_LIBS}
-        -lGLEW
-        -lssl
-        -lcrypto
-        -lPocoCrypto -lPocoFoundation -lPocoNet -lPocoNetSSL -lPocoUtil -lPocoXML -lPocoZip -lPocoJSON
     )
 endif()
 
@@ -75,7 +87,7 @@ add_subdirectory(Library_FreeType)
 add_subdirectory(Library_GLFW)
 add_subdirectory(Library_libpng)
 add_subdirectory(Library_hts_engine_API)
-add_subdirectory(Library_librdkafka)
+#add_subdirectory(Library_librdkafka)
 add_subdirectory(Library_Open_JTalk)
 add_subdirectory(Library_Julius)
 add_subdirectory(Library_MMDFiles)

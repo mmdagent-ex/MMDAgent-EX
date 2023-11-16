@@ -16,9 +16,15 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+# project name
 project(MMDAGENT)
 
-set(LIB_SOURCES
+# packages required to build this project
+find_package(OpenSSL REQUIRED)
+find_package(Poco REQUIRED JSON XML Zip Crypto Data Net NetSSL)
+
+# list of source files
+set(SOURCES
     src/lib/BoneController.cpp
     src/lib/BoneFaceControl.cpp
     src/lib/Button.cpp
@@ -57,7 +63,11 @@ set(LIB_SOURCES
     src/lib/Timer.cpp
 )
 
-set(INCLUDE_DIRS
+# add this project as static library
+add_library(MMDAGENT STATIC ${SOURCES})
+
+# private include dirs to build this project
+target_include_directories(MMDAGENT BEFORE PRIVATE
     ../Library_Bullet_Physics/include
     ../Library_FreeType/include
     ../Library_UTF8-CPP/include
@@ -66,23 +76,42 @@ set(INCLUDE_DIRS
     ../Library_libpng/include
     ../Library_cpphttplib/include
     src/include
-    /usr/X11/include
+#/usr/X11/include
 )
 
-set(COMPILER_DEFS
+# compiler definitions (-D) for private build
+target_compile_definitions(MMDAGENT PRIVATE
     GL_GLEXT_PROTOTYPES
     MMDAGENT
     MMDAGENT_DONTPICKMODEL
 )
 
-add_library(MMDAGENT STATIC ${LIB_SOURCES})
-
+# compiler options for private build
 if(APPLE)
-   target_compile_options(MMDAGENT PRIVATE -std=c++11)
+    target_compile_options(MMDAGENT PRIVATE
+        -Wno-deprecated-declarations
+        -std=c++11
+    )
+else()
+    target_compile_options(MMDAGENT PRIVATE
+        -Wno-deprecated-declarations
+    )
 endif()
 
-target_include_directories(MMDAGENT BEFORE PRIVATE ${INCLUDE_DIRS})
+##############
+# public compiler definitions (-D) required to link with this project
+#target_compile_definitions(MMDAGENT PUBLIC
+#)
 
-target_compile_definitions(MMDAGENT PRIVATE ${COMPILER_DEFS})
+# public compiler options required to link with this project
+#target_compile_options(MMDAGENT PUBLIC
+#)
 
-target_link_libraries(MMDAGENT PUBLIC MMDFILES FreeType)
+# public link libraries to be linked with this project
+target_link_libraries(MMDAGENT PUBLIC
+    MMDFILES
+    FreeType
+    OpenSSL::SSL
+    OpenSSL::Crypto
+    ${Poco_LIBRARIES}
+)
