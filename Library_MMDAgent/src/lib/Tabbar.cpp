@@ -218,7 +218,7 @@ void Tabbar::exec(int id)
          m_mmdagent->setResetFlag(p);
          free(p);
       } else {
-         m_mmdagent->sendMessage(0, PROMPT_COMMAND_SHOW, "no home|OK");
+         m_mmdagent->sendMessage(0, NOTIFY_COMMAND_SHOW, "no home");
       }
       break;
    case 1: // info
