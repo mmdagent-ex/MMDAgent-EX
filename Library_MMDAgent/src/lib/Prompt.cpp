@@ -86,6 +86,9 @@
 
 #define RENDERING_Z_OFFSET -0.4f
 
+/* notify duration default in sec. */
+#define NOTIFY_SHOW_DURATION_DEFAULT  2.0
+
 /* Prompt::initialize: initialize prompt */
 void Prompt::initialize()
 {
@@ -98,6 +101,7 @@ void Prompt::initialize()
    m_textOffsetX = 0.0f;
    m_textOffsetY = 0.0f;
    m_labelNum = 0;
+   m_isNotify = false;
 
    m_currentCursor = -1;
    m_showing = false;
@@ -108,6 +112,8 @@ void Prompt::initialize()
 
    m_showHideAnimationFrameLeft = PROMPT_DURATION_SHOWHIDE;
    m_execLabelAnimationFrameLeft = 0.0f;
+   m_autoHide = false;
+   m_autoHideFrameLeft = 0.0f;
    m_execLabelId = -1;
 }
 
@@ -254,8 +260,8 @@ void Prompt::updatePosition()
    }
 }
 
-/* Prompt::compose: compose prompt */
-bool Prompt::compose(const char *text, char **labels, int num)
+/* Prompt::composePrompt: compose prompt */
+bool Prompt::composePrompt(const char *text, char **labels, int num)
 {
    size_t i, size, inLen;
    int j;
@@ -317,6 +323,10 @@ bool Prompt::compose(const char *text, char **labels, int num)
    /* reset cursor position */
    m_currentCursor = -1;
 
+   /* set as prompt */
+   m_autoHide = false;
+   m_isNotify = false;
+
    /* set minimal animation */
    if (m_showHideAnimationFrameLeft < PROMPT_DURATION_SHOWSHOW)
       m_showHideAnimationFrameLeft = PROMPT_DURATION_SHOWSHOW;
@@ -326,6 +336,82 @@ bool Prompt::compose(const char *text, char **labels, int num)
 
    return true;
 }
+
+/* Prompt::composeNotify: compose notify */
+bool Prompt::composeNotify(const char *text, double duration)
+{
+   size_t i, size, inLen;
+   bool mode;
+   char *str;
+
+   if (m_font == NULL)
+      return false;
+
+   /* clear text elements */
+   clearElem();
+   initializeElem();
+
+   /* convert "\n" as newline in the given text */
+   str = MMDAgent_strdup(text);
+   inLen = MMDAgent_strlen(str);
+   mode = false;
+   for (i = 0; i < inLen; i += size) {
+      size = MMDFiles_getcharsize(&(str[i]));
+      if (size == 1 && str[i] == '\\') {
+         mode = true;
+      } else if (mode == true && size == 1 && str[i] == 'n') {
+         str[i - 1] = '\r';
+         str[i] = '\n';
+         mode = false;
+      }
+   }
+
+   /* build text element for text */
+   m_elem_text.textLen = 0;
+   m_elem_text.numIndices = 0;
+   if (m_font->getTextDrawElements(str, &m_elem_text, m_elem_text.textLen, 0.0f, 0.0f, 0.1f) == false) {
+      m_elem_text.textLen = 0; /* reset */
+      m_elem_text.numIndices = 0;
+      free(str);
+      return false;
+   }
+   free(str);
+
+   /* build text elements for OK label */
+   m_elem_label[0].textLen = 0;
+   m_elem_label[0].numIndices = 0;
+   if (m_font->getTextDrawElements("OK", &(m_elem_label[0]), m_elem_label[0].textLen, 0.0f, 0.0f, 0.1f) == false) {
+      m_elem_label[0].textLen = 0; /* reset */
+      m_elem_label[0].numIndices = 0;
+      return false;
+   }
+   m_labelNum = 1;
+
+   /* update position */
+   updatePosition();
+
+   /* reset cursor position */
+   m_currentCursor = -1;
+
+   /* set auto-hide flag */
+   if (duration <= 0.0) {
+      m_autoHide = false;
+   } else {
+      m_autoHide = true;
+      m_autoHideFrameLeft = (float)(duration * 30.0);
+   }
+   m_isNotify = true;
+
+   /* set minimal animation */
+   if (m_showHideAnimationFrameLeft < PROMPT_DURATION_SHOWSHOW)
+      m_showHideAnimationFrameLeft = PROMPT_DURATION_SHOWSHOW;
+
+   /* start showing */
+   m_showing = true;
+
+   return true;
+}
+
 
 /* Prompt: constructor */
 Prompt::Prompt()
@@ -360,8 +446,10 @@ void Prompt::cancel()
    if (m_showing == true) {
       /* start closing */
       m_showing = false;
-      /* output message with selection number -1 */
-      m_mmdagent->sendMessage(m_id, PROMPT_EVENT_SELECTED, "%d", -1);
+      if (m_isNotify == false) {
+         /* output message with selection number -1 */
+         m_mmdagent->sendMessage(m_id, PROMPT_EVENT_SELECTED, "%d", -1);
+      }
    }
 }
 
@@ -454,7 +542,8 @@ void Prompt::update(double ellapsedFrame)
          m_execLabelAnimationFrameLeft = 0.0f;
          /* when exec animation was expired, send message and start hiding this prompt */
          if (m_execLabelId != -1) {
-            m_mmdagent->sendMessage(m_id, PROMPT_EVENT_SELECTED, "%d", m_execLabelId);
+            if (m_isNotify == false)
+               m_mmdagent->sendMessage(m_id, PROMPT_EVENT_SELECTED, "%d", m_execLabelId);
             m_execLabelId = -1;
          }
          if (m_showing == true)
@@ -469,6 +558,15 @@ void Prompt::update(double ellapsedFrame)
          m_showHideAnimationFrameLeft += (float)ellapsedFrame;
          if (m_showHideAnimationFrameLeft > PROMPT_DURATION_SHOWHIDE)
             m_showHideAnimationFrameLeft = PROMPT_DURATION_SHOWHIDE;
+      }
+   }
+   if (m_autoHide) {
+      if (m_autoHideFrameLeft > 0.0f) {
+         m_autoHideFrameLeft -= (float)ellapsedFrame;
+         if (m_autoHideFrameLeft <= 0.0f) {
+            m_autoHideFrameLeft = 0.0f;
+            m_showing = false;
+         }
       }
    }
 }
@@ -634,8 +732,24 @@ bool Prompt::processMessage(const char *type, const char *args)
          return false;
       }
       /* compose a new prompt and start showing */
-      if (compose(argv[0], &(argv[1]), num - 1) == false)
+      if (composePrompt(argv[0], &(argv[1]), num - 1) == false)
          m_mmdagent->sendLogString(m_id, MLOG_ERROR, "Error: %s: failed to compose prompt", type);
+   } else if (MMDAgent_strequal(type, NOTIFY_COMMAND_SHOW)) {
+      if (num < 1) {
+         m_mmdagent->sendLogString(m_id, MLOG_ERROR, "Error: %s: too few arguments", type);
+         return false;
+      }
+      if (num > 2) {
+         m_mmdagent->sendLogString(m_id, MLOG_ERROR, "Error: %s: too many arguments", type);
+         return false;
+      }
+      double dur = NOTIFY_SHOW_DURATION_DEFAULT;
+      /* compose a new notification and start showing with timer */
+      if (num == 2) {
+         dur = MMDAgent_str2double(argv[1]);
+      }
+      if (composeNotify(argv[0], dur) == false)
+         m_mmdagent->sendLogString(m_id, MLOG_ERROR, "Error: %s: failed to compose notify", type);
    }
 
    return true;
