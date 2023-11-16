@@ -62,6 +62,7 @@
 /* message */
 #define PROMPT_COMMAND_SHOW     "PROMPT_SHOW"
 #define PROMPT_EVENT_SELECTED   "PROMPT_EVENT_SELECTED"
+#define NOTIFY_COMMAND_SHOW     "NOTIFY_SHOW"
 
 /* Prompt: prompt */
 class Prompt
@@ -87,6 +88,8 @@ private:
    float m_labelTransX[PROMPT_LABEL_MAXNUM];   /* label X transition for exec animation */
    float m_labelTransY[PROMPT_LABEL_MAXNUM];   /* label Y transition for exec animation */
 
+   bool m_isNotify;                            /* true when this is involed by notify message */
+
    /* working variables */
    int m_currentCursor;   /* current cursor position for key operation */
    bool m_showing;        /* true when showing, false when hiding */
@@ -106,6 +109,8 @@ private:
    /* animation */
    float m_showHideAnimationFrameLeft;   /* remaining frame for show/hide animation */
    float m_execLabelAnimationFrameLeft;  /* remaining frame for label execution animation */
+   bool  m_autoHide;                     /* true when auto hide is enabled */
+   float m_autoHideFrameLeft;            /* remaining frame for auto hide */
    int m_execLabelId;                    /* last executed label id */
 
    /* initialize: initialize prompt */
@@ -126,8 +131,11 @@ private:
    /* updatePosition: update positions */
    void updatePosition();
 
-   /* compose: compose prompt */
-   bool compose(const char *text, char **labels, int num);
+   /* composePrompt: compose prompt */
+   bool composePrompt(const char *text, char **labels, int num);
+
+   /* composeNotify: compose notify */
+   bool composeNotify(const char *text, double duration);
 
 public:
 

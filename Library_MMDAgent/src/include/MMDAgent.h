@@ -282,6 +282,7 @@ private:
    bool m_buttonShowing;        /* true when buttons are showing */
    FileBrowser *m_filebrowser;  /* file browser */
    Prompt *m_prompt;            /* prompt handler */
+   Prompt *m_notify;            /* notify handler */
    InfoText *m_infotext;        /* information text */
    Slider *m_slider;            /* slider */
    Tabbar *m_tabbar;            /* tabbar */

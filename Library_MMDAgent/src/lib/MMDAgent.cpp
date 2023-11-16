@@ -1592,6 +1592,7 @@ void MMDAgent::initialize()
    m_buttonShowing = false;
    m_filebrowser = NULL;
    m_prompt = NULL;
+   m_notify = NULL;
    m_infotext = NULL;
    m_slider = NULL;
    m_tabbar = NULL;
@@ -1772,6 +1773,8 @@ void MMDAgent::clear()
       delete m_infotext;
    if (m_prompt)
       delete m_prompt;
+   if (m_notify)
+      delete m_notify;
    if (m_filebrowser)
       delete m_filebrowser;
    if (m_lipSync)
@@ -2322,6 +2325,10 @@ bool MMDAgent::setupWorld()
    m_prompt = new Prompt();
    m_prompt->setup(this, m_moduleId, m_font);
 
+   /* setup notifier */
+   m_notify = new Prompt();
+   m_notify->setup(this, m_moduleId, m_font);
+
    /* setup models */
    m_model = (PMDObject*)MMDFiles_alignedmalloc(sizeof(PMDObject) * m_option->getMaxNumModel(), 16);
    for (int i = 0; i < m_option->getMaxNumModel(); i++)
@@ -2741,6 +2748,7 @@ bool MMDAgent::updateScene()
       }
       if (m_filebrowser) m_filebrowser->update(intervalFrame);
       if (m_prompt) m_prompt->update(intervalFrame);
+      if (m_notify) m_notify->update(intervalFrame);
       if (m_infotext) m_infotext->update(intervalFrame);
       if (m_slider) m_slider->update(intervalFrame);
       if (m_tabbar) m_tabbar->update(intervalFrame);
@@ -2957,6 +2965,10 @@ bool MMDAgent::updateScene()
    /* update prompter */
    if (m_prompt)
       m_prompt->update(processedFrame);
+
+   /* update notifier */
+   if (m_notify)
+      m_notify->update(processedFrame);
 
    /* update infotext */
    if (m_infotext)
@@ -3301,6 +3313,10 @@ bool MMDAgent::renderScene()
    /* render prompter */
    if (m_prompt)
       m_prompt->render();
+
+   /* render notifier */
+   if (m_notify)
+      m_notify->render();
 
    /* render slider */
    if (m_slider)
@@ -3965,7 +3981,7 @@ void MMDAgent::procMenu(int id, int item)
       case 2: /* Show Buttons */
          toggleButtons();
          getMenu()->hide();
-         break;
+         break;NOTIFY_COMMAND_SHOW
 #endif
       case 2: /* Show Files */
          if (getFileBrowser()) {
@@ -3979,12 +3995,12 @@ void MMDAgent::procMenu(int id, int item)
          break;
       case 4: /* Set Home */
          m_content->setHomeURL(m_configFileName);
-         m_prompt->processMessage(PROMPT_COMMAND_SHOW, "Saved this content as home|OK");
+         m_notify->processMessage(NOTIFY_COMMAND_SHOW, "Saved this content as home");
          getMenu()->hide();
          break;
       case 5: /* Clear Home */
          m_content->clearHome();
-         m_prompt->processMessage(PROMPT_COMMAND_SHOW, "Cleared home|OK");
+         m_notify->processMessage(NOTIFY_COMMAND_SHOW, "Cleared home");
          getMenu()->hide();
          break;
       case 6: /* Reload */
@@ -5724,6 +5740,9 @@ void MMDAgent::procReceivedMessage(const char *type, const char *value)
          return;
    } else if (MMDAgent_strequal(type, PROMPT_COMMAND_SHOW)) {
       if (m_prompt->processMessage(type, value) == false)
+         return;
+   } else if (MMDAgent_strequal(type, NOTIFY_COMMAND_SHOW)) {
+      if (m_notify->processMessage(type, value) == false)
          return;
    } else if (MMDAgent_strequal(type, MMDAGENT_COMMAND_MODELBINDBONE)) {
       // MODEL_BINDBONE|(key name)|(min)|(max)|(model alias)|(bone name)|x1,y1,z1|rx1,ry1,rz1|x2,y2,z2|rx2,ry2,rz2
