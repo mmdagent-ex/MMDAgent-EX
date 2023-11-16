@@ -3984,7 +3984,7 @@ void MMDAgent::procMenu(int id, int item)
          break;
       case 5: /* Clear Home */
          m_content->clearHome();
-         m_prompt->processMessage(PROMPT_COMMAND_SHOW, "Cleared home, now blank|OK");
+         m_prompt->processMessage(PROMPT_COMMAND_SHOW, "Cleared home|OK");
          getMenu()->hide();
          break;
       case 6: /* Reload */
@@ -4204,8 +4204,8 @@ void MMDAgent::createMenu()
    m_menu->setItem(id, 1, "Reset camera", NULL, NULL, NULL, MENUKEY("<Shift+C>"));
 //   m_menu->setItem(id, 2, "Button Show/Hide", NULL, NULL, NULL, MENUKEY("<Q>"));
    m_menu->setItem(id, 2, "Browse content", NULL, NULL, NULL, MENUKEY("<Shift+O>"));
-   m_menu->setItem(id, 4, "\xE2\x87\xA8 Home set", NULL, NULL, NULL, NULL);
-   m_menu->setItem(id, 5, "\xE2\x87\xA8 Home clear", NULL, NULL, NULL, NULL);
+   m_menu->setItem(id, 4, "\xE2\x87\xA8 Set current as Home", NULL, NULL, NULL, NULL);
+   m_menu->setItem(id, 5, "\xE2\x87\xA8 Clear Home", NULL, NULL, NULL, NULL);
    m_menu->setItem(id, 6, "\xE2\x87\xA8 Reload", NULL, NULL, NULL, MENUKEY("<Shift+R>"));
 
    id = m_menu->add("[System]", MENUPRIORITY_DEVELOP, menuHandler, this);
