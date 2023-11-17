@@ -16,8 +16,13 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+# project name
 project(Plugin_Flite_plus_hts_engine)
 
+# packages required to build this project
+#find_package()
+
+# list of source files
 set(SOURCES
     Flite_plus_hts_engine.cpp
     Flite_plus_hts_engine_Manager.cpp
@@ -25,7 +30,11 @@ set(SOURCES
     Plugin_Flite_plus_hts_engine.cpp
 )
 
-set(INCLUDE_DIRS
+# add this project as shared library
+add_library(Plugin_Flite_plus_hts_engine SHARED ${SOURCES})
+
+# include dirs to build this project
+target_include_directories(Plugin_Flite_plus_hts_engine PRIVATE
     ../Library_Bullet_Physics/include
     ../Library_GLFW/include
     ../Library_MMDFiles/include
@@ -34,17 +43,23 @@ set(INCLUDE_DIRS
     ../Library_Flite_plus_hts_engine/include
 )
 
-add_library(Plugin_Flite_plus_hts_engine SHARED ${SOURCES})
-
-target_include_directories(Plugin_Flite_plus_hts_engine PRIVATE ${INCLUDE_DIRS})
-
-target_compile_definitions(Plugin_Flite_plus_hts_engine PRIVATE MMDAGENT)
-
-target_link_libraries(Plugin_Flite_plus_hts_engine
-    ${MMDAGENT_LINK_OPTIONS}
-    HTSENGINEAPI
+# compiler definitions (-D) for build
+target_compile_definitions(Plugin_Flite_plus_hts_engine PRIVATE
+    MMDAGENT
 )
 
+# compiler options for build
+target_compile_options(Plugin_Flite_plus_hts_engine PRIVATE
+   -Wno-deprecated-declarations
+)
+
+# library linking
+target_link_libraries(Plugin_Flite_plus_hts_engine
+    ${MMDAGENT_LINK_OPTIONS}
+    FlitePlusHTSEngine
+)
+
+# custom command to copy binaries
 add_custom_command(
     TARGET Plugin_Flite_plus_hts_engine
     POST_BUILD

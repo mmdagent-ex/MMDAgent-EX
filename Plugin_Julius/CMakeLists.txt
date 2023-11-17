@@ -16,8 +16,13 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+# project name
 project(Plugin_Julius)
 
+# packages required to build this project
+#find_package()
+
+# list of source files
 set(SOURCES
     Julius_Logger.cpp
     Julius_Thread.cpp
@@ -25,7 +30,11 @@ set(SOURCES
     Plugin_Julius.cpp
 )
 
-set(INCLUDE_DIRS
+# add this project as shared library
+add_library(Plugin_Julius SHARED ${SOURCES})
+
+# include dirs to build this project
+target_include_directories(Plugin_Julius PRIVATE
     ../Library_Bullet_Physics/include
     ../Library_GLFW/include
     ../Library_MMDFiles/include
@@ -33,17 +42,24 @@ set(INCLUDE_DIRS
     ../Library_Julius/include
 )
 
-add_library(Plugin_Julius SHARED ${SOURCES})
+# compiler definitions (-D) for build
+target_compile_definitions(Plugin_Julius PRIVATE
+    MMDAGENT
+    HAVE_STRCASECMP
+)
 
-target_include_directories(Plugin_Julius PRIVATE ${INCLUDE_DIRS})
+# compiler options for build
+target_compile_options(Plugin_Julius PRIVATE
+   -Wno-deprecated-declarations
+)
 
-target_compile_definitions(Plugin_Julius PRIVATE MMDAGENT HAVE_STRCASECMP)
-
+# library linking
 target_link_libraries(Plugin_Julius
     ${MMDAGENT_LINK_OPTIONS}
     JULIUS
 )
 
+# custom command to copy binaries
 add_custom_command(
     TARGET Plugin_Julius
     POST_BUILD

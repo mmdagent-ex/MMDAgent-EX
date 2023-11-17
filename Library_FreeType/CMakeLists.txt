@@ -16,9 +16,14 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+# project name
 project(FreeType)
 
-set(LIB_SOURCES
+# packages required to build this project
+#find_package()
+
+# list of source files
+set(SOURCES
     src/src/autofit/autofit.c
     src/src/base/ftbase.c
     src/src/base/ftbbox.c
@@ -64,11 +69,33 @@ set(LIB_SOURCES
     src/src/winfonts/winfnt.c
 )
 
-set(INCLUDE_DIRS
+# add this project as static library
+add_library(FreeType STATIC ${SOURCES})
+
+# private include dirs to build this project
+target_include_directories(FreeType PRIVATE
     src/include
 )
 
-add_library(FreeType STATIC ${LIB_SOURCES})
+# compiler definitions (-D) for private build
+target_compile_definitions(FreeType PRIVATE
+    FT2_BUILD_LIBRARY
+)
 
-target_include_directories(FreeType PRIVATE ${INCLUDE_DIRS})
-target_compile_definitions(FreeType PRIVATE FT2_BUILD_LIBRARY)
+# compiler options for private build
+#target_compile_options(FreeType PRIVATE
+#    -Wno-deprecated-declarations
+#)
+
+##############
+# public compiler definitions (-D) required to link with this project
+#target_compile_definitions(FreeType PUBLIC
+#)
+
+# public compiler options required to link with this project
+#target_compile_options(FreeType PUBLIC
+#)
+
+# public link libraries to be linked with this project
+#target_link_libraries(FreeType PUBLIC
+#)

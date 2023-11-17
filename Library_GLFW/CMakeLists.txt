@@ -16,19 +16,14 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+# project name
 project(GLFW)
 
-set(COMPILER_DEFS
-    MMDAGENT
-    _GLFW_USE_LINUX_JOYSTICKS
-    _GLFW_HAS_XRANDR
-    _GLFW_HAS_PTHREAD
-    _GLFW_HAS_SCHED_YIELD
-    _GLFW_HAS_GLXGETPROCADDRESS
-    _GLFW_HAS_SYSCONF
-)
+# packages required to build this project
+find_package(OpenGL REQUIRED)
 
-set(LIB_SOURCES
+# list of source files
+set(SOURCES
     src/lib/enable.c
     src/lib/fullscreen.c
     src/lib/glext.c
@@ -49,7 +44,7 @@ set(INCLUDE_DIRS
 )
 
 if(APPLE)
-    list(APPEND LIB_SOURCES
+    list(APPEND SOURCES
         src/lib/cocoa/cocoa_thread.c
         src/lib/cocoa/cocoa_enable.m
         src/lib/cocoa/cocoa_fullscreen.m
@@ -62,11 +57,8 @@ if(APPLE)
     list(APPEND INCLUDE_DIRS
         src/lib/cocoa
     )
-    list(APPEND COMPILER_DEFS
-        TARGET_OS_IPHONE=0
-    )
 else()
-    list(APPEND LIB_SOURCES
+    list(APPEND SOURCES
         src/lib/x11/x11_enable.c
         src/lib/x11/x11_fullscreen.c
         src/lib/x11/x11_glext.c
@@ -82,20 +74,49 @@ else()
     )
 endif()
 
-set(PRIVATE_COMPILER_OPTIONS
+# add this project as static library
+add_library(GLFW STATIC ${SOURCES})
+
+# private include dirs to build this project
+target_include_directories(GLFW PRIVATE
+    ${INCLUDE_DIRS}
+)
+
+# compiler definitions (-D) for private build
+target_compile_definitions(GLFW PRIVATE
+    MMDAGENT
+    _GLFW_USE_LINUX_JOYSTICKS
+    _GLFW_HAS_XRANDR
+    _GLFW_HAS_PTHREAD
+    _GLFW_HAS_SCHED_YIELD
+    _GLFW_HAS_GLXGETPROCADDRESS
+    _GLFW_HAS_SYSCONF
+)
+
+# compiler options for private build
+target_compile_options(GLFW PRIVATE
     -pthread
     -Wno-deprecated-declarations
 )
 
-add_library(GLFW STATIC ${LIB_SOURCES})
+##############
+# public compiler definitions (-D) required to link with this project
+target_compile_definitions(GLFW PUBLIC
+)
 
-target_include_directories(GLFW PRIVATE ${INCLUDE_DIRS})
+# public compiler options required to link with this project
+target_compile_options(GLFW PUBLIC
+)
 
-target_compile_options(GLFW PRIVATE ${PRIVATE_COMPILER_OPTIONS})
-
-target_compile_definitions(GLFW PRIVATE ${COMPILER_DEFS})
-
+# public link libraries to be linked with this project
 if(APPLE)
+    target_link_libraries(GLFW PUBLIC
+        ${OPENGL_LIBRARIES}
+    )
 else()
-    target_link_libraries(GLFW PUBLIC -lXrandr -lX11 -lGL -lGLU)
+    target_link_libraries(GLFW PUBLIC
+        ${OPENGL_LIBRARIES}
+        -lXrandr -lX11 -lGL -lGLU
+    )
 endif()
+

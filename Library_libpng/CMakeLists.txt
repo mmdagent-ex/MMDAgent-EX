@@ -16,9 +16,14 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+# project name
 project(LIBPNG)
 
-set(LIB_SOURCES
+# packages required to build this project
+#find_package()
+
+# list of source files
+set(SOURCES
     src/png.c
     src/pngerror.c
     src/pngget.c
@@ -36,7 +41,7 @@ set(LIB_SOURCES
     src/pngwutil.c
 )
 if(APPLE)
-    list(APPEND LIB_SOURCES
+    list(APPEND SOURCES
         src/arm/arm_init.c
         src/arm/filter_neon.S
         src/arm/filter_neon_intrinsics.c
@@ -44,14 +49,35 @@ if(APPLE)
     )
 endif()
 
-set(INCLUDE_DIRS
+# add this project as static library
+add_library(LIBPNG STATIC ${SOURCES})
+
+# private include dirs to build this project
+target_include_directories(LIBPNG PRIVATE
     src
     include
 )
 
-add_library(LIBPNG STATIC ${LIB_SOURCES})
+# compiler definitions (-D) for private build
+#target_compile_definitions(LIBPNG PRIVATE
+#    XXXX=1
+#    XXXX
+#)
 
-target_include_directories(LIBPNG PRIVATE ${INCLUDE_DIRS})
+# compiler options for private build
+#target_compile_options(LIBPNG PRIVATE
+#    -Wno-deprecated-declarations
+#)
 
-target_link_libraries(LIBPNG PUBLIC -lz)
+##############
+# public compiler definitions (-D) required to link with this project
+#target_compile_definitions(LIBPNG PUBLIC
+#)
 
+# public compiler options required to link with this project
+#target_compile_options(LIBPNG PUBLIC
+#)
+
+# public link libraries to be linked with this project
+#target_link_libraries(LIBPNG PUBLIC
+#)

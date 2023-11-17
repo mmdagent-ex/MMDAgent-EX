@@ -16,27 +16,42 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+# project name
 #project(MMDAgent-EX)
 
+# packages required to build this project
+#find_package()
+
+# list of source files
 set(SOURCES
     main.cpp
 )
 
-set(INCLUDE_DIRS
+# add this project as executable
+add_executable(MMDAgent-EX ${SOURCES})
+
+# private include dirs to build this project
+target_include_directories(MMDAgent-EX PRIVATE
     ../Library_Bullet_Physics/include
     ../Library_GLFW/include
     ../Library_MMDFiles/include
     ../Library_MMDAgent/include
 )
 
-add_executable(MMDAgent-EX ${SOURCES})
+# compiler definitions (-D) for private build
+target_compile_definitions(MMDAgent-EX PRIVATE
+    MMDAGENT
+)
 
-target_compile_definitions(MMDAgent-EX PRIVATE MMDAGENT)
+# compiler options for private build
+target_compile_options(MMDAgent-EX PRIVATE
+    -Wno-deprecated-declarations
+)
 
-target_include_directories(MMDAgent-EX PRIVATE ${INCLUDE_DIRS})
-
+# link libraries to build executable
 target_link_libraries(MMDAgent-EX ${MMDAGENT_LINK_OPTIONS})
 
+# custom command to copy built binaries
 add_custom_command(
    TARGET MMDAgent-EX
    POST_BUILD

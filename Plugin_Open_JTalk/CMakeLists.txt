@@ -16,8 +16,13 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+# project name
 project(Plugin_Open_JTalk)
 
+# packages required to build this project
+#find_package()
+
+# list of source files
 set(SOURCES
     Open_JTalk.cpp
     Open_JTalk_Manager.cpp
@@ -25,7 +30,11 @@ set(SOURCES
     Plugin_Open_JTalk.cpp
 )
 
-set(INCLUDE_DIRS
+# add this project as shared library
+add_library(Plugin_Open_JTalk SHARED ${SOURCES})
+
+# include dirs to build this project
+target_include_directories(Plugin_Open_JTalk PRIVATE
     ../Library_Bullet_Physics/include
     ../Library_GLFW/include
     ../Library_MMDFiles/include
@@ -34,16 +43,22 @@ set(INCLUDE_DIRS
     ../Library_Open_JTalk/include
 )
 
-add_library(Plugin_Open_JTalk SHARED ${SOURCES})
+# compiler definitions (-D) for build
+#target_compile_definitions(Plugin_Open_JTalk PRIVATE
+#)
 
-target_include_directories(Plugin_Open_JTalk PRIVATE ${INCLUDE_DIRS})
+# compiler options for build
+target_compile_options(Plugin_Open_JTalk PRIVATE
+   -Wno-deprecated-declarations
+)
 
+# library linking
 target_link_libraries(Plugin_Open_JTalk
     ${MMDAGENT_LINK_OPTIONS}
-    HTSENGINEAPI
     OPEN_JTALK
 )
 
+# custom command to copy binaries
 add_custom_command(
     TARGET Plugin_Open_JTalk
     POST_BUILD

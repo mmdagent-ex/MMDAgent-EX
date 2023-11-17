@@ -16,29 +16,45 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+# project name
 project(Plugin_Variables)
 
+# packages required to build this project
+#find_package()
+
+# list of source files
 set(SOURCES
     CountDown_Thread.cpp
     Variables.cpp
     Plugin_Variables.cpp
 )
 
-set(INCLUDE_DIRS
+# add this project as shared library
+add_library(Plugin_Variables SHARED ${SOURCES})
+
+# include dirs to build this project
+target_include_directories(Plugin_Variables PRIVATE
     ../Library_Bullet_Physics/include
     ../Library_GLFW/include
     ../Library_MMDFiles/include
     ../Library_MMDAgent/include
 )
 
-add_library(Plugin_Variables SHARED ${SOURCES})
+# compiler definitions (-D) for buildtarget_compile_definitions(Plugin_Variables PRIVATE MMDAGENT)
+#target_compile_definitions(Plugin_Variables PRIVATE
+#)
 
-target_include_directories(Plugin_Variables PRIVATE ${INCLUDE_DIRS})
+# compiler options for build
+target_compile_options(Plugin_Variables PRIVATE
+   -Wno-deprecated-declarations
+)
 
-target_compile_definitions(Plugin_Variables PRIVATE MMDAGENT)
+# library linking
+target_link_libraries(Plugin_Variables
+    ${MMDAGENT_LINK_OPTIONS}
+)
 
-target_link_libraries(Plugin_Variables ${MMDAGENT_LINK_OPTIONS})
-
+# custom command to copy binaries
 add_custom_command(
     TARGET Plugin_Variables
     POST_BUILD

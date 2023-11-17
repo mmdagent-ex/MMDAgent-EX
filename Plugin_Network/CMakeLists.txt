@@ -16,34 +16,52 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+# project name
 project(Plugin_Network)
 
+# packages required to build this project
+#find_package()
+
+# list of source files
 set(SOURCES
     Plugin_Network.cpp
     Downloader.cpp
 )
 
-set(INCLUDE_DIRS
+# add this project as shared library
+add_library(Plugin_Network SHARED ${SOURCES})
+
+# include dirs to build this project
+target_include_directories(Plugin_Network PRIVATE
     ../Library_Bullet_Physics/include
     ../Library_GLFW/include
     ../Library_MMDFiles/include
     ../Library_MMDAgent/include
 )
 
-add_library(Plugin_Network SHARED ${SOURCES})
+# compiler definitions (-D) for build
+target_compile_definitions(Plugin_Network PRIVATE
+    MMDAGENT
+)
 
-target_include_directories(Plugin_Network PRIVATE ${INCLUDE_DIRS})
-
-target_compile_definitions(Plugin_Network PRIVATE MMDAGENT)
-
+# compiler options for build
 if(APPLE)
-   target_compile_options(Plugin_Network PRIVATE -std=c++11)
+    target_compile_options(Plugin_Network PRIVATE
+        -std=c++11
+        -Wno-deprecated-declarations
+    )
+else()
+    target_compile_options(Plugin_Network PRIVATE
+        -Wno-deprecated-declarations
+    )
 endif()
 
+# library linking
 target_link_libraries(Plugin_Network
     ${MMDAGENT_LINK_OPTIONS}
 )
 
+# custom command to copy binaries
 add_custom_command(
     TARGET Plugin_Network
     POST_BUILD
