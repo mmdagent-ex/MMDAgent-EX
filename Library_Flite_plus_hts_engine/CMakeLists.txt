@@ -16,9 +16,14 @@
 
 cmake_minimum_required(VERSION 3.10)
 
-project(FlitePlugHTSEngine)
+# project name
+project(FlitePlusHTSEngine)
 
-set(LIB_SOURCES
+# packages required to build this project
+#find_package()
+
+# list of source files
+set(SOURCES
     src/flite/lang/cmu_us_kal/cmu_us_kal.c
     src/flite/lang/cmulex/cmu_lex.c
     src/flite/lang/cmulex/cmu_lex_data.c
@@ -64,20 +69,40 @@ set(LIB_SOURCES
     src/lib/flite_hts_engine.c
 )
 
-set(INCLUDE_DIRS
+# add this project as static library
+add_library(FlitePlusHTSEngine STATIC ${SOURCES})
+
+# private include dirs to build this project
+target_include_directories(FlitePlusHTSEngine PRIVATE
     src/flite/include
     src/flite/lang/cmu_us_kal
     src/flite/lang/cmulex
     src/flite/lang/usenglish
     src/include
-    ./../Library_hts_engine_API/include
+    ../Library_hts_engine_API/include
 )
 
-add_library(FlitePlusHTSEngine STATIC ${LIB_SOURCES})
+# compiler definitions (-D) for private build
+target_compile_definitions(FlitePlusHTSEngine PRIVATE
+    NO_UNION_INITIALIZATION=1
+    FLITE_PLUS_HTS_ENGINE=1
+)
 
-target_include_directories(FlitePlusHTSEngine PRIVATE ${INCLUDE_DIRS})
-target_compile_definitions(FlitePlusHTSEngine PRIVATE NO_UNION_INITIALIZATION=1 FLITE_PLUS_HTS_ENGINE=1)
+# compiler options for private build
 target_compile_options(FlitePlusHTSEngine PRIVATE
-   -Wno-empty-body
+    -Wno-empty-body
 )
 
+##############
+# public compiler definitions (-D) required to link with this project
+#target_compile_definitions(FlitePlusHTSEngine PUBLIC
+#)
+
+# public compiler options required to link with this project
+#target_compile_options(FlitePlusHTSEngine PUBLIC
+#)
+
+# public link libraries to be linked with this project
+target_link_libraries(FlitePlusHTSEngine PUBLIC
+    HTSENGINEAPI
+)

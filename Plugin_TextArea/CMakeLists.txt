@@ -16,36 +16,47 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+# project name
 project(Plugin_TextArea)
 
-find_package(OpenCV REQUIRED)
+# packages required to build this project
+#find_package(OpenCV REQUIRED)
 
+# list of source files
 set(SOURCES
     TextArea.cpp
     Plugin_TextArea.cpp
 )
 
-set(INCLUDE_DIRS
+# add this project as shared library
+add_library(Plugin_TextArea SHARED ${SOURCES})
+
+# include dirs to build this project
+target_include_directories(Plugin_TextArea PRIVATE
     ../Library_Bullet_Physics/include
     ../Library_GLFW/include
     ../Library_MMDFiles/include
     ../Library_MMDAgent/include
-    ${OpenCV_INCLUDE_DIRS}
+    #${OpenCV_INCLUDE_DIRS}
 )
 
-add_library(Plugin_TextArea SHARED ${SOURCES})
+# compiler definitions (-D) for build
+target_compile_definitions(Plugin_TextArea PRIVATE
+    MMDAGENT
+)
 
-target_include_directories(Plugin_TextArea PRIVATE ${INCLUDE_DIRS})
+# compiler options for build
+target_compile_options(Plugin_TextArea PRIVATE
+    -std=c++17
+)
 
-target_compile_definitions(Plugin_TextArea PRIVATE MMDAGENT)
-
-target_compile_options(Plugin_TextArea PRIVATE -std=c++17)
-
+# library linking
 target_link_libraries(Plugin_TextArea
     ${MMDAGENT_LINK_OPTIONS}
-    ${OpenCV_LIBRARIES}
+#    ${OpenCV_LIBRARIES}
 )
 
+# custom command to copy binaries
 add_custom_command(
     TARGET Plugin_TextArea
     POST_BUILD

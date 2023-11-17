@@ -16,9 +16,14 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+# project name
 project(BulletPhysics)
 
-set(LIB_SOURCES
+# packages required to build this project
+#find_package()
+
+# list of source files
+set(SOURCES
     src/src/BulletCollision/BroadphaseCollision/btAxisSweep3.cpp
     src/src/BulletCollision/BroadphaseCollision/btBroadphaseProxy.cpp
     src/src/BulletCollision/BroadphaseCollision/btCollisionAlgorithm.cpp
@@ -153,7 +158,35 @@ set(LIB_SOURCES
     src/src/LinearMath/btVector3.cpp
 )
 
-add_library(BulletPhysics STATIC ${LIB_SOURCES})
+# add this project as static library
+add_library(BulletPhysics STATIC ${SOURCES})
 
-target_include_directories(BulletPhysics PRIVATE src/src)
-target_compile_options(BulletPhysics PRIVATE -march=native -ffast-math)
+# private include dirs to build this project
+target_include_directories(BulletPhysics PRIVATE
+    src/src
+)
+
+# compiler definitions (-D) for private build
+#target_compile_definitions(BulletPhysics PRIVATE
+#    XXXX=1
+#    XXXX
+#)
+
+# compiler options for private build
+target_compile_options(BulletPhysics PRIVATE
+    -march=native
+    -ffast-math
+)
+
+##############
+# public compiler definitions (-D) required to link with this project
+#target_compile_definitions(BulletPhysics PUBLIC
+#)
+
+# public compiler options required to link with this project
+#target_compile_options(BulletPhysics PUBLIC
+#)
+
+# public link libraries to be linked with this project
+#target_link_libraries(BulletPhysics PUBLIC
+#)

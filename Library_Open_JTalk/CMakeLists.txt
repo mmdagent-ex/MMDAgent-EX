@@ -16,9 +16,14 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+# project name
 project(OPEN_JTALK)
 
-set(LIB_SOURCES
+# packages required to build this project
+#find_package(portaudio)
+
+# list of source files
+set(SOURCES
     src/jpcommon/jpcommon.c
     src/jpcommon/jpcommon_label.c
     src/jpcommon/jpcommon_node.c
@@ -58,7 +63,11 @@ set(LIB_SOURCES
     src/mecab/src/writer.cpp
 )
 
-set(INCLUDE_DIRS
+# add this project as static library
+add_library(OPEN_JTALK STATIC ${SOURCES})
+
+# private include dirs to build this project
+target_include_directories(OPEN_JTALK PRIVATE
     src/jpcommon
     src/mecab/src
     src/mecab2njd
@@ -71,12 +80,10 @@ set(INCLUDE_DIRS
     src/njd_set_pronunciation
     src/njd_set_unvoiced_vowel
     src/text2mecab
+    ${PORTAUDIO_INCLUDE_DIR}
 )
 
-add_library(OPEN_JTALK STATIC ${LIB_SOURCES})
-
-target_include_directories(OPEN_JTALK PRIVATE ${INCLUDE_DIRS})
-
+# compiler definitions (-D) for private build
 target_compile_definitions(OPEN_JTALK PRIVATE
     DIC_VERSION=102
     MECAB_DEFAULT_RC="dummy"
@@ -123,7 +130,22 @@ target_compile_definitions(OPEN_JTALK PRIVATE
     ASCII_HEADER=1
 )
 
-target_compile_options(HTSENGINEAPI PRIVATE
+# compiler options for private build
+target_compile_options(OPEN_JTALK PRIVATE
     -Wno-deprecated-declarations
 )
 
+##############
+# public compiler definitions (-D) required to link with this project
+#target_compile_definitions(OPEN_JTALK PUBLIC
+#)
+
+# public compiler options required to link with this project
+#target_compile_options(OPEN_JTALK PUBLIC
+#)
+
+# public link libraries to be linked with this project
+target_link_libraries(OPEN_JTALK PUBLIC
+    HTSENGINEAPI
+    ${PORTAUDIO_LIBRARIES}
+)

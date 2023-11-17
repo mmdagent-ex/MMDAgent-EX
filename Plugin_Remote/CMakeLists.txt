@@ -16,10 +16,23 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+# project name
 project(Plugin_Remote)
 
-find_package(OpenCV REQUIRED)
+# packages required to build this project
+if(APPLE)
+    find_package(SndFile REQUIRED)
+    find_package(SampleRate REQUIRED)
+    set(SNDFILE_LIBRARIES SndFile::sndfile)
+    set(SAMPLERATE_LIBRARIES SampleRate::samplerate)
+else()
+    set(SNDFILE_LIBRARIES -lsndfile)
+    set(SAMPLERATE_LIBRARIES -lsamplerate)
+endif()
 
+#find_package(OpenCV REQUIRED)
+
+# list of source files
 set(SOURCES
     Plugin_Remote.cpp
     Avatar.cpp
@@ -32,31 +45,42 @@ set(SOURCES
     Speak.cpp
 )
 
-set(INCLUDE_DIRS
+# add this project as shared library
+add_library(Plugin_Remote SHARED ${SOURCES})
+
+# include dirs to build this project
+target_include_directories(Plugin_Remote PRIVATE
     ../Library_Bullet_Physics/include
     ../Library_GLFW/include
     ../Library_MMDFiles/include
     ../Library_MMDAgent/include
     ../Library_Julius/include
-    ${OpenCV_INCLUDE_DIRS}
+#    ${OpenCV_INCLUDE_DIRS}
 )
 
-add_library(Plugin_Remote SHARED ${SOURCES})
+# compiler definitions (-D) for build
+target_compile_definitions(Plugin_Remote PRIVATE
+    MMDAGENT
+    HAVE_SOCKLEN_T
+)
 
-target_include_directories(Plugin_Remote PRIVATE ${INCLUDE_DIRS})
+# compiler options for build
+target_compile_options(Plugin_Remote PRIVATE
+    -std=c++17
+    -Wno-deprecated-declarations
+)
 
-target_compile_definitions(Plugin_Remote PRIVATE MMDAGENT HAVE_SOCKLEN_T)
-
-target_compile_options(Plugin_Remote PRIVATE -std=c++17)
-
+# library linking
 target_link_libraries(Plugin_Remote
     ${MMDAGENT_LINK_OPTIONS}
     JULIUS
-    ${OpenCV_LIBRARIES}
-    -lsndfile -lsamplerate
-    -lavcodec -lavutil -lswscale
+    ${SNDFILE_LIBRARIES}
+    ${SAMPLERATE_LIBRARIES}
+#    ${OpenCV_LIBRARIES}
+#    -lavcodec -lavutil -lswscale
 )
 
+# custom command to copy binaries
 add_custom_command(
     TARGET Plugin_Remote
     POST_BUILD

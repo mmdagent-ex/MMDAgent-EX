@@ -16,33 +16,49 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+# project name
 project(Plugin_Kafka)
 
+# packages required to build this project
+#find_package()
+
+# list of source files
 set(SOURCES
     Kafka.cpp
     Thread.cpp
     Plugin_Kafka.cpp
 )
 
-set(INCLUDE_DIRS
+# add this project as shared library
+add_library(Plugin_Kafka SHARED ${SOURCES})
+
+# nclude dirs to build this project
+target_include_directories(Plugin_Kafka PRIVATE
     ../Library_Bullet_Physics/include
     ../Library_GLFW/include
     ../Library_MMDFiles/include
     ../Library_MMDAgent/include
     ../Library_librdkafka/include
+    ${LIBRDKAFKA_INCLUDE_DIR}
 )
 
-add_library(Plugin_Kafka SHARED ${SOURCES})
+# compiler definitions (-D) for build
+target_compile_definitions(Plugin_Kafka PRIVATE
+    MMDAGENT
+    HAVE_SOCKLEN_T
+)
 
-target_include_directories(Plugin_Kafka PRIVATE ${INCLUDE_DIRS})
+# compiler options for build
+#target_compile_options(MYPROJECT PRIVATE
+#)
 
-target_compile_definitions(Plugin_Kafka PRIVATE MMDAGENT HAVE_SOCKLEN_T)
-
+# library linking
 target_link_libraries(Plugin_Kafka
     ${MMDAGENT_LINK_OPTIONS}
-    LIBRDKAFKA
+    ${LIBRDKAFKA_LIBRARIES}
 )
 
+# custom command to copy binaries
 add_custom_command(
     TARGET Plugin_Kafka
     POST_BUILD

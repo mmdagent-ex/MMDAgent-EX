@@ -16,9 +16,14 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+# project name
 project(JULIUS)
 
-set(LIB_SOURCES
+# packages required to build this project
+#find_package(portaudio)
+
+# list of source files
+set(SOURCES
     src/libjulius/src/adin-cut.c
     src/libjulius/src/backtrellis.c
     src/libjulius/src/beam.c
@@ -174,40 +179,56 @@ set(LIB_SOURCES
     src/libjulius/libfvad/libfvad/src/vad/vad_sp.c
 )
 
-set(INCLUDE_DIRS
+# add this project as static library
+add_library(JULIUS STATIC ${SOURCES})
+
+# private include dirs to build this project
+target_include_directories(JULIUS PRIVATE
     src/libjulius/include
     src/libsent/include
-    ../Library_zlib/include
     libfvad/include
+    ${MINIZIP_INCLUDE_DIR}
+    ${PORTAUDIO_INCLUDE_DIR}
 )
 
-set(PRIVATE_COMPILER_OPTIONS
-    -march=native -ffast-math
+# compiler definitions (-D) for private build
+#target_compile_definitions(JULIUS PRIVATE
+#    XXXX=1
+#    XXXX
+#)
+
+# compiler options for private build
+target_compile_options(JULIUS PRIVATE
+    -march=native
+    -ffast-math
     -Wno-deprecated-non-prototype
 )
 
+##############
+# public compiler definitions (-D) required to link with this project
 set(DEFS_PUBLIC
     HAVE_ZLIB
     HAVE_STRCASECMP
     MMDAGENT
 )
-
-add_library(JULIUS STATIC ${LIB_SOURCES})
-
 if(APPLE)
     list(APPEND DEFS_PUBLIC
         USE_PREGENERATED_CONFIG_APPLE_M
     )
 else()
     list(APPEND DEFS_PUBLIC
-       USE_PREGENERATED_CONFIG_UBUNTU
+        USE_PREGENERATED_CONFIG_UBUNTU
     )
 endif()
+target_compile_definitions(JULIUS PUBLIC
+    ${DEFS_PUBLIC}
+)
 
-target_include_directories(JULIUS PRIVATE ${INCLUDE_DIRS})
+# public compiler options required to link with this project
+#target_compile_options(JULIUS PUBLIC
+#)
 
-target_compile_definitions(JULIUS PUBLIC ${DEFS_PUBLIC})
-
-target_compile_options(JULIUS PRIVATE ${PRIVATE_COMPILER_OPTIONS})
-
-target_link_libraries(JULIUS PUBLIC -lportaudio -lz)
+# public link libraries to be linked with this project
+target_link_libraries(JULIUS PUBLIC
+    ${PORTAUDIO_LIBRARIES}
+)
