@@ -24,23 +24,33 @@ project(MMDAgent-EX)
 
 # deal with libraries that has no cmake config
 if(APPLE)
-    if(IS_DIRECTORY /opt/homebrew)
-        set(MINIZIP_INCLUDE_DIR /opt/homebrew/include)
-        set(MINIZIP_LIBRARIES /opt/homebrew/lib/libminizip.dylib)
-        set(PORTAUDIO_INCLUDE_DIR /opt/homebrew/include)
-        set(PORTAUDIO_LIBRARIES /opt/homebrew/lib/libportaudio.dylib)
-        set(LIBRDKAFKA_INCLUDE_DIR /opt/homebrew/include)
-        set(LIBRDKAFKA_LIBRARIES /opt/homebrew/lib/librdkafka.dylib)
+    if(DEFINED ${HOMEBREW_PREFIX})
+        list(APPEND CMAKE_PREFIX_PATH ${HOMEBREW_PREFIX})
     else()
-        if(IS_DIRECTORY /usr/local)
-            set(MINIZIP_INCLUDE_DIR /usr/local/include)
-            set(MINIZIP_LIBRARIES /usr/local/lib/libminizip.dylib)
-            set(PORTAUDIO_INCLUDE_DIR /usr/local/include)
-            set(PORTAUDIO_LIBRARIES /usr/local/lib/libportaudio.dylib)
-            set(LIBRDKAFKA_INCLUDE_DIR /usr/local/include)
-            set(LIBRDKAFKA_LIBRARIES /usr/local/lib/librdkafka.dylib)
+        execute_process(
+            COMMAND brew --prefix
+            RESULT_VARIABLE HOMEBREW_RESULT
+            OUTPUT_VARIABLE HOMEBREW_PREFIX
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+        if(HOMEBREW_RESULT EQUAL 0 and EXISTS "${HOMEBREW_PREFIX}")
+            list(APPEND CMAKE_PREFIX_PATH ${HOMEBREW_PREFIX})
+        else()
+            if(IS_DIRECTORY /opt/homebrew)
+                set(HOMEBREW_PREFIX /opt/homebrew)
+            else()
+                set(HOMEBREW_PREFIX /usr/local)
             endif()
+            list(APPEND CMAKE_PREFIX_PATH ${HOMEBREW_PREFIX})
+        endif()
     endif()
+    message(STATUS "Detected brew prefix: ${HOMEBREW_PREFIX}")
+    set(MINIZIP_INCLUDE_DIR ${HOMEBREW_PREFIX}/include)
+    set(MINIZIP_LIBRARIES ${HOMEBREW_PREFIX}/lib/libminizip.dylib)
+    set(PORTAUDIO_INCLUDE_DIR ${HOMEBREW_PREFIX}/include)
+    set(PORTAUDIO_LIBRARIES ${HOMEBREW_PREFIX}/lib/libportaudio.dylib)
+    set(LIBRDKAFKA_INCLUDE_DIR ${HOMEBREW_PREFIX}/include)
+    set(LIBRDKAFKA_LIBRARIES ${HOMEBREW_PREFIX}/lib/librdkafka.dylib)
 else()
     set(MINIZIP_LIBRARIES -lminizip)
     set(PORTAUDIO_LIBRARIES -lportaudio)
@@ -48,10 +58,6 @@ else()
 endif()
 
 if(APPLE)
-    # brew path of Apple Silicon Mac
-    list(APPEND CMAKE_PREFIX_PATH "/opt/homebrew")
-    # brew path of Intel Mac
-    list(APPEND CMAKE_PREFIX_PATH "/usr/local")
     # global definitions
     add_compile_definitions(
       TARGET_OS_IPHONE=0
