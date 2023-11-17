@@ -20,7 +20,12 @@ cmake_minimum_required(VERSION 3.10)
 project(Plugin_VIManager)
 
 # packages required to build this project
-find_package(re2 REQUIRED)
+if(APPLE)
+    find_package(re2 REQUIRED)
+    set(RE_LIBRARIES re2::re2)
+else()
+    set(RE_LIBRARIES -lre2)
+endif()
 
 # list of source files
 set(SOURCES
@@ -55,7 +60,7 @@ target_compile_options(Plugin_VIManager PRIVATE
 # library linking
 target_link_libraries(Plugin_VIManager
     ${MMDAGENT_LINK_OPTIONS}
-    re2::re2
+    ${RE_LIBRARIES}
 )
 
 # custom command to copy binaries

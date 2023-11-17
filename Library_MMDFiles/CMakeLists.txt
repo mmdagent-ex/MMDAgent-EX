@@ -23,18 +23,6 @@ project(MMDFILES)
 find_package(OpenMP REQUIRED)
 find_package(JPEG REQUIRED)
 find_package(GLEW REQUIRED)
-if(APPLE)
-    # homebrew minizip has no cmake config
-    if(IS_DIRECTORY /opt/homebrew)
-        set(MINIZIP_LIBRARIES /opt/homebrew/lib/libminizip.dylib)
-    else()
-        if(IS_DIRECTORY /usr/local)
-            set(MINIZIP_LIBRARIES /opt/homebrew/lib/libminizip.dylib)
-        endif()
-    endif()
-else()
-    find_package(minizip REQUIRED)
-endif()
 
 # list of source files
 set(SOURCES
@@ -125,7 +113,7 @@ else()
         GLFW
         LIBPNG
         ${JPEG_LIBRARIES}
-        -lminizip
+        ${MINIZIP_LIBRARIES}
         OpenMP::OpenMP_CXX
         GLEW::GLEW
         -ldl

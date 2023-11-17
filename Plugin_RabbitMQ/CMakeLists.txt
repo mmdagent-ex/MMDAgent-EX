@@ -16,14 +16,16 @@
 
 cmake_minimum_required(VERSION 3.10)
 
-# packages required to build this project
-find_package(rabbitmq-c)
-
 # project name
 project(Plugin_RabbitMQ)
 
 # packages required to build this project
-find_package(rabbitmq-c)
+if(APPLE)
+    find_package(rabbitmq-c)
+    set(RABBITMQ_LIBRARIES rabbitmq::rabbitmq)
+else()
+    set(RABBITMQ_LIBRARIES -lrabbitmq)
+endif()
 
 # list of source files
 set(SOURCES
@@ -63,7 +65,7 @@ target_compile_options(Plugin_RabbitMQ PRIVATE
 target_link_libraries(Plugin_RabbitMQ
     ${MMDAGENT_LINK_OPTIONS}
     JULIUS
-    rabbitmq::rabbitmq
+    ${RABBITMQ_LIBRARIES}
 )
 
 # custom command to copy binaries

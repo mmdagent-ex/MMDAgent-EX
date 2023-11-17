@@ -20,8 +20,16 @@ cmake_minimum_required(VERSION 3.10)
 project(Plugin_Remote)
 
 # packages required to build this project
-find_package(SndFile REQUIRED)
-find_package(SampleRate REQUIRED)
+if(APPLE)
+    find_package(SndFile REQUIRED)
+    find_package(SampleRate REQUIRED)
+    set(SNDFILE_LIBRARIES SndFile::sndfile)
+    set(SAMPLERATE_LIBRARIES SampleRate::samplerate)
+else()
+    set(SNDFILE_LIBRARIES -lsndfile)
+    set(SAMPLERATE_LIBRARIES -lsamplerate)
+endif()
+
 #find_package(OpenCV REQUIRED)
 
 # list of source files
@@ -66,8 +74,8 @@ target_compile_options(Plugin_Remote PRIVATE
 target_link_libraries(Plugin_Remote
     ${MMDAGENT_LINK_OPTIONS}
     JULIUS
-    SndFile::sndfile
-    SampleRate::samplerate
+    ${SNDFILE_LIBRARIES}
+    ${SAMPLERATE_LIBRARIES}
 #    ${OpenCV_LIBRARIES}
 #    -lavcodec -lavutil -lswscale
 )

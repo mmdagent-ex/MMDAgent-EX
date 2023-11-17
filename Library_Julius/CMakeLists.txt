@@ -217,7 +217,7 @@ if(APPLE)
     )
 else()
     list(APPEND DEFS_PUBLIC
-       USE_PREGENERATED_CONFIG_UBUNTU
+        USE_PREGENERATED_CONFIG_UBUNTU
     )
 endif()
 target_compile_definitions(JULIUS PUBLIC
