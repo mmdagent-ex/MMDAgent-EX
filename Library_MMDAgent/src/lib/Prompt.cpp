@@ -77,6 +77,7 @@
 #define PROMPT_FACTOR_EXEC         2.0f  /* degree factor of exec pop animation */
 
 /* colors */
+#define NOTIFY_COLOR_BACKGROUND       0.8f, 0.4f, 0.2f, 0.8f  /* notify background color */
 #define PROMPT_COLOR_BACKGROUND       0.3f, 0.2f, 0.6f, 0.8f  /* whole background color */
 #define PROMPT_COLOR_TEXT             1.0f, 1.0f, 1.0f, 1.0f  /* text color */
 #define PROMPT_COLOR_LABELBACKGROUND  1.0f, 1.0f, 1.0f, 0.8f  /* label background color */
@@ -222,9 +223,12 @@ void Prompt::updatePosition()
    }
 
    /* obtain whole height */
-   m_height = m_elem_text.height + (PROMPT_MARGIN + PROMPT_PADDING) * 2.0f + PROMPT_EXTRAMARGIN;
-   for (i = 0; i < m_labelNum; i++)
-      m_height += m_elem_label[i].height + PROMPT_MARGIN + PROMPT_PADDING * 2.0f;
+   m_height = m_elem_text.height + (PROMPT_MARGIN + PROMPT_PADDING) * 2.0f;
+   if (m_labelNum > 0) {
+      m_height += PROMPT_EXTRAMARGIN;
+      for (i = 0; i < m_labelNum; i++)
+         m_height += m_elem_label[i].height + PROMPT_MARGIN + PROMPT_PADDING * 2.0f;
+   }
 
    /* set position coordinates from obtained width, height and screen parameters */
    m_posX = (screenWidth - m_width) * 0.5f;
@@ -377,15 +381,7 @@ bool Prompt::composeNotify(const char *text, double duration)
    }
    free(str);
 
-   /* build text elements for OK label */
-   m_elem_label[0].textLen = 0;
-   m_elem_label[0].numIndices = 0;
-   if (m_font->getTextDrawElements("OK", &(m_elem_label[0]), m_elem_label[0].textLen, 0.0f, 0.0f, 0.1f) == false) {
-      m_elem_label[0].textLen = 0; /* reset */
-      m_elem_label[0].numIndices = 0;
-      return false;
-   }
-   m_labelNum = 1;
+   m_labelNum = 0;
 
    /* update position */
    updatePosition();
@@ -460,9 +456,11 @@ void Prompt::moveCursorUp()
    if (m_showing == false)
       return;
 
-   m_currentCursor--;
-   if (m_currentCursor < 0)
-      m_currentCursor = m_labelNum - 1;
+   if (m_labelNum > 0) {
+      m_currentCursor--;
+      if (m_currentCursor < 0)
+         m_currentCursor = m_labelNum - 1;
+   }
 }
 
 /* Prompt::moveCursorDown: move cursor down */
@@ -471,9 +469,11 @@ void Prompt::moveCursorDown()
    if (m_showing == false)
       return;
 
-   m_currentCursor++;
-   if (m_currentCursor > m_labelNum - 1)
-      m_currentCursor = 0;
+   if (m_labelNum > 0) {
+      m_currentCursor++;
+      if (m_currentCursor > m_labelNum - 1)
+         m_currentCursor = 0;
+   }
 }
 
 /* Prompt::execItem: execute the item at the cursor */
@@ -583,9 +583,6 @@ void Prompt::render()
    if (m_font == NULL)
       return;
 
-   if (m_labelNum == 0)
-      return;
-
    if (m_showing == false && m_showHideAnimationFrameLeft >= PROMPT_DURATION_SHOWHIDE)
       return;
 
@@ -636,7 +633,11 @@ void Prompt::render()
    /* draw background */
    glVertexPointer(3, GL_FLOAT, 0, m_vertices[0]);
    glBindTexture(GL_TEXTURE_2D, 0);
-   glColor4f(PROMPT_COLOR_BACKGROUND * alphaCoef);
+   if (m_isNotify) {
+      glColor4f(NOTIFY_COLOR_BACKGROUND * alphaCoef);
+   } else {
+      glColor4f(PROMPT_COLOR_BACKGROUND * alphaCoef);
+   }
    glDrawElements(GL_TRIANGLES, 6, GL_INDICES, (const GLvoid *)indices);
    for (i = 0; i < m_labelNum; i++) {
       if (m_execLabelId == i && m_execLabelAnimationFrameLeft > 0.0f) {

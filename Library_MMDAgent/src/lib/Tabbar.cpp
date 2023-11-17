@@ -222,7 +222,12 @@ void Tabbar::exec(int id)
       }
       break;
    case 1: // info
-      m_mmdagent->showReadme();
+      if (m_mmdagent->getMenu()->isShowing())
+         m_mmdagent->getMenu()->hide();
+      if (m_mmdagent->hasReadme())
+         m_mmdagent->showReadme();
+      else
+         m_mmdagent->sendMessage(0, NOTIFY_COMMAND_SHOW, "no readme specified");
       break;
    case 2: // bookmark
       menu = m_mmdagent->getMenu()->find("[Bookmark]");
