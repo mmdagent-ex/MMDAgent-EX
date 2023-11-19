@@ -20,7 +20,7 @@ cmake_minimum_required(VERSION 3.10)
 project(Plugin_TextArea)
 
 # packages required to build this project
-#find_package(OpenCV REQUIRED)
+#find_package()
 
 # list of source files
 set(SOURCES
@@ -37,7 +37,6 @@ target_include_directories(Plugin_TextArea PRIVATE
     ../Library_GLFW/include
     ../Library_MMDFiles/include
     ../Library_MMDAgent/include
-    #${OpenCV_INCLUDE_DIRS}
 )
 
 # compiler definitions (-D) for build
@@ -53,7 +52,6 @@ target_compile_options(Plugin_TextArea PRIVATE
 # library linking
 target_link_libraries(Plugin_TextArea
     ${MMDAGENT_LINK_OPTIONS}
-#    ${OpenCV_LIBRARIES}
 )
 
 # custom command to copy binaries

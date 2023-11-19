@@ -30,8 +30,6 @@ else()
     set(SAMPLERATE_LIBRARIES -lsamplerate)
 endif()
 
-#find_package(OpenCV REQUIRED)
-
 # list of source files
 set(SOURCES
     Plugin_Remote.cpp
@@ -55,7 +53,6 @@ target_include_directories(Plugin_Remote PRIVATE
     ../Library_MMDFiles/include
     ../Library_MMDAgent/include
     ../Library_Julius/include
-#    ${OpenCV_INCLUDE_DIRS}
 )
 
 # compiler definitions (-D) for build
@@ -76,8 +73,6 @@ target_link_libraries(Plugin_Remote
     JULIUS
     ${SNDFILE_LIBRARIES}
     ${SAMPLERATE_LIBRARIES}
-#    ${OpenCV_LIBRARIES}
-#    -lavcodec -lavutil -lswscale
 )
 
 # custom command to copy binaries
