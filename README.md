@@ -82,8 +82,6 @@ MMDAgent-EX depends on various open-source softwares and libraries. Some of them
 - Open JTalk
 - Julius
 - POCO C++ Libraries
-- OpenCV
-- FFmpeg
 - RabbitMQ
 - cpp-httplib
 

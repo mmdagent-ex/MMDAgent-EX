@@ -54,7 +54,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;MMDAGENT;AMQP_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Library_glew\include;..\Library_Bullet_physics\include;..\Library_MMDFiles\include;..\Library_Julius\include;..\Library_MMDAgent\include;..\Library_GLFW\include;..\Library_OpenCV\include;..\Library_rabbitmq\include;..\Library_Poco\include;..\Library_Poco\win32\include;..\Library_PortAudio\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Library_glew\include;..\Library_Bullet_physics\include;..\Library_MMDFiles\include;..\Library_Julius\include;..\Library_MMDAgent\include;..\Library_GLFW\include;..\Library_rabbitmq\include;..\Library_Poco\include;..\Library_Poco\win32\include;..\Library_PortAudio\include</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
@@ -62,8 +62,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>..\Library_Bullet_Physics\lib;..\Library_MMDFiles\lib;..\Library_zlib\lib;..\Library_libpng\lib;..\Library_glew\lib;..\Library_MMDAgent\lib;..\Library_JPEG\lib;..\Library_GLFW\lib;..\Library_FreeType\lib;..\Library_Poco\win32\lib;..\Library_OpenCV\lib\x86;..\Library_rabbitmq\lib;..\Library_Julius\lib;..\Library_PortAudio\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>MMDFiles_D.lib;libpng_D.lib;Bullet_Physics_D.lib;winmm.lib;opengl32.lib;glu32.lib;zlib_D.lib;glew_D.lib;MMDAgent_D.lib;JPEG_D.lib;GLFW_D.lib;FreeType_D.lib;Julius_D.lib;PortAudio_D.lib;PocoXMLmdd.lib;PocoUtilmdd.lib;PocoNetSSLmdd.lib;PocoNetmdd.lib;PocoJSONmdd.lib;PocoFoundationmdd.lib;PocoCryptomdd.lib;libeay32MDd.lib;ssleay32MDd.lib;crypt32.lib;ws2_32.lib;IPHLPAPI.lib;rabbitmq_D.lib;opencv_calib3d470.lib;opencv_core470.lib;opencv_dnn470.lib;opencv_features2d470.lib;opencv_flann470.lib;opencv_gapi470.lib;opencv_highgui470.lib;opencv_imgcodecs470.lib;opencv_imgproc470.lib;opencv_ml470.lib;opencv_objdetect470.lib;opencv_photo470.lib;opencv_stitching470.lib;opencv_video470.lib;opencv_videoio470.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\Library_Bullet_Physics\lib;..\Library_MMDFiles\lib;..\Library_zlib\lib;..\Library_libpng\lib;..\Library_glew\lib;..\Library_MMDAgent\lib;..\Library_JPEG\lib;..\Library_GLFW\lib;..\Library_FreeType\lib;..\Library_Poco\win32\lib;..\Library_rabbitmq\lib;..\Library_Julius\lib;..\Library_PortAudio\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>MMDFiles_D.lib;libpng_D.lib;Bullet_Physics_D.lib;winmm.lib;opengl32.lib;glu32.lib;zlib_D.lib;glew_D.lib;MMDAgent_D.lib;JPEG_D.lib;GLFW_D.lib;FreeType_D.lib;Julius_D.lib;PortAudio_D.lib;PocoXMLmdd.lib;PocoUtilmdd.lib;PocoNetSSLmdd.lib;PocoNetmdd.lib;PocoJSONmdd.lib;PocoFoundationmdd.lib;PocoCryptomdd.lib;libeay32MDd.lib;ssleay32MDd.lib;crypt32.lib;ws2_32.lib;IPHLPAPI.lib;rabbitmq_D.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -74,7 +74,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;MMDAGENT;AMQP_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Library_glew\include;..\Library_Bullet_physics\include;..\Library_MMDFiles\include;..\Library_Julius\include;..\Library_MMDAgent\include;..\Library_GLFW\include;..\Library_OpenCV\include;..\Library_rabbitmq\include;..\Library_Poco\include;..\Library_Poco\win32\include;..\Library_PortAudio\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Library_glew\include;..\Library_Bullet_physics\include;..\Library_MMDFiles\include;..\Library_Julius\include;..\Library_MMDAgent\include;..\Library_GLFW\include;..\Library_rabbitmq\include;..\Library_Poco\include;..\Library_Poco\win32\include;..\Library_PortAudio\include</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
@@ -87,8 +87,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>MMDFiles.lib;libpng.lib;Bullet_Physics.lib;winmm.lib;opengl32.lib;glu32.lib;zlib.lib;glew.lib;MMDAgent.lib;JPEG.lib;GLFW.lib;FreeType.lib;Julius.lib;PortAudio.lib;PocoXMLmd.lib;PocoUtilmd.lib;PocoNetSSLmd.lib;PocoNetmd.lib;PocoJSONmd.lib;PocoFoundationmd.lib;PocoCryptomd.lib;libeay32MD.lib;ssleay32MD.lib;PocoZipmd.lib;crypt32.lib;opencv_calib3d470.lib;opencv_core470.lib;opencv_dnn470.lib;opencv_features2d470.lib;opencv_flann470.lib;opencv_gapi470.lib;opencv_highgui470.lib;opencv_imgcodecs470.lib;opencv_imgproc470.lib;opencv_ml470.lib;opencv_objdetect470.lib;opencv_photo470.lib;opencv_stitching470.lib;opencv_video470.lib;opencv_videoio470.lib;rabbitmq.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\Library_Bullet_Physics\lib;..\Library_MMDFiles\lib;..\Library_zlib\lib;..\Library_libpng\lib;..\Library_glew\lib;..\Library_MMDAgent\lib;..\Library_JPEG\lib;..\Library_GLFW\lib;..\Library_FreeType\lib;..\Library_Poco\win32\lib;..\Library_OpenCV\lib\x86;..\Library_rabbitmq\lib;..\Library_Julius\lib;..\Library_PortAudio\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>MMDFiles.lib;libpng.lib;Bullet_Physics.lib;winmm.lib;opengl32.lib;glu32.lib;zlib.lib;glew.lib;MMDAgent.lib;JPEG.lib;GLFW.lib;FreeType.lib;Julius.lib;PortAudio.lib;PocoXMLmd.lib;PocoUtilmd.lib;PocoNetSSLmd.lib;PocoNetmd.lib;PocoJSONmd.lib;PocoFoundationmd.lib;PocoCryptomd.lib;libeay32MD.lib;ssleay32MD.lib;PocoZipmd.lib;crypt32.lib;rabbitmq.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\Library_Bullet_Physics\lib;..\Library_MMDFiles\lib;..\Library_zlib\lib;..\Library_libpng\lib;..\Library_glew\lib;..\Library_MMDAgent\lib;..\Library_JPEG\lib;..\Library_GLFW\lib;..\Library_FreeType\lib;..\Library_Poco\win32\lib;..\Library_rabbitmq\lib;..\Library_Julius\lib;..\Library_PortAudio\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
