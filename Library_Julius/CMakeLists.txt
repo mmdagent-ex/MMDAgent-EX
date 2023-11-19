@@ -198,12 +198,20 @@ target_include_directories(JULIUS PRIVATE
 #)
 
 # compiler options for private build
-target_compile_options(JULIUS PRIVATE
-    -march=native
-    -ffast-math
-    -Wno-deprecated-non-prototype
-    -Wno-format-overflow
-)
+if(APPLE)
+    target_compile_options(JULIUS PRIVATE
+        -march=native
+        -ffast-math
+        -Wno-deprecated-non-prototype
+    )
+else()
+    target_compile_options(JULIUS PRIVATE
+        -march=native
+        -ffast-math
+        -Wno-deprecated-non-prototype
+        -Wno-format-overflow
+    )
+endif()
 
 ##############
 # public compiler definitions (-D) required to link with this project

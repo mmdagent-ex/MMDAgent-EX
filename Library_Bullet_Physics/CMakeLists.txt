@@ -173,11 +173,18 @@ target_include_directories(BulletPhysics PRIVATE
 #)
 
 # compiler options for private build
-target_compile_options(BulletPhysics PRIVATE
-    -march=native
-    -ffast-math
-    -Wno-stringop-overflow
-)
+if(APPLE)
+    target_compile_options(BulletPhysics PRIVATE
+        -march=native
+        -ffast-math
+    )
+else()
+    target_compile_options(BulletPhysics PRIVATE
+        -march=native
+        -ffast-math
+        -Wno-stringop-overflow
+    )
+endif()
 
 ##############
 # public compiler definitions (-D) required to link with this project
