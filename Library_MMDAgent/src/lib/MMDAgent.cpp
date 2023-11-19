@@ -3994,7 +3994,7 @@ void MMDAgent::procMenu(int id, int item)
          }
          break;
       case 4: /* Set Home */
-         m_content->setHomeURL(m_configFileName);
+         m_content->setHomeFile(m_configFileName);
          m_notify->processMessage(NOTIFY_COMMAND_SHOW, "Saved this content as home");
          getMenu()->hide();
          break;
@@ -6094,7 +6094,7 @@ void MMDAgent::procReceivedMessage(const char *type, const char *value)
          sendLogString(m_moduleId, MLOG_ERROR, "%s: should have no argument.", type);
          return;
       }
-      m_content->setHomeURL(m_configFileName);
+      m_content->setHomeFile(m_configFileName);
    } else if (MMDAgent_strequal(type, MMDAGENT_COMMAND_HOME_CLEAR)) {
       /* HOME_CLEAR */
       sendLogString(m_moduleId, MLOG_MESSAGE_CAPTURED, "%s|%s", type, value);

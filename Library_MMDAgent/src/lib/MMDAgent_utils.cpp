@@ -197,6 +197,31 @@ char *MMDAgent_basename(const char *file)
    return MMDFiles_basename(file);
 }
 
+/* MMDAgent_fullpathname: get full path name */
+char *MMDAgent_fullpathname(const char *file)
+{
+#ifdef _WIN32
+   char buff[MMDAGENT_MAXBUFLEN];
+   DWORD retval = GetFullPathNameA(file, MMDAGENT_MAXBUFLEN, buff, NULL);
+   if (retval == 0)
+      return NULL;
+   char *path = MMDFiles_pathdup_from_system_locale_to_application(buff);
+   if (path == NULL)
+      return NULL;
+   return path;
+#else
+   char buff[MMDAGENT_MAXBUFLEN];
+   char *filepath = realpath(file, NULL);
+   if (filepath == NULL)
+      return NULL;
+   char *path = MMDFiles_pathdup_from_system_locale_to_application(filepath);
+   free(filepath);
+   if (path == NULL)
+      return NULL;
+   return path;
+#endif
+}
+
 /* MMDAgent_stat: get file attributes */
 MMDAGENT_STAT MMDAgent_stat(const char *file)
 {
