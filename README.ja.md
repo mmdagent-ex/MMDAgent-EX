@@ -87,8 +87,6 @@ MMDAgent-EX のコードは Apache License, Version 2.0 で提供されていま
 - Open JTalk
 - Julius
 - POCO C++ Libraries
-- OpenCV
-- FFmpeg
 - RabbitMQ
 - cpp-httplib
 
