@@ -9,9 +9,7 @@ libxi-dev
 libgl-dev
 cmake
 libpoco-dev
-libopencv-dev
 libglew-dev
-libavcodec-dev
 libsndfile1-dev
 libsamplerate0-dev
 zlib1g-dev
