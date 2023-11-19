@@ -99,7 +99,7 @@ bool SystemTexture::load(const char *dir)
 
    for (i = 0; i < SYSTEMTEXTURE_NUMFILES; i++) {
       if (MMDFiles_strlen(dir) > 0)
-         sprintf(buff, "%s%c%s", dir, MMDFILES_DIRSEPARATOR, files[i]);
+         MMDFiles_snprintf(buff, MMDFILES_MAXBUFLEN, "%s%c%s", dir, MMDFILES_DIRSEPARATOR, files[i]);
       else
          strcpy(buff, files[i]);
       if (m_toonTexture[i].load(buff) == false)

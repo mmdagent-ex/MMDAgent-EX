@@ -188,7 +188,7 @@ void Speak::loadWaveAndSpeak()
    }
 
    double src_ratio = (double)OUTPUT_SAMPLE_RATE / (double)input_info.samplerate;
-   long input_frames = input_info.frames;
+   long input_frames = (long)input_info.frames;
    long output_frames = (long)(input_frames * src_ratio) + 1;
 
    double duration_sec = (double)input_frames / (double)input_info.samplerate;

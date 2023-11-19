@@ -140,8 +140,9 @@ bool DLLibrary_load(DLLibrary *d, const char *dir, const char *file)
    DLLibrary_clear(d);
 
    /* open */
-   buf = (char *) malloc(sizeof(char) * (MMDAgent_strlen(dir) + 1 + MMDAgent_strlen(file) + 1));
-   sprintf(buf, "%s%c%s", dir, MMDAGENT_DIRSEPARATOR, file);
+   int plen = sizeof(char) * (MMDAgent_strlen(dir) + 1 + MMDAgent_strlen(file) + 1);
+   buf = (char *) malloc(plen);
+   MMDAgent_snprintf(buf, plen, "%s%c%s", dir, MMDAGENT_DIRSEPARATOR, file);
    d->handle = MMDAgent_dlopen(buf);
    free(buf);
    if (!d->handle)

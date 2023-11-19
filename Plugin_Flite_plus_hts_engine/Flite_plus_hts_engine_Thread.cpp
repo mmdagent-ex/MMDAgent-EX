@@ -305,7 +305,7 @@ void Flite_plus_hts_engine_Thread::run()
       /* synthesize */
       m_flite_plus_hts_engine.setStyle(index);
       m_flite_plus_hts_engine.prepare(text);
-      m_flite_plus_hts_engine.getPhonemeSequence(lip);
+      m_flite_plus_hts_engine.getPhonemeSequence(lip, MMDAGENT_MAXBUFLEN);
       if (MMDAgent_strlen(lip) > 0) {
          m_mmdagent->sendMessage(m_id, FLITEPLUSHTSENGINETHREAD_COMMANDSTARTLIP, "%s|%s", chara, lip);
          m_flite_plus_hts_engine.synthesis();

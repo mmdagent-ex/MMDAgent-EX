@@ -206,7 +206,7 @@ void LogText::log(unsigned int flag, const char *format, ...)
    if (m_textList == NULL) return;
 
    va_start(args, format);
-   vsprintf(buff, format, args);
+   vsnprintf(buff, MMDAGENT_MAXBUFLEN, format, args);
    va_end(args);
    for (p = MMDAgent_strtok(buff, "\n", &save); p; p = MMDAgent_strtok(NULL, "\n", &save)) {
       int i, len;

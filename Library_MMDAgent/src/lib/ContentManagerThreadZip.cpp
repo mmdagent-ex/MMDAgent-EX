@@ -118,7 +118,7 @@ bool ContentManagerThreadZip::unzipAndFindConfig(const char *zip, const char *te
          free(tmp);
       }
 
-      sprintf(buff2, "%s%c%s", tempDirName, MMDAGENT_DIRSEPARATOR, buff1);
+      MMDAgent_snprintf(buff2, MMDAGENT_MAXBUFLEN, "%s%c%s", tempDirName, MMDAGENT_DIRSEPARATOR, buff1);
       len = MMDAgent_strlen(buff2);
       /* make directory */
       if (len > 0 && buff2[len - 1] == MMDAGENT_DIRSEPARATOR) {
@@ -313,11 +313,11 @@ void ContentManagerThreadZip::run()
    /* extract package description: top dir, or same dir of mdf */
    desc = new KeyValue;
    desc->setup();
-   sprintf(buff, "%s%c%s", m_dstDir, MMDAGENT_DIRSEPARATOR, CONTENTMANAGER_PACKAGEFILE);
+   MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%c%s", m_dstDir, MMDAGENT_DIRSEPARATOR, CONTENTMANAGER_PACKAGEFILE);
    if (desc->load(buff, NULL) == false) {
       p = MMDAgent_dirname(configFileNameInContent);
       if (p) {
-         sprintf(buff, "%s%c%s%c%s", m_dstDir, MMDAGENT_DIRSEPARATOR, p, MMDAGENT_DIRSEPARATOR, CONTENTMANAGER_PACKAGEFILE);
+         MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%c%s%c%s", m_dstDir, MMDAGENT_DIRSEPARATOR, p, MMDAGENT_DIRSEPARATOR, CONTENTMANAGER_PACKAGEFILE);
          desc->load(buff, NULL);
       }
       free(p);
@@ -369,12 +369,12 @@ void ContentManagerThreadZip::run()
       prop->setString("KafkaConsumerTopic", desc->getString("kafkaConsumerTopic", ""));
    if (desc->exist("kafkaPartition"))
       prop->setString("KafkaPartition", desc->getString("kafkaPartition", ""));
-   sprintf(buff, "%s%c%s", m_dstDir, MMDAGENT_DIRSEPARATOR, MMDAGENT_CONTENTINFOFILE);
+   MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%c%s", m_dstDir, MMDAGENT_DIRSEPARATOR, MMDAGENT_CONTENTINFOFILE);
    prop->save(buff);
    delete prop;
    delete desc;
 
-   sprintf(buff, "%s%c%s", m_dstDir, MMDAGENT_DIRSEPARATOR, configFileNameInContent);
+   MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%c%s", m_dstDir, MMDAGENT_DIRSEPARATOR, configFileNameInContent);
    if (m_mdfFile)
       free(m_mdfFile);
    m_mdfFile = MMDAgent_strdup(buff);
@@ -410,7 +410,7 @@ const char *ContentManagerThreadZip::getContentMDFFile()
 }
 
 /* ContentManagerThreadZip::getProgress: get progress information */
-void ContentManagerThreadZip::getProgress(char *buff_ret, float *rate_ret)
+void ContentManagerThreadZip::getProgress(char *buff_ret, int buff_ret_len, float *rate_ret)
 {
    float rate;
 
@@ -419,7 +419,7 @@ void ContentManagerThreadZip::getProgress(char *buff_ret, float *rate_ret)
    else
       rate = (float)(m_currentSize) / (float)m_totalSize;
 
-   sprintf(buff_ret, "unpacking %4.1fMB - %3.1f%% done", byte2mb(m_totalSize), rate * 100.0f);
+   MMDAgent_snprintf(buff_ret, buff_ret_len, "unpacking %4.1fMB - %3.1f%% done", byte2mb(m_totalSize), rate * 100.0f);
 
    *rate_ret = rate;
 }

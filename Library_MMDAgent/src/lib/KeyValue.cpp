@@ -250,7 +250,7 @@ bool KeyValue::setString(const char *key, const char *format, ...)
    }
 
    va_start(args, format);
-   vsprintf(buff, format, args);
+   vsnprintf(buff, MMDAGENT_MAXBUFLEN, format, args);
    va_end(args);
 
    if (*data != NULL)

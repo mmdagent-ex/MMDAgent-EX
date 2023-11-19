@@ -345,7 +345,7 @@ void Open_JTalk_Thread::run()
       /* synthesize */
       m_openJTalk.setStyle(index);
       m_openJTalk.prepare(text);
-      m_openJTalk.getPhonemeSequence(lip);
+      m_openJTalk.getPhonemeSequence(lip, MMDAGENT_MAXBUFLEN);
       if (MMDAgent_strlen(lip) > 0) {
          m_mmdagent->sendMessage(m_id, OPENJTALKTHREAD_COMMANDSTARTLIP, "%s|%s", chara, lip);
          m_openJTalk.synthesis();

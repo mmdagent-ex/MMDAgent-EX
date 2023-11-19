@@ -805,7 +805,7 @@ void ContentManagerThreadWeb::run()
       /* do not download, just update time stampcheck */
       KeyValue *prop;
 
-      sprintf(buff, "%s%c%s", m_saveDir, MMDAGENT_DIRSEPARATOR, MMDAGENT_CONTENTINFOFILE);
+      MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%c%s", m_saveDir, MMDAGENT_DIRSEPARATOR, MMDAGENT_CONTENTINFOFILE);
       prop = new KeyValue;
       prop->setup();
       if (prop->load(buff, NULL)) {
@@ -849,7 +849,7 @@ void ContentManagerThreadWeb::run()
 
    /* make MDF file to absolute */
    if (configFileNameInContent) {
-      sprintf(buff, "%s%c%s", m_saveDir, MMDAGENT_DIRSEPARATOR, configFileNameInContent);
+      MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%c%s", m_saveDir, MMDAGENT_DIRSEPARATOR, configFileNameInContent);
       if (m_mdfFile)
          free(m_mdfFile);
       m_mdfFile = MMDAgent_strdup(buff);
@@ -1016,7 +1016,7 @@ void ContentManagerThreadWeb::run()
       prop->setString("KafkaConsumerTopic", desc->getString("kafkaConsumerTopic", ""));
    if (desc->exist("kafkaPartition"))
       prop->setString("KafkaPartition", desc->getString("kafkaPartition", ""));
-   sprintf(buff, "%s%c%s", m_saveDir, MMDAGENT_DIRSEPARATOR, MMDAGENT_CONTENTINFOFILE);
+   MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%c%s", m_saveDir, MMDAGENT_DIRSEPARATOR, MMDAGENT_CONTENTINFOFILE);
    prop->save(buff);
 
    delete prop;
@@ -1063,7 +1063,7 @@ const char *ContentManagerThreadWeb::getContentMDFFile()
 }
 
 /* ContentManagerThreadWeb::getProgress: get progress information */
-void ContentManagerThreadWeb::getProgress(char *buff_ret, float *rate_ret)
+void ContentManagerThreadWeb::getProgress(char *buff_ret, int buff_ret_len, float *rate_ret)
 {
    float rate;
 
@@ -1078,7 +1078,7 @@ void ContentManagerThreadWeb::getProgress(char *buff_ret, float *rate_ret)
    else
       rate = (float)(m_currentFetchedSize + m_files[m_currentId]->getCurrentSize()) / (float)m_fetchSize;
 
-   sprintf(buff_ret, "total %4.1fMB: downloading %4.1fMB - %3.1f%% done\n(%d/%d)[%4.1f/%4.1fMB] %s", byte2mb(m_totalSize), byte2mb(m_fetchSize), rate * 100.0f, m_fetchCount, m_fetchNum, byte2mb(m_files[m_currentId]->getCurrentSize()), byte2mb(m_files[m_currentId]->getSize()), m_files[m_currentId]->getFileName());
+   MMDAgent_snprintf(buff_ret, buff_ret_len, "total %4.1fMB: downloading %4.1fMB - %3.1f%% done\n(%d/%d)[%4.1f/%4.1fMB] %s", byte2mb(m_totalSize), byte2mb(m_fetchSize), rate * 100.0f, m_fetchCount, m_fetchNum, byte2mb(m_files[m_currentId]->getCurrentSize()), byte2mb(m_files[m_currentId]->getSize()), m_files[m_currentId]->getFileName());
 
    *rate_ret = rate;
 }

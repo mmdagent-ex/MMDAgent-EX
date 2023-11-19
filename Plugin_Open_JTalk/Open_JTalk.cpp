@@ -246,7 +246,7 @@ void Open_JTalk::prepare(const char *str)
 }
 
 /* Open_JTalk::getPhonemeSequence: get phoneme sequence */
-void Open_JTalk::getPhonemeSequence(char *str)
+void Open_JTalk::getPhonemeSequence(char *str, int strlen)
 {
    int i, j, k;
    int size;
@@ -282,14 +282,14 @@ void Open_JTalk::getPhonemeSequence(char *str)
       end = strchr(feature[i], '+');
       if (start != NULL && end != NULL) {
          for (ch = start + 1; ch != end; ch++)
-            sprintf(str, "%s%c", str, *ch);
+            MMDAgent_snprintf(str, strlen, "%s%c", str, *ch);
       } else {
          strcat(str, feature[i]);
       }
       /* get ms */
       for (j = 0, k = 0; j < nstate; j++)
          k += (HTS_Engine_get_state_duration(&m_engine, i * nstate + j) * fperiod * 1000) / sampling_frequency;
-      sprintf(str, "%s,%d", str, k);
+      MMDAgent_snprintf(str, strlen, "%s,%d", str, k);
    }
 }
 

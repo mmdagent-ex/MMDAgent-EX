@@ -279,7 +279,7 @@ void VIManager_Thread::loadAndStart(MMDAgent *mmdagent, int id, const char *file
             l = new VIManager_Link;
             l->id = ++i;
             l->next = NULL;
-            sprintf(buf2, "sub%d", l->id);
+            MMDAgent_snprintf(buf2, MMDAGENT_MAXBUFLEN, "sub%d", l->id);
             if(l->vim.load(m_mmdagent, m_id, m_key, buf, buf2) == false)
                delete l;
             else {

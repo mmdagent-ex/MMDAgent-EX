@@ -311,7 +311,7 @@ public:
    void getCurrentViewTransform(btTransform *tr);
 
    /* getInfoString: store current view parameters to buffer */
-   void getInfoString(char *buf);
+   void getInfoString(char *buf, int buflen);
 
    /* clearScreen: clear screen */
    void clearScreen();

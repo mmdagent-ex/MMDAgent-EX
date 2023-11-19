@@ -137,24 +137,24 @@ static bool Audio_openAndStart(Audio *audio, const char *alias, char *file)
 
    /* wait */
    filepath = MMDFiles_pathdup_from_application_to_system_locale(file);
-   sprintf(audio->buf, "open \"%s\" alias _%s wait", filepath, alias);
+   MMDAgent_snprintf(audio->buf, MMDAGENT_MAXBUFLEN, "open \"%s\" alias _%s wait", filepath, alias);
    free(filepath);
    if (mciSendStringA(audio->buf, NULL, 0, 0) != 0) {
       return false;
    }
 
    /* enqueue */
-   sprintf(audio->buf, "cue _%s output wait", alias);
+   MMDAgent_snprintf(audio->buf, MMDAGENT_MAXBUFLEN, "cue _%s output wait", alias);
    if (mciSendStringA(audio->buf, NULL, 0, 0) != 0) {
-      sprintf(audio->buf, "close _%s wait", alias);
+      MMDAgent_snprintf(audio->buf, MMDAGENT_MAXBUFLEN, "close _%s wait", alias);
       mciSendStringA(audio->buf, NULL, 0, 0);
       return false;
    }
 
    /* start */
-   sprintf(audio->buf, "play _%s", alias);
+   MMDAgent_snprintf(audio->buf, MMDAGENT_MAXBUFLEN, "play _%s", alias);
    if (mciSendStringA(audio->buf, NULL, 0, 0) != 0) {
-      sprintf(audio->buf, "close _%s wait", alias);
+      MMDAgent_snprintf(audio->buf, MMDAGENT_MAXBUFLEN, "close _%s wait", alias);
       mciSendStringA(audio->buf, NULL, 0, 0);
       return false;
    }
@@ -166,7 +166,7 @@ static bool Audio_openAndStart(Audio *audio, const char *alias, char *file)
       else
          MMDAgent_sleep(AUDIOTHREAD_STARTSLEEPSEC);
       /* check sound start */
-      sprintf(audio->buf, "status _%s mode wait", alias);
+      MMDAgent_snprintf(audio->buf, MMDAGENT_MAXBUFLEN, "status _%s mode wait", alias);
       mciSendStringA(audio->buf, audio->ret, sizeof(audio->ret), NULL);
    } while(MMDAgent_strequal(audio->ret, "playing") == false);
 
@@ -178,20 +178,20 @@ static void Audio_waitToStop(MMDAgent *mmdagent, Audio *audio, const char *alias
    do {
       /* check user's stop */
       if(*m_playing == false) {
-         sprintf(audio->buf, "stop _%s wait", alias);
+         MMDAgent_snprintf(audio->buf, MMDAGENT_MAXBUFLEN, "stop _%s wait", alias);
          mciSendStringA(audio->buf, NULL, 0, NULL);
          break;
       }
       MMDAgent_sleep(AUDIOTHREAD_ENDSLEEPSEC);
       /* check end of sound */
-      sprintf(audio->buf, "status _%s mode wait", alias);
+      MMDAgent_snprintf(audio->buf, MMDAGENT_MAXBUFLEN, "status _%s mode wait", alias);
       mciSendStringA(audio->buf, audio->ret, sizeof(audio->ret), NULL);
    } while(MMDAgent_strequal(audio->ret, "playing") == true);
 }
 
 static void Audio_close(Audio *audio, const char *alias)
 {
-   sprintf(audio->buf, "close _%s wait", alias);
+   MMDAgent_snprintf(audio->buf, MMDAGENT_MAXBUFLEN, "close _%s wait", alias);
    mciSendStringA(audio->buf, NULL, 0, NULL);
 }
 #endif /* AUDIO_INTERFACE_WIN32 */
@@ -830,9 +830,9 @@ bool Audio_Thread::startLipsync(const char *file)
             phonemeLen = zf->gettoken(buff);
             if(startLen > 0 && endLen > 0 && phonemeLen > 0 && startTime < endTime) {
                if(first)
-                  sprintf(message, "%s,%d", buff, (int) ((double) (endTime - startTime) * 1.0E-04 + 0.5));
+                  MMDAgent_snprintf(message, MMDAGENT_MAXBUFLEN, "%s,%d", buff, (int) ((double) (endTime - startTime) * 1.0E-04 + 0.5));
                else
-                  sprintf(message, "%s,%s,%d", message, buff, (int) ((double) (endTime - startTime) * 1.0E-04 + 0.5));
+                  MMDAgent_snprintf(message, MMDAGENT_MAXBUFLEN, "%s,%s,%d", message, buff, (int) ((double) (endTime - startTime) * 1.0E-04 + 0.5));
                first = false;
             } else {
                break;

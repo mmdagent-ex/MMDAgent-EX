@@ -114,7 +114,7 @@ EXPORT void extAppStart(MMDAgent *mmdagent)
    mid = mmdagent->getModuleId(PLUGINOPENJTALK_NAME);
 
    /* get dictionary directory name */
-   sprintf(dic, "%s%c%s", mmdagent->getAppDirName(), MMDAGENT_DIRSEPARATOR, PLUGINOPENJTALK_NAME);
+   MMDAgent_snprintf(dic, MMDAGENT_MAXBUFLEN, "%s%c%s", mmdagent->getAppDirName(), MMDAGENT_DIRSEPARATOR, PLUGINOPENJTALK_NAME);
 
    /* get config file */
    /* since current directory is config dir, we should get only base name */

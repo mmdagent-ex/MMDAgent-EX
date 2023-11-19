@@ -264,8 +264,9 @@ bool FileBrowser::openDir(const char *directory)
             break;
          }
          /* check the file status */
-         p = (char *)malloc(MMDAgent_strlen(dir) + 1 + MMDAgent_strlen(buf) + 1);
-         sprintf(p, "%s%c%s", dir, MMDAGENT_DIRSEPARATOR, buf);
+         int plen = MMDAgent_strlen(dir) + 1 + MMDAgent_strlen(buf) + 1;
+         p = (char *)malloc(plen);
+         MMDAgent_snprintf(p, plen, "%s%c%s", dir, MMDAGENT_DIRSEPARATOR, buf);
          attr = MMDAgent_stat(p);
          free(p);
          if (attr == MMDAGENT_STAT_UNKNOWN)
@@ -342,7 +343,7 @@ bool FileBrowser::upDir()
    if (dir[0] == '\0') {
       free(dir);
       dir = (char *)malloc(sizeof(char) * 2);
-      sprintf(dir, "%c", MMDAGENT_DIRSEPARATOR);
+      MMDAgent_snprintf(dir, sizeof(char) * 2, "%c", MMDAGENT_DIRSEPARATOR);
    }
 
    openDir(dir);
@@ -703,11 +704,12 @@ void FileBrowser::execItem(int choice)
       /* do nothing */
    } else {
       /* open */
-      p = (char *)malloc(MMDAgent_strlen(m_current) + 1 + MMDAgent_strlen(currentItem) + 1);
+      int plen = MMDAgent_strlen(m_current) + 1 + MMDAgent_strlen(currentItem) + 1;
+      p = (char *)malloc(plen);
       if (MMDAgent_strlen(m_current) == 1 && MMDFiles_dirseparator(m_current[0]) == true)
-         sprintf(p, "%s%s", m_current, currentItem);
+         MMDAgent_snprintf(p, plen, "%s%s", m_current, currentItem);
       else
-         sprintf(p, "%s%c%s", m_current, MMDAGENT_DIRSEPARATOR, currentItem);
+         MMDAgent_snprintf(p, plen, "%s%c%s", m_current, MMDAGENT_DIRSEPARATOR, currentItem);
       if (m_list[choice].attrib == MMDAGENT_STAT_DIRECTORY) {
          /* open directory */
          m_listExecuted = choice;
