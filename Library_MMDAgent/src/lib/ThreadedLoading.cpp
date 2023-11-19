@@ -74,6 +74,8 @@ void ThreadedLoading::run(JobLink *job)
          job->pmd = NULL;
       }
       break;
+   case TASKNUM:
+      break;
    }
 
    job->finished = true;
@@ -141,6 +143,8 @@ void ThreadedLoading::update()
                /* model has been passed under main thread, so just kill link here */
                j->pmd = NULL;
             }
+            break;
+         case TASKNUM:
             break;
          }
          tmp = j->next;

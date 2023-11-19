@@ -592,7 +592,7 @@ void InfoText::update(double ellapsedFrame)
             m_showHideAnimationFrameLeft = 0.0f;
       }
    }
-   if (m_autoCloseFrameLeft > 0.0f) {(float)ellapsedFrame;
+   if (m_autoCloseFrameLeft > 0.0f) {
       m_autoCloseFrameLeft -= (float)ellapsedFrame;
       if (m_autoCloseFrameLeft <= 0.0f) {
          m_autoCloseFrameLeft = 0.0f;
