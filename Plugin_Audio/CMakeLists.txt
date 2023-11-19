@@ -45,10 +45,16 @@ target_compile_definitions(Plugin_Audio PRIVATE
     MMDAGENT
 )
 
-target_compile_options(Plugin_Audio PRIVATE
-   -Wno-deprecated-declarations
-   -Wno-format-truncation
-)
+if(APPLE)
+    target_compile_options(Plugin_Audio PRIVATE
+        -Wno-deprecated-declarations
+    )
+else()
+    target_compile_options(Plugin_Audio PRIVATE
+        -Wno-deprecated-declarations
+        -Wno-format-truncation
+    )
+endif()
 
 #library linking
 if(APPLE)

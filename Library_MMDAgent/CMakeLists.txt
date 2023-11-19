@@ -90,7 +90,6 @@ target_compile_definitions(MMDAGENT PRIVATE
 if(APPLE)
     target_compile_options(MMDAGENT PRIVATE
         -Wno-deprecated-declarations
-        -Wno-format-truncation
         -std=c++11
     )
 else()

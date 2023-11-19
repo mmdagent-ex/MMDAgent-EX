@@ -52,11 +52,18 @@ target_compile_definitions(Plugin_VIManager PRIVATE
 )
 
 # compiler options for build
-target_compile_options(Plugin_VIManager PRIVATE
-    -std=c++17
-    -Wno-deprecated-declarations
-    -Wno-format-truncation
-)
+if(APPLE)
+    target_compile_options(Plugin_VIManager PRIVATE
+        -std=c++17
+        -Wno-deprecated-declarations
+    )
+else()
+    target_compile_options(Plugin_VIManager PRIVATE
+        -std=c++17
+        -Wno-deprecated-declarations
+        -Wno-format-truncation
+    )
+endif()
 
 # library linking
 target_link_libraries(Plugin_VIManager

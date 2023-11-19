@@ -49,10 +49,16 @@ target_compile_definitions(Plugin_Julius PRIVATE
 )
 
 # compiler options for build
-target_compile_options(Plugin_Julius PRIVATE
-   -Wno-deprecated-declarations
-   -Wno-format-truncation   
-)
+if(APPLE)
+    target_compile_options(Plugin_Julius PRIVATE
+        -Wno-deprecated-declarations
+    )
+else()
+    target_compile_options(Plugin_Julius PRIVATE
+        -Wno-deprecated-declarations
+        -Wno-format-truncation
+    )
+endif()
 
 # library linking
 target_link_libraries(Plugin_Julius
