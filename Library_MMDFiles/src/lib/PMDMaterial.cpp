@@ -157,7 +157,7 @@ bool PMDMaterial::setup(PMDFile_Material *m, PMDTextureLoader *textureLoader, co
    /* shadow drawing flag */
    m_shadowFlag = m_edgeFlag;
    /* shadow map flag */
-   m_shadowMapFlag = (m_alpha != 0.98) ? m_shadowFlag : false;
+   m_shadowMapFlag = (m_alpha >= 0.97999 && m_alpha <= 0.98001) ? m_shadowFlag : false;
 #ifdef MY_LUMINOUS
    /* luminous flag */
    m_luminousFlag = (m_specular[0] == 0.0f && m_specular[1] == 0.0f && m_specular[2] == 0.0f && m_shiness >= 100.0f) ? true : false;

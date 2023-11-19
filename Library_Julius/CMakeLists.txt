@@ -225,8 +225,9 @@ target_compile_definitions(JULIUS PUBLIC
 )
 
 # public compiler options required to link with this project
-#target_compile_options(JULIUS PUBLIC
-#)
+target_compile_options(JULIUS PUBLIC
+    -Wno-writable-strings
+)
 
 # public link libraries to be linked with this project
 target_link_libraries(JULIUS PUBLIC
