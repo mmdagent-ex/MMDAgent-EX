@@ -1373,6 +1373,16 @@ void ContentManager::setHomeURL(const char *url)
    free(contentDirName);
 }
 
+/* ContentManager::setHomeFile: set home to the given path */
+void ContentManager::setHomeFile(const char *path)
+{
+   char *fullpath = MMDAgent_fullpathname(path);
+   if (fullpath == NULL)
+      return;
+   setHomeURL(fullpath);
+   free(fullpath);
+}
+
 /* ContentManager::clearHome: clear home */
 void ContentManager::clearHome()
 {

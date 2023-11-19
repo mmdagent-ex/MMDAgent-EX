@@ -112,6 +112,9 @@ char *MMDAgent_dirname(const char *file);
 /* MMDAgent_basename: get file name from path */
 char *MMDAgent_basename(const char *file);
 
+/* MMDAgent_fullpathname: get full path name */
+char *MMDAgent_fullpathname(const char *file);
+
 enum MMDAGENT_STAT {
    MMDAGENT_STAT_NORMAL = 0,
    MMDAGENT_STAT_DIRECTORY,

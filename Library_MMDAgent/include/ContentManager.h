@@ -202,6 +202,9 @@ public:
    /* setHomeURL: set home to the given url */
    void setHomeURL(const char *url);
 
+   /* setHomeFile: set home to the given path */
+   void setHomeFile(const char *path);
+
    /* clearHome: clear home */
    void clearHome();
 };
