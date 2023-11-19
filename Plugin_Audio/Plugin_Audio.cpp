@@ -143,8 +143,9 @@ EXPORT void extProcMessage(MMDAgent *mmdagent, const char *type, const char *arg
             }
             /* start mp3 */
             audio_manager.stop(PLUGINAUDIO_DEFAULTALIAS);
-            q = (char *) malloc(sizeof(char) * (strlen(PLUGINAUDIO_DEFAULTALIAS) + 1 + strlen(p) + 1));
-            sprintf(q, "%s|%s", PLUGINAUDIO_DEFAULTALIAS, p);
+            int plen = sizeof(char) * (strlen(PLUGINAUDIO_DEFAULTALIAS) + 1 + strlen(p) + 1);
+            q = (char *) malloc(plen);
+            MMDAgent_snprintf(q, plen, "%s|%s", PLUGINAUDIO_DEFAULTALIAS, p);
             audio_manager.play(q);
             free(q);
          }

@@ -300,7 +300,7 @@ static char *prepareCacheDirDup(char *basename)
    if (contentDirName == NULL)
       return NULL;
 
-   sprintf(buff, "%s%c%s", contentDirName, MMDAGENT_DIRSEPARATOR, basename);
+   MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%c%s", contentDirName, MMDAGENT_DIRSEPARATOR, basename);
    cacheDirName = MMDAgent_strdup(buff);
 
    if (MMDAgent_stat(cacheDirName) != MMDAGENT_STAT_DIRECTORY) {
@@ -1936,7 +1936,7 @@ bool MMDAgent::setupSystem(const char *systemDirName, const char *pluginDirName,
 #endif
    if (m_appDirName)
       free(m_appDirName);
-   sprintf(buff, "%s%c%s", m_systemDirName, MMDAGENT_DIRSEPARATOR, "AppData");
+   MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%c%s", m_systemDirName, MMDAGENT_DIRSEPARATOR, "AppData");
    m_appDirName = MMDAgent_strdup(buff);
    sendLogString(m_moduleId, MLOG_STATUS, "AppData dir = %s", m_appDirName);
 
@@ -1972,7 +1972,7 @@ bool MMDAgent::setupSystem(const char *systemDirName, const char *pluginDirName,
 
    /* setup lipsync */
    m_lipSync = new LipSync();
-   sprintf(buff, "%s%c%s", m_appDirName, MMDAGENT_DIRSEPARATOR, LIPSYNC_CONFIGFILE);
+   MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%c%s", m_appDirName, MMDAGENT_DIRSEPARATOR, LIPSYNC_CONFIGFILE);
    if (m_lipSync->load(buff) == false) {
       sendLogString(m_moduleId, MLOG_ERROR, "failed to load lipsync config file %s", buff);
       delete m_lipSync;
@@ -2008,7 +2008,7 @@ bool MMDAgent::setupSystem(const char *systemDirName, const char *pluginDirName,
       m_atlas = NULL;
    } else {
       m_font = new FTGLTextureFont();
-      sprintf(buff, "%s%c%s%c%s", m_appDirName, MMDAGENT_DIRSEPARATOR, FREETYPEGL_FONTDIR, MMDAGENT_DIRSEPARATOR, FREETYPEGL_FONTFILE);
+      MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%c%s%c%s", m_appDirName, MMDAGENT_DIRSEPARATOR, FREETYPEGL_FONTDIR, MMDAGENT_DIRSEPARATOR, FREETYPEGL_FONTFILE);
       if (m_font->setup(m_atlas, buff) == false) {
          sendLogString(m_moduleId, MLOG_WARNING, "failed to load font from %s", buff);
          if (m_font->setup(m_atlas, NULL) == false) {
@@ -2019,7 +2019,7 @@ bool MMDAgent::setupSystem(const char *systemDirName, const char *pluginDirName,
          sendLogString(m_moduleId, MLOG_WARNING, "use embedded BreeSerif font");
       }
       m_fontAwesome = new FTGLTextureFont();
-      sprintf(buff, "%s%c%s", m_appDirName, MMDAGENT_DIRSEPARATOR, FREETYPEGL_FONTFILE_AWESOME);
+      MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%c%s", m_appDirName, MMDAGENT_DIRSEPARATOR, FREETYPEGL_FONTFILE_AWESOME);
       if (m_fontAwesome->setup(m_atlas, buff) == false) {
          sendLogString(m_moduleId, MLOG_WARNING, "failed to load font from %s", buff);
          delete m_fontAwesome;
@@ -2224,7 +2224,7 @@ bool MMDAgent::setupContent(int argc, char **argv)
          hash = (16777619U * hash) ^ *p;
          p++;
       }
-      sprintf(buff, "%u", hash);
+      MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%u", hash);
 
       sendLogString(m_moduleId, MLOG_STATUS, "downloading %s to cache dir %s", urlPath, buff);
       targetDir = prepareCacheDirDup(buff);
@@ -3121,20 +3121,20 @@ bool MMDAgent::renderScene()
       if (m_screen->getNumMultiSampling() > 0) {
 #ifdef MY_LUMINOUS
          if (m_render->getLuminousIntensity() != 0.0f)
-            sprintf(buff, "%5.1ffps %dx MSAA [AL%.1f]", m_timer->getFps(), m_screen->getNumMultiSampling(), m_render->getLuminousIntensity());
+            MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%5.1ffps %dx MSAA [AL%.1f]", m_timer->getFps(), m_screen->getNumMultiSampling(), m_render->getLuminousIntensity());
          else
-            sprintf(buff, "%5.1ffps %dx MSAA", m_timer->getFps(), m_screen->getNumMultiSampling());
+            MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%5.1ffps %dx MSAA", m_timer->getFps(), m_screen->getNumMultiSampling());
 #else
-         sprintf(buff, "%5.1ffps %dx MSAA", m_timer->getFps(), m_screen->getNumMultiSampling());
+         MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%5.1ffps %dx MSAA", m_timer->getFps(), m_screen->getNumMultiSampling());
 #endif
       } else {
 #ifdef MY_LUMINOUS
          if (m_render->getLuminousIntensity() != 0.0f)
-            sprintf(buff, "%5.1ffps No AA [AL%.1f]", m_timer->getFps(), m_render->getLuminousIntensity());
+            MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%5.1ffps No AA [AL%.1f]", m_timer->getFps(), m_render->getLuminousIntensity());
          else
-            sprintf(buff, "%5.1ffps No AA", m_timer->getFps());
+            MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%5.1ffps No AA", m_timer->getFps());
 #else
-         sprintf(buff, "%5.1ffps No AA", m_timer->getFps());
+         MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%5.1ffps No AA", m_timer->getFps());
 #endif
       }
       if (m_option->getUseShadow()) {
@@ -3242,11 +3242,11 @@ bool MMDAgent::renderScene()
    if (m_dispLog) {
       /* show adjustment time for audio */
       if (m_option->getMotionAdjustTime() > 0.0f)
-         sprintf(buff, "%d msec advance (current motion: %+d)", (int)(m_option->getMotionAdjustTime() * 1000.0f + 0.5f), (int)(m_timer->getCurrentAdjustmentFrame() * 1000.0 / 30.0 + 0.5f));
+         MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%d msec advance (current motion: %+d)", (int)(m_option->getMotionAdjustTime() * 1000.0f + 0.5f), (int)(m_timer->getCurrentAdjustmentFrame() * 1000.0 / 30.0 + 0.5f));
       else if (m_option->getMotionAdjustTime() < 0.0f)
-         sprintf(buff, "%d msec delay (current motion: %+d)", (int)(m_option->getMotionAdjustTime() * 1000.0f - 0.5f), (int)(m_timer->getCurrentAdjustmentFrame() * 1000.0 / 30.0 - 0.5f));
+         MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%d msec delay (current motion: %+d)", (int)(m_option->getMotionAdjustTime() * 1000.0f - 0.5f), (int)(m_timer->getCurrentAdjustmentFrame() * 1000.0 / 30.0 - 0.5f));
       else
-         sprintf(buff, "%d msec (current motion: %+d)", (int)(m_option->getMotionAdjustTime() * 1000.0f + 0.5f), (int)(m_timer->getCurrentAdjustmentFrame() * 1000.0 / 30.0 + 0.5f));
+         MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%d msec (current motion: %+d)", (int)(m_option->getMotionAdjustTime() * 1000.0f + 0.5f), (int)(m_timer->getCurrentAdjustmentFrame() * 1000.0 / 30.0 + 0.5f));
       if (m_font == NULL || m_font->getTextDrawElements(buff, &m_elem, m_elem.textLen, MMDAGENT_INDICATOR_OFFSET, y_offset + 1.1f * 2.0f, 0.0f) == false) {
          m_elem.textLen = 0; /* reset */
          m_elem.numIndices = 0;
@@ -3254,7 +3254,7 @@ bool MMDAgent::renderScene()
    }
    if (m_dispLog) {
       /* show camera parameters */
-      m_render->getInfoString(buff);
+      m_render->getInfoString(buff, MMDAGENT_MAXBUFLEN);
       if (m_font == NULL || m_font->getTextDrawElements(buff, &m_elem, m_elem.textLen, MMDAGENT_INDICATOR_OFFSET, y_offset + 1.1f * 1.0f, 0.0f) == false) {
          m_elem.textLen = 0; /* reset */
          m_elem.numIndices = 0;
@@ -3267,9 +3267,9 @@ bool MMDAgent::renderScene()
          if (m_model[i].isEnable() == true) {
             m_model[i].getCurrentPosition(&pos);
             if (MMDAgent_strlen(buff) <= 0)
-               sprintf(buff, "(%.2f, %.2f, %.2f)", pos.x(), pos.y(), pos.z());
+               MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "(%.2f, %.2f, %.2f)", pos.x(), pos.y(), pos.z());
             else
-               sprintf(buff, "%s (%.2f, %.2f, %.2f)", buff, pos.x(), pos.y(), pos.z());
+               MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s (%.2f, %.2f, %.2f)", buff, pos.x(), pos.y(), pos.z());
          }
       }
    }
@@ -3656,7 +3656,7 @@ void MMDAgent::sendLogString(int id, unsigned int flag, const char * format, ...
       return;
 
    va_start(argv, format);
-   vsprintf(buf, format, argv);
+   vsnprintf(buf, MMDAGENT_MAXBUFLEN, format, argv);
    va_end(argv);
 
    if (m_message != NULL)
@@ -3809,7 +3809,7 @@ void MMDAgent::setButtonsInDir(const char *dir)
    m_buttonTop = NULL;
    for (i = 0; i < 10; i++) {
       /* read button defs */
-      sprintf(buff, "%s%cBUTTON%d.txt", dir, MMDAGENT_DIRSEPARATOR, i);
+      MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%cBUTTON%d.txt", dir, MMDAGENT_DIRSEPARATOR, i);
       if (MMDAgent_exist(buff) == false)
          continue;
       b = new Button;
@@ -3827,7 +3827,7 @@ void MMDAgent::setButtonsInDir(const char *dir)
       /* find child */
       blocal = NULL;
       for (j = 0; j < 10; j++) {
-         sprintf(buff, "%s%cBUTTON%d-%d.txt", dir, MMDAGENT_DIRSEPARATOR, i, j);
+         MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%cBUTTON%d-%d.txt", dir, MMDAGENT_DIRSEPARATOR, i, j);
          if (MMDAgent_exist(buff) == false)
             continue;
          b2 = new Button;
@@ -3945,7 +3945,7 @@ bool MMDAgent::requireSystemUpdate()
       return false;
 
    ret = false;
-   sprintf(buff, "%s%c%s", m_systemDirName, MMDAGENT_DIRSEPARATOR, MMDAGENT_CONTENTINFOFILE);
+   MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%c%s", m_systemDirName, MMDAGENT_DIRSEPARATOR, MMDAGENT_CONTENTINFOFILE);
    prop = new KeyValue;
    prop->setup();
    if (prop->load(buff, NULL) && prop->exist("LastModifiedEpochTime")) {
@@ -4254,7 +4254,7 @@ void MMDAgent::updateCurrentSystem()
    if (m_systemDirName == NULL)
       return;
 
-   sprintf(buff, "%s%c%s", m_systemDirName, MMDAGENT_DIRSEPARATOR, MMDAGENT_CONTENTINFOFILE);
+   MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%c%s", m_systemDirName, MMDAGENT_DIRSEPARATOR, MMDAGENT_CONTENTINFOFILE);
    prop = new KeyValue;
    prop->setup();
    if (prop->load(buff, NULL) && prop->exist("DownloadCompleted")) {
@@ -4285,7 +4285,7 @@ void MMDAgent::deleteContents()
       return;
    while (MMDAgent_readdir(d, buff) == true) {
       if (buff[0] != '.' && buff[0] != '_') {
-         sprintf(buff2, "%s%c%s", contentDirName, MMDAGENT_DIRSEPARATOR, buff);
+         MMDAgent_snprintf(buff2, MMDAGENT_MAXBUFLEN, "%s%c%s", contentDirName, MMDAGENT_DIRSEPARATOR, buff);
          MMDAgent_rmdir(buff2);
       }
    }
@@ -4427,7 +4427,7 @@ void MMDAgent::deleteAllContentsInCache()
       return;
    while (MMDAgent_readdir(d, buff) == true) {
       if (buff[0] != '.') {
-         sprintf(buff2, "%s%c%s", contentDirName, MMDAGENT_DIRSEPARATOR, buff);
+         MMDAgent_snprintf(buff2, MMDAGENT_MAXBUFLEN, "%s%c%s", contentDirName, MMDAGENT_DIRSEPARATOR, buff);
          s = MMDAgent_stat(buff2);
          if (s == MMDAGENT_STAT_DIRECTORY)
             MMDAgent_rmdir(buff2);

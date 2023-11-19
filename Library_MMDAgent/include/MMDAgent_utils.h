@@ -56,7 +56,8 @@
 
 /* definitions */
 #ifdef WIN32
-#define MMDAgent_snprintf _snprintf_s
+//#define MMDAgent_snprintf _snprintf_s
+#define MMDAgent_snprintf(A,B,...) _snprintf_s(A, B, _TRUNCATE, __VA_ARGS__)
 #else
 #define MMDAgent_snprintf snprintf
 #include <ctype.h>

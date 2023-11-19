@@ -55,11 +55,10 @@
 /* ----------------------------------------------------------------- */
 
 /* definitions */
-/* definitions */
 #ifdef WIN32
-#define MMDFiles_snprintf _snprintf_s
+#define MMDFiles_snprintf(A,B,...) _snprintf_s(A, B, _TRUNCATE, __VA_ARGS__)
 #else
-#define MMDFiles_snprintf snprintf
+#define MMDAgent_snprintf snprintf
 #include <ctype.h>
 #endif
 

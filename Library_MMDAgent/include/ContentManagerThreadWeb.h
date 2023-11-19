@@ -157,7 +157,7 @@ public:
    const char *getContentMDFFile();
 
    /* getProgress: get progress information */
-   void getProgress(char *buff_ret, float *rate_ret);
+   void getProgress(char *buff_ret, int buff_ret_len, float *rate_ret);
 
    /* getContentMessage: get content message */
    char *getContentMessage();

@@ -283,7 +283,7 @@ private:
          return;
 
       va_start(argv, format);
-      vsprintf(buf, format, argv);
+      vsnprintf(buf, MMDAGENT_MAXBUFLEN, format, argv);
       va_end(argv);
 
       m_mmdagent->sendLogString(m_id, flag, buf);

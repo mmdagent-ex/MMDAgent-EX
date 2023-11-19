@@ -437,11 +437,11 @@ void ContentManager::updateAndRender()
    /* call rendering functions for existing threads */
    renderBegin();
    if (m_zip) {
-      m_zip->getProgress(buff, &rate);
+      m_zip->getProgress(buff, MMDAGENT_MAXBUFLEN, &rate);
       render(buff, rate);
    }
    if (m_web) {
-      m_web->getProgress(buff, &rate);
+      m_web->getProgress(buff, MMDAGENT_MAXBUFLEN, &rate);
       render(buff, rate);
    }
    renderEnd();

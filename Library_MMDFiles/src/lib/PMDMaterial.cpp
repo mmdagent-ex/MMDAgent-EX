@@ -229,17 +229,17 @@ bool PMDMaterial::loadTexture(char *textureFileString, PMDTextureLoader *texture
       if (p) {
          /* has extra sphere map */
          len = p - &(textureFileString[0]);
-         sprintf(buf, "%s%c", dir, MMDFILES_DIRSEPARATOR);
+         MMDFiles_snprintf(buf, MMDFILES_MAXBUFLEN, "%s%c", dir, MMDFILES_DIRSEPARATOR);
          strncat(buf, textureFileString, len);
          m_texture = textureLoader->load(buf, textureFileString);
          if (!m_texture)
             ret = false;
-         sprintf(buf, "%s%c%s", dir, MMDFILES_DIRSEPARATOR, p + 1);
+         MMDFiles_snprintf(buf, MMDFILES_MAXBUFLEN, "%s%c%s", dir, MMDFILES_DIRSEPARATOR, p + 1);
          m_additionalTexture = textureLoader->load(buf, textureFileString);
          if (!m_additionalTexture)
             ret = false;
       } else {
-         sprintf(buf, "%s%c%s", dir, MMDFILES_DIRSEPARATOR, textureFileString);
+         MMDFiles_snprintf(buf, MMDFILES_MAXBUFLEN, "%s%c%s", dir, MMDFILES_DIRSEPARATOR, textureFileString);
          m_texture = textureLoader->load(buf, textureFileString);
          if (!m_texture)
             ret = false;
@@ -416,7 +416,7 @@ void PMDMaterial::setExtParam(bool edge, float edgeSize, float *col, float alpha
    ret = true;
    if (texFile != NULL) {
       name = MMDFiles_strdup_from_sjis_to_utf8(texFile);
-      sprintf(buf, "%s%c%s", dir, MMDFILES_DIRSEPARATOR, name);
+      MMDFiles_snprintf(buf, MMDFILES_MAXBUFLEN, "%s%c%s", dir, MMDFILES_DIRSEPARATOR, name);
       m_texture = textureLoader->load(buf, name, false, false);
       if (!m_texture) {
          ret = false;
@@ -425,7 +425,7 @@ void PMDMaterial::setExtParam(bool edge, float edgeSize, float *col, float alpha
    }
    if (sphereFile != NULL && (sphereMode == 1 || sphereMode == 2)) {
       name = MMDFiles_strdup_from_sjis_to_utf8(sphereFile);
-      sprintf(buf, "%s%c%s", dir, MMDFILES_DIRSEPARATOR, name);
+      MMDFiles_snprintf(buf, MMDFILES_MAXBUFLEN, "%s%c%s", dir, MMDFILES_DIRSEPARATOR, name);
       if (texFile != NULL) {
          m_additionalTexture = textureLoader->load(buf, name, true, sphereMode == 2 ? true : false);
          if (!m_additionalTexture) {

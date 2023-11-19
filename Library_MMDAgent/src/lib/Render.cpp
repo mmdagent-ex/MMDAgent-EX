@@ -1683,9 +1683,9 @@ void Render::getCurrentViewTransform(btTransform *tr)
 }
 
 /* Render::getInfoString: store current view parameters to buffer */
-void Render::getInfoString(char *buf)
+void Render::getInfoString(char *buf, int buflen)
 {
-   sprintf(buf, "%.2f, %.2f, %.2f | %.2f, %.2f, %.2f | %.2f | %.2f", m_currentTrans.x(), m_currentTrans.y(), m_currentTrans.z(), m_angle.x(), m_angle.y(), m_angle.z(), m_currentDistance, m_currentFovy);
+   MMDAgent_snprintf(buf, buflen, "%.2f, %.2f, %.2f | %.2f, %.2f, %.2f | %.2f | %.2f", m_currentTrans.x(), m_currentTrans.y(), m_currentTrans.z(), m_angle.x(), m_angle.y(), m_angle.z(), m_currentDistance, m_currentFovy);
 }
 
 /* Render::clearScreen: clear screen */

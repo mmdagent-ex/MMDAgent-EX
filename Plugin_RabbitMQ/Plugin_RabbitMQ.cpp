@@ -179,7 +179,7 @@ EXPORT void extUpdate(MMDAgent *mmdagent, double deltaFrame)
    if (enable == false)
       return;
    if (m_sync)
-      m_sync->update(deltaFrame);
+      m_sync->update((float)deltaFrame);
 }
 
 

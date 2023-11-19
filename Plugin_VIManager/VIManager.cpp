@@ -724,7 +724,7 @@ bool VIManager::checkStringMatchRegExp(const char *vstr, const char *str1, const
 
    /* set target pattern */
    if (str2 != NULL)
-      sprintf(buf2, "%s%c%s", str1, VIMANAGER_SEPARATOR1, str2);
+      MMDAgent_snprintf(buf2, MMDAGENT_MAXBUFLEN, "%s%c%s", str1, VIMANAGER_SEPARATOR1, str2);
    else
       strcpy(buf2, str1);
 
@@ -750,7 +750,7 @@ bool VIManager::checkStringMatchRegExp(const char *vstr, const char *str1, const
    if (match == true) {
       /* set numeric variables */
       for (i = 0; i < n; i++) {
-         sprintf(buf2, "%d", i + 1);
+         MMDAgent_snprintf(buf2, MMDAGENT_MAXBUFLEN, "%d", i + 1);
          VIManager_VList_set(&m_variableList, buf2, result[i].c_str());
          m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: $%s=%s", m_name, buf2, result[i].c_str());
       }
@@ -1192,16 +1192,16 @@ bool VIManager::load(MMDAgent *mmdagent, int id, ZFileKey *key, const char *file
    return ret;
 }
 
-static void dispNum(char *buff, VIManager_State *s1, VIManager_State *s2)
+static void dispNum(char *buff, int bufflen, VIManager_State *s1, VIManager_State *s2)
 {
    if (s1->virtual_fromState && s2->virtual_fromState)
-      sprintf(buff, "[%s -> %s]", s1->virtual_fromState->label, s2->virtual_toState->label);
+      MMDAgent_snprintf(buff, bufflen, "[%s -> %s]", s1->virtual_fromState->label, s2->virtual_toState->label);
    else if (s1->virtual_fromState)
-      sprintf(buff, "[%s ->] %s", s1->virtual_fromState->label, s2->label);
+      MMDAgent_snprintf(buff, bufflen, "[%s ->] %s", s1->virtual_fromState->label, s2->label);
    else if (s2->virtual_fromState)
-      sprintf(buff, "%s [-> %s]", s1->label, s2->virtual_toState->label);
+      MMDAgent_snprintf(buff, bufflen, "%s [-> %s]", s1->label, s2->virtual_toState->label);
    else
-      sprintf(buff, "%s %s", s1->label, s2->label);
+      MMDAgent_snprintf(buff, bufflen, "%s %s", s1->label, s2->label);
 }
 
 /* VIManager::transition: state transition (if jumped, return arc) */
@@ -1227,7 +1227,7 @@ bool VIManager::transition(const char *itype, const InputArguments *iargs, char 
    for (arc = arc_list->head; arc != NULL; arc = arc->next) {
       /* check if input matches this arc, consulting variables and wildcards */
       if (checkArcMatch(arc->input_event_type, itype, &arc->input_event_args, iargs)) {
-         dispNum(buff, m_currentState, arc->next_state);
+         dispNum(buff, 128, m_currentState, arc->next_state);
          if (iargs == NULL || iargs->str == NULL)
             m_mmdagent->sendLogString(m_id, MLOG_MESSAGE_CAPTURED, "%s", itype);
          else

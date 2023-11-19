@@ -181,7 +181,7 @@ char *MMDAgent_intdup(const int digit)
    }
 
    p = (char *) malloc(sizeof(char) * size);
-   sprintf(p, "%d", digit);
+   MMDAgent_snprintf(p, sizeof(char) * size, "%d", digit);
    return p;
 }
 
@@ -502,7 +502,7 @@ DIRECTORY *MMDAgent_opendir(const char *name)
    if(MMDAgent_strlen(name) <= 0)
       strcpy(buff, "*");
    else
-      sprintf(buff, "%s%c*", name, MMDAGENT_DIRSEPARATOR);
+      MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%c*", name, MMDAGENT_DIRSEPARATOR);
 
    path = MMDAgent_pathdup_from_application_to_system_locale(buff);
    if(path == NULL)
@@ -650,7 +650,7 @@ bool MMDAgent_rmdir(const char *name)
       while(MMDAgent_readdir(dir, buff1) == true) {
          if(MMDAgent_strequal(buff1, ".") == true || MMDAgent_strequal(buff1, "..") == true)
             continue;
-         sprintf(buff2, "%s%c%s", name, MMDAGENT_DIRSEPARATOR, buff1);
+         MMDAgent_snprintf(buff2, MMDAGENT_MAXBUFLEN, "%s%c%s", name, MMDAGENT_DIRSEPARATOR, buff1);
          MMDAgent_rmdir(buff2);
          p = MMDFiles_pathdup_from_application_to_system_locale(buff2);
 #ifdef _WIN32
@@ -709,11 +709,11 @@ char *MMDAgent_tmpdirdup()
    char buff1[MMDAGENT_MAXBUFLEN];
 
 #if defined(_WIN32)
-   sprintf(buff1, "%s%d", "MMDAgent-", (int) GetCurrentProcessId());
+   MMDAgent_snprintf(buff1, MMDAGENT_MAXBUFLEN, "%s%d", "MMDAgent-", (int) GetCurrentProcessId());
 #elif defined(__ANDROID__)
-   sprintf(buff1, "%s%d%s%d", "MMDAgent-", getuid(), "-", getpid());
+   MMDAgent_snprintf(buff1, MMDAGENT_MAXBUFLEN, "%s%d%s%d", "MMDAgent-", getuid(), "-", getpid());
 #else
-   sprintf(buff1, "%s%d%s%d", "MMDAgent-", getuid(), "-", getpid());
+   MMDAgent_snprintf(buff1, MMDAGENT_MAXBUFLEN, "%s%d%s%d", "MMDAgent-", getuid(), "-", getpid());
 #endif /* _WIN32 && __ANDROID__ */
 
    path = MMDFiles_pathdup_from_system_locale_to_application(buff1);
@@ -748,11 +748,11 @@ char *MMDAgent_contentdirdup()
       result = RegQueryValueEx(key, "Desktop", NULL, &type, (LPBYTE)(LPCTSTR)&buff2, &size);
       if (result != ERROR_SUCCESS)
          return MMDAgent_tmpdirdup();
-      sprintf(buff, "%s/MMDAgent-Contents", buff2);
+      MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s/MMDAgent-Contents", buff2);
    }
 #elif TARGET_OS_IPHONE
    /* ~/Library/Caches */
-   sprintf(buff, "%s/Library/Caches", getenv("HOME"));
+   MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s/Library/Caches", getenv("HOME"));
 #elif defined(__ANDROID__)
    if (localContentDir)
       strcpy(buff, localContentDir);
@@ -763,7 +763,7 @@ char *MMDAgent_contentdirdup()
    if (std::getenv("MMDAgentContentDir") != NULL)
       strcpy(buff, std::getenv("MMDAgentContentDir"));
    else
-      sprintf(buff, "%s/MMDAgent-Contents", std::getenv("HOME"));
+      MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s/MMDAgent-Contents", std::getenv("HOME"));
 #endif
 
    path = MMDFiles_pathdup_from_system_locale_to_application(buff);

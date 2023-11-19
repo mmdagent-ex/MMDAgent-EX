@@ -106,7 +106,7 @@ public:
    void prepare(const char *str);
 
    /* getPhonemeSequence: get phoneme sequence */
-   void getPhonemeSequence(char *str);
+   void getPhonemeSequence(char *str, int strlen);
 
    /* synthesis: speech synthesis */
    void synthesis();

@@ -404,7 +404,7 @@ EXPORT void extProcMessage(MMDAgent *mmdagent, const char *type, const char *arg
       p1 = MMDAgent_strtok(buff, "|", &save);
       p2 = MMDAgent_strtok(NULL, "|", &save);
       if (MMDAgent_strequal(p1, JULIUSTHREAD_CHANGECONF)) {
-         sprintf(buff2, "%s.txt", p2);
+         MMDAgent_snprintf(buff2, MMDAGENT_MAXBUFLEN, "%s.txt", p2);
          julius_thread.stopAndRelease();
          mmdagent->sendMessage(mid, MMDAGENT_EVENT_PLUGINDISABLE, "%s", PLUGINJULIUS_NAME);
          startJulius(mmdagent, buff2);

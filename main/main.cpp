@@ -1206,11 +1206,11 @@ int commonMainExec(int argc, char **argv)
    }
    systemConfigFileName = MMDAgent_strdup(buff);
    systemDirName = MMDAgent_dirname(argv[0]);
-   sprintf(buff, "%s%c%s", systemDirName, MMDAGENT_DIRSEPARATOR, "Plugins");
+   MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%c%s", systemDirName, MMDAGENT_DIRSEPARATOR, "Plugins");
    pluginDirName = MMDAgent_strdup(buff);
 
    /* if system URL is defined in a file, try to update the system */
-   sprintf(buff, "%s%c%s", systemDirName, MMDAGENT_DIRSEPARATOR, "site");
+   MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%c%s", systemDirName, MMDAGENT_DIRSEPARATOR, "site");
    FILE *fp = MMDAgent_fopen(buff, "rb");
    if (fp) {
       char readbuf[1024];
@@ -1405,12 +1405,12 @@ void android_main(struct android_app *app)
 
    /* set paths */
    systemDirName = MMDAgent_strdup(path);
-   sprintf(buff, "%s%c%s", systemDirName, MMDAGENT_DIRSEPARATOR, "MMDAgent-EX.mdf");
+   MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%c%s", systemDirName, MMDAGENT_DIRSEPARATOR, "MMDAgent-EX.mdf");
    systemConfigFileName = MMDAgent_strdup(buff);
    pluginDirName = MMDAgent_strdup("/data/data/org.lee_lab.pocketmmdagent/lib");
 
    /* if AppData does not exist in system dir, download to ContentDir/_sys */
-   sprintf(buff, "%s%c%s", systemDirName, MMDAGENT_DIRSEPARATOR, "AppData");
+   MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%c%s", systemDirName, MMDAGENT_DIRSEPARATOR, "AppData");
    if (MMDAgent_existdir(buff)) {
       /* AppData exist on the same dir of executable: no download */
    } else {
@@ -1419,7 +1419,7 @@ void android_main(struct android_app *app)
       if (contentDownloadDir != NULL) {
          if (MMDAgent_existdir(contentDownloadDir) || MMDAgent_mkdir(contentDownloadDir) == true) {
             /* content dir exists */
-            sprintf(buff, "%s%c%s", contentDownloadDir, MMDAGENT_DIRSEPARATOR, "_sys");
+            MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%c%s", contentDownloadDir, MMDAGENT_DIRSEPARATOR, "_sys");
             if (MMDAgent_existdir(buff) || MMDAgent_mkdir(buff) == true) {
                /* system cache dir under content dir exists */
                free(systemDirName);

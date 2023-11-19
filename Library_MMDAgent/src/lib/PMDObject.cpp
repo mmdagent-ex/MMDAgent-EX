@@ -942,9 +942,9 @@ void PMDObject::renderText(FTGLTextureFont *font, bool displayModelNameFlag)
       pos = m_pmd->getCenterBone()->getTransform()->getOrigin();
       /* render model name */
       if (m_pmd->getName()) {
-         sprintf(buf, "%s(%s)", m_alias, m_pmd->getName());
+         MMDAgent_snprintf(buf, MMDAGENT_MAXBUFLEN, "%s(%s)", m_alias, m_pmd->getName());
       } else {
-         sprintf(buf, "%s", m_alias);
+         MMDAgent_snprintf(buf, MMDAGENT_MAXBUFLEN, "%s", m_alias);
       }
       if (font->getTextDrawElements(buf, &m_nameElem, 0, pos.x() + 2.0f, m_pmd->getMaxHeight() + 2.0f, 0.0f) == false) {
          m_nameElem.textLen = 0; /* reset */

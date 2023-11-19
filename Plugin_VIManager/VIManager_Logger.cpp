@@ -99,21 +99,21 @@ void VIManager_Logger::setup(MMDAgent *mmdagent)
    m_mmdagent = mmdagent;
 }
 
-static void dispNum(char *buff, VIManager_State *s1, VIManager_State *s2)
+static void dispNum(char *buff, int bufflen, VIManager_State *s1, VIManager_State *s2)
 {
    if (s1 == NULL)
       if (s2->virtual_fromState)
-         sprintf(buff, "(initial state) [-> %s]", s2->virtual_toState->label);
+         MMDAgent_snprintf(buff, bufflen, "(initial state) [-> %s]", s2->virtual_toState->label);
       else
-         sprintf(buff, "(initial state) %s", s2->label);
+         MMDAgent_snprintf(buff, bufflen, "(initial state) %s", s2->label);
    else if (s1->virtual_fromState && s2->virtual_fromState)
-      sprintf(buff, "[%s -> %s]", s1->virtual_fromState->label, s2->virtual_toState->label);
+      MMDAgent_snprintf(buff, bufflen, "[%s -> %s]", s1->virtual_fromState->label, s2->virtual_toState->label);
    else if (s1->virtual_fromState)
-      sprintf(buff, "[%s ->] %s", s1->virtual_fromState->label, s2->label);
+      MMDAgent_snprintf(buff, bufflen, "[%s ->] %s", s1->virtual_fromState->label, s2->label);
    else if (s2->virtual_fromState)
-      sprintf(buff, "%s [-> %s]", s1->label, s2->virtual_toState->label);
+      MMDAgent_snprintf(buff, bufflen, "%s [-> %s]", s1->label, s2->virtual_toState->label);
    else
-      sprintf(buff, "%s %s", s1->label, s2->label);
+      MMDAgent_snprintf(buff, bufflen, "%s %s", s1->label, s2->label);
 }
 
 /* VIManager_Logger::addArcToElement: add arc to element */
@@ -156,7 +156,7 @@ void VIManager_Logger::addVariableToElement(VIManager_Variable *v, float x, floa
 {
    char buf[MMDAGENT_MAXBUFLEN];
 
-   sprintf(buf, "$%s=%s", v->name, v->value);
+   MMDAgent_snprintf(buf, MMDAGENT_MAXBUFLEN, "$%s=%s", v->name, v->value);
    if (m_mmdagent->getTextureFont())
       m_mmdagent->getTextureFont()->getTextDrawElements(buf, &m_elem, m_elem.textLen, x, y, 0.0f);
 }

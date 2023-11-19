@@ -575,9 +575,9 @@ void Julius_Thread::run()
 
    /* set latency */
 #if !defined(__APPLE__) && !defined(__ANDROID__)
-   sprintf(buff, "PA_MIN_LATENCY_MSEC=%d", JULIUSTHREAD_LATENCY);
+   MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "PA_MIN_LATENCY_MSEC=%d", JULIUSTHREAD_LATENCY);
    putenv(buff);
-   sprintf(buff, "LATENCY_MSEC=%d", JULIUSTHREAD_LATENCY);
+   MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "LATENCY_MSEC=%d", JULIUSTHREAD_LATENCY);
    putenv(buff);
 #endif
 

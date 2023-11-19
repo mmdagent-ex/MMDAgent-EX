@@ -286,9 +286,9 @@ bool PMDModel::parse(const unsigned char *data, unsigned long size, BulletPhysic
       /* assign default toon textures for toon shading */
       for (j = 0; j <= 10; j++) {
          if (j == 0)
-            sprintf(buf, "%s%ctoon0.bmp", dir, MMDFILES_DIRSEPARATOR);
+            MMDFiles_snprintf(buf, MMDFILES_MAXBUFLEN, "%s%ctoon0.bmp", dir, MMDFILES_DIRSEPARATOR);
          else
-            sprintf(buf, "%s%ctoon%02d.bmp", dir, MMDFILES_DIRSEPARATOR, j);
+            MMDFiles_snprintf(buf, MMDFILES_MAXBUFLEN, "%s%ctoon%02d.bmp", dir, MMDFILES_DIRSEPARATOR, j);
          /* if "toon??.bmp" exist at the same directory as PMD file, use it */
          /* if not exist or failed to read, use system default toon textures */
          if (MMDFiles_exist(buf)) {
@@ -319,7 +319,7 @@ bool PMDModel::parse(const unsigned char *data, unsigned long size, BulletPhysic
 
       /* toon texture file list (replace toon01.bmp - toon10.bmp) */
       /* the "toon0.bmp" should be loaded separatedly */
-      sprintf(buf, "%s%ctoon0.bmp", dir, MMDFILES_DIRSEPARATOR);
+      MMDFiles_snprintf(buf, MMDFILES_MAXBUFLEN, "%s%ctoon0.bmp", dir, MMDFILES_DIRSEPARATOR);
       if (MMDFiles_exist(buf)) {
          if (m_localToonTexture[0].load(buf) == true) {
             m_toonTextureID[0] = m_localToonTexture[0].getID();
@@ -332,7 +332,7 @@ bool PMDModel::parse(const unsigned char *data, unsigned long size, BulletPhysic
       }
       for (i = 1; i <= 10; i++) {
          exToonBMPName = MMDFiles_strdup_from_sjis_to_utf8((char *)data);
-         sprintf(buf, "%s%c%s", dir, MMDFILES_DIRSEPARATOR, exToonBMPName);
+         MMDFiles_snprintf(buf, MMDFILES_MAXBUFLEN, "%s%c%s", dir, MMDFILES_DIRSEPARATOR, exToonBMPName);
          if (MMDFiles_exist(buf)) {
             if (m_localToonTexture[i].load(buf) == true) {
                m_toonTextureID[i] = m_localToonTexture[i].getID();
