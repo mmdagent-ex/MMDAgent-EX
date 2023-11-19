@@ -55,6 +55,7 @@ target_compile_definitions(Plugin_VIManager PRIVATE
 target_compile_options(Plugin_VIManager PRIVATE
     -std=c++17
     -Wno-deprecated-declarations
+    -Wno-format-truncation
 )
 
 # library linking

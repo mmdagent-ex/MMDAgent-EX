@@ -176,6 +176,7 @@ target_include_directories(BulletPhysics PRIVATE
 target_compile_options(BulletPhysics PRIVATE
     -march=native
     -ffast-math
+    -Wno-stringop-overflow
 )
 
 ##############

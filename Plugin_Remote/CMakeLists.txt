@@ -65,6 +65,7 @@ target_compile_definitions(Plugin_Remote PRIVATE
 target_compile_options(Plugin_Remote PRIVATE
     -std=c++17
     -Wno-deprecated-declarations
+    -Wno-format-truncation
 )
 
 # library linking

@@ -3161,7 +3161,7 @@ bool MMDAgent::renderScene()
    }
    if (m_holdMotion) {
       /* show holding message */
-      strncat(buff, " <<HOLD>>", MMDAGENT_MAXBUFLEN);
+      strcat(buff, " <<HOLD>>");
    }
    if (MMDAgent_strlen(buff) > 0) {
       if (m_font == NULL || m_font->getTextDrawElements(buff, &m_elem, m_elem.textLen, MMDAGENT_INDICATOR_OFFSET, height - 1.2f - top_space, 0.0f) == false) {
