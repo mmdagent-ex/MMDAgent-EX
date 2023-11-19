@@ -80,6 +80,7 @@ MMDAgent-EX のコードは Apache License, Version 2.0 で提供されていま
 - libpng
 - librdkafka
 - Libsndfile
+- libsamplerate
 - UTF8-CPP
 - google/re2
 - zlib

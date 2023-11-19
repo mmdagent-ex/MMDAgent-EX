@@ -74,7 +74,8 @@ MMDAgent-EX depends on various open-source softwares and libraries. Some of them
 - libjpeg
 - libpng
 - librdkafka
-- Libsndfile
+- libsndfile
+- libsamplerate
 - UTF8-CPP
 - google/re2
 - zlib
