@@ -1487,8 +1487,10 @@ int main(int argc, char **argv)
    setlocale(LC_CTYPE, "");
 
    ic = iconv_open("UTF-8", "");
-   if(ic == (iconv_t) -1)
+   if(ic == (iconv_t) -1) {
+      fprintf(stderr, "Error: failed to open iconv");
       return -1;
+   }
 
    newArgv = (char **) malloc(sizeof(char *) * argc);
    for(i = 0; i < argc; i++) {
@@ -1501,7 +1503,10 @@ int main(int argc, char **argv)
       /* prepare buffer */
       memset(inBuff, 0, PATH_MAX + 1);
       memset(outBuff, 0, PATH_MAX + 1);
-      realpath(argv[i], inBuff);
+      if (realpath(argv[i], inBuff) == NULL) {
+         fprintf(stderr, "Error: failed to resolve real path: %s", argv[i]);
+         return -1;
+      }
 
       inStr = &inBuff[0];
       outStr = &outBuff[0];

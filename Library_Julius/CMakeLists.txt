@@ -202,6 +202,7 @@ target_compile_options(JULIUS PRIVATE
     -march=native
     -ffast-math
     -Wno-deprecated-non-prototype
+    -Wno-format-overflow
 )
 
 ##############
@@ -227,6 +228,7 @@ target_compile_definitions(JULIUS PUBLIC
 # public compiler options required to link with this project
 target_compile_options(JULIUS PUBLIC
     -Wno-writable-strings
+    -Wno-write-strings
 )
 
 # public link libraries to be linked with this project

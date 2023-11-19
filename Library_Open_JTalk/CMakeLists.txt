@@ -134,6 +134,10 @@ target_compile_definitions(OPEN_JTALK PRIVATE
 target_compile_options(OPEN_JTALK PRIVATE
     -Wno-deprecated-declarations
 )
+# set only for C++ compiler
+set_target_properties(OPEN_JTALK PROPERTIES
+    COMPILE_OPTIONS "$<$<COMPILE_LANGUAGE:CXX>:-Wno-register>"
+)
 
 ##############
 # public compiler definitions (-D) required to link with this project

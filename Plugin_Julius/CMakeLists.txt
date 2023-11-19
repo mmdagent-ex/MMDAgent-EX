@@ -51,6 +51,7 @@ target_compile_definitions(Plugin_Julius PRIVATE
 # compiler options for build
 target_compile_options(Plugin_Julius PRIVATE
    -Wno-deprecated-declarations
+   -Wno-format-truncation   
 )
 
 # library linking

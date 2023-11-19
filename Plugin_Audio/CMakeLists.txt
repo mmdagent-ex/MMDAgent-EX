@@ -47,6 +47,7 @@ target_compile_definitions(Plugin_Audio PRIVATE
 
 target_compile_options(Plugin_Audio PRIVATE
    -Wno-deprecated-declarations
+   -Wno-format-truncation
 )
 
 #library linking
