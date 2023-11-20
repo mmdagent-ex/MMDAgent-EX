@@ -80,11 +80,20 @@ target_include_directories(MMDAGENT BEFORE PRIVATE
 )
 
 # compiler definitions (-D) for private build
-target_compile_definitions(MMDAGENT PRIVATE
-    GL_GLEXT_PROTOTYPES
-    MMDAGENT
-    MMDAGENT_DONTPICKMODEL
-)
+if(APPLE)
+    target_compile_definitions(MMDAGENT PRIVATE
+        GL_GLEXT_PROTOTYPES
+        MMDAGENT
+        MMDAGENT_DONTPICKMODEL
+        NO_OFFSCREEN_RENDERING
+    )
+else()
+    target_compile_definitions(MMDAGENT PRIVATE
+        GL_GLEXT_PROTOTYPES
+        MMDAGENT
+        MMDAGENT_DONTPICKMODEL
+    )
+endif()
 
 # compiler options for private build
 if(APPLE)

@@ -64,17 +64,6 @@
 #include "android/log.h"
 #endif
 
-#if defined(__APPLE__)
-#if TARGET_OS_IPHONE
-#else
-#include <time.h>
-#include <sys/time.h>
-/* OSX does not allow compatibility profile that allows both <=2.1 and >=3.2 API */
-/* part of off-screen rendering using 3.2 API, so off-screen rendering is disabled on OSX */
-#define NO_OFFSCREEN_RENDERING
-#endif
-#endif /* __APPLE__ */
-
 #include <omp.h>
 
 #ifndef HISTORYSAVEPATH
