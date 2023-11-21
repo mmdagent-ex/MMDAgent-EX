@@ -107,6 +107,7 @@ Disallowed usage of our software:
   - Coordinated inauthentic behavior
   - Plagiarism
   - Disinformation
+  - Impersonation or misrepresentation of an actual person, group, or organization for the purpose of deceiving others
 - Actions harmful to the MikuMikuDance related community and its fun society:
   - Creation and disribution of contents that violates the rights of copyright holders of models, motions, music, etc.
   - Ignoring guidelines set by the copyright holders.
