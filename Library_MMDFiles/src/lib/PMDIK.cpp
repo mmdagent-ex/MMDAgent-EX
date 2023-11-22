@@ -108,7 +108,7 @@ void PMDIK::setup(PMDFile_IK *ik, const unsigned char *data, PMDBone *boneList)
       }
    }
    m_iteration = ik->numIteration;
-   m_angleConstraint = ik->angleConstraint * PMDIK_PI;
+   m_angleConstraint = ik->angleConstraint * 4.0f;
 }
 
 /* PMDIK::solve: try to move targetBone toward destBone, solving constraint among bones in boneList[] and the targetBone */
@@ -207,30 +207,27 @@ void PMDIK::solve()
          rot = btQuaternion(axis, btScalar(angle));
          /* if this bone has limitation for rotation, consult the limitation */
          if (m_boneList[j]->isLimitAngleX()) {
-            if (ite == 0) {
+            /* get euler angles of this rotation */
+            mat.setRotation(rot);
+            mat.getEulerZYX(z, y, x);
+            /* get euler angles of current bone rotation (specified by the motion) */
+            m_boneList[j]->getCurrentRotation(&tmpRot);
+            mat.setRotation(tmpRot);
+            mat.getEulerZYX(cz, cy, cx);
+            if (ite == 0 && cx < m_angleConstraint) {
                /* when this is the first iteration, we force rotating to the maximum angle toward limited direction */
                /* this will help convergence the whole IK step earlier for most of models, especially for legs */
                if (angle < 0.0f)
-                  angle = - angle;
+                  angle = -angle;
                rot = btQuaternion(btVector3(btScalar(1.0f), btScalar(0.0f), btScalar(0.0f)), btScalar(angle));
             } else {
-               /* get euler angles of this rotation */
-               mat.setRotation(rot);
-               mat.getEulerZYX(z, y, x);
-               /* get euler angles of current bone rotation (specified by the motion) */
-               m_boneList[j]->getCurrentRotation(&tmpRot);
-               mat.setRotation(tmpRot);
-               mat.getEulerZYX(cz, cy, cx);
-               /* y and z should be zero, x should be over 0 */
+               /* y and z should be zero, x should be from 0 to PI */
+               if (cx < -PMDIK_PI * 0.5f)
+                  cx += PMDIK_PI * 2.0f;
                if (x + cx > PMDIK_PI)
                   x = PMDIK_PI - cx;
                if (PMDIK_MINROTSUM > x + cx)
                   x = PMDIK_MINROTSUM - cx;
-               /* apply the rotation limit factor */
-               if (x < -m_angleConstraint)
-                  x = -m_angleConstraint;
-               if (x > m_angleConstraint)
-                  x = m_angleConstraint;
                /* if rotation becomes minimal by the limitation, skip to next bone */
                if (fabsf(x) < PMDIK_MINROTATION)
                   continue;
