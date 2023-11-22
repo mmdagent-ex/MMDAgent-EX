@@ -118,6 +118,10 @@ MMDAgent-EX のコードは Apache License, Version 2.0 で提供されていま
   - 権利者が定めるガイドラインに従わない利用
   - 不当な二次配布・盗用・作者なりすまし
 
+## リンク
+
+- [名工大 李 研究室](https://www.slp.nitech.ac.jp/)
+
 ## Acknowledgments
 
 MMDAgent-EX:

@@ -113,6 +113,10 @@ Disallowed usage of our software:
   - Ignoring guidelines set by the copyright holders.
   - Unauthorized redistribution, plagiarism, and impersonation of the original creators.
 
+## Links
+
+- [Lee-Lab, Nitech](https://www.slp.nitech.ac.jp/en/)
+
 ## Acknowledgments
 
 MMDAgent-EX:
