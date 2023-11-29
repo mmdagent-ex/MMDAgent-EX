@@ -96,6 +96,8 @@ EXPORT void extAppStart(MMDAgent *mmdagent)
       /* get values */
       std::string hostStr;
       int port;
+      std::string userStr;
+      std::string passStr;
       std::string nameStr;
       std::string typeStr;
       std::string modeStr;
@@ -105,6 +107,8 @@ EXPORT void extAppStart(MMDAgent *mmdagent)
 
       hostStr = jsonObject->getValue<std::string>("host");
       port = jsonObject->getValue<int>("port");
+      userStr = jsonObject->getValue<std::string>("user");
+      passStr = jsonObject->getValue<std::string>("pass");
 
       Poco::JSON::Array::Ptr connectionList = jsonObject->getArray("connection_list");
       pluginNum = connectionList->size();
@@ -117,19 +121,19 @@ EXPORT void extAppStart(MMDAgent *mmdagent)
          if (MMDAgent_strequal(modeStr.c_str(), "consumer-basic")) {
             /* queue */
             queueStr = connection->getValue<std::string>("queue");
-            pluginList[i] = new RabbitMQ(mmdagent, mid, nameStr.c_str(), RABBITMQ_CONSUMER_MODE, hostStr.c_str(), port, "", "", queueStr.c_str(), m_sync, m_motion_config);
+            pluginList[i] = new RabbitMQ(mmdagent, mid, nameStr.c_str(), RABBITMQ_CONSUMER_MODE, hostStr.c_str(), port, userStr.c_str(), passStr.c_str(), "", "", queueStr.c_str(), m_sync, m_motion_config);
          } else if (MMDAgent_strequal(modeStr.c_str(), "consumer")) {
             /* exchange and bindingkey */
             typeStr = connection->getValue<std::string>("type");
             exchangeStr = connection->getValue<std::string>("exchange");
             bindingkeyStr = connection->getValue<std::string>("bindingkey");
-            pluginList[i] = new RabbitMQ(mmdagent, mid, nameStr.c_str(), RABBITMQ_CONSUMER_MODE, hostStr.c_str(), port, exchangeStr.c_str(), typeStr.c_str(), bindingkeyStr.c_str(), m_sync, m_motion_config);
+            pluginList[i] = new RabbitMQ(mmdagent, mid, nameStr.c_str(), RABBITMQ_CONSUMER_MODE, hostStr.c_str(), port, userStr.c_str(), passStr.c_str(), exchangeStr.c_str(), typeStr.c_str(), bindingkeyStr.c_str(), m_sync, m_motion_config);
          } else if (MMDAgent_strequal(modeStr.c_str(), "producer")) {
             /* exchange and bindingkey */
             typeStr = connection->getValue<std::string>("type");
             exchangeStr = connection->getValue<std::string>("exchange");
             bindingkeyStr = connection->getValue<std::string>("bindingkey");
-            pluginList[i] = new RabbitMQ(mmdagent, mid, nameStr.c_str(), RABBITMQ_PRODUCER_MODE, hostStr.c_str(), port, exchangeStr.c_str(), typeStr.c_str(), bindingkeyStr.c_str(), m_sync, m_motion_config);
+            pluginList[i] = new RabbitMQ(mmdagent, mid, nameStr.c_str(), RABBITMQ_PRODUCER_MODE, hostStr.c_str(), port, userStr.c_str(), passStr.c_str(), exchangeStr.c_str(), typeStr.c_str(), bindingkeyStr.c_str(), m_sync, m_motion_config);
          } else {
             mmdagent->sendLogString(mid, MLOG_ERROR, "error opening file: %s: unknown mode %s", config_file, modeStr.c_str());
             return;

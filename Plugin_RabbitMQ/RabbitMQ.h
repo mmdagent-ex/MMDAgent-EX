@@ -70,6 +70,8 @@ private:
    int m_mode;             // RABBITMQ_{CONSUMER|PRODUCER}_MODE
    char *m_host;           // RabbitMQ host to connect
    int m_port;             // RabbitMQ port number to connect
+   char *m_username;       // credential user name
+   char *m_password;       // credential password
    char *m_exchangename;   // exchange name
    char *m_queuename;      // queue name or routing key
    Thread *m_thread;       // thread instance
@@ -90,7 +92,7 @@ private:
 public:
 
    /* constructor */
-   RabbitMQ(MMDAgent *mmdagent, int id, const char *name, int mode, const char *host, int port, const char *exchangename, const char *type, const char *queuename, AudioLipSync *sync, RabbitMQMotionConfig *motion_config);
+   RabbitMQ(MMDAgent *mmdagent, int id, const char *name, int mode, const char *host, int port, const char *username, const char *password, const char *exchangename, const char *type, const char *queuename, AudioLipSync *sync, RabbitMQMotionConfig *motion_config);
 
    /* destructor */
    ~RabbitMQ();

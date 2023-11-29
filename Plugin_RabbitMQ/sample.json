@@ -1,6 +1,8 @@
 {
    "host" : "localhost",
    "port" : 5672,
+   "user" : "guest",
+   "pass" : "guest",
    "connection_list" : [
       {
          "name" : "cons1",
