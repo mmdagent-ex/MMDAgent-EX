@@ -162,7 +162,7 @@ bool RabbitMQ::on_amqp_error(amqp_rpc_reply_t x, char const *context)
 }
 
 /* constructor */
-RabbitMQ::RabbitMQ(MMDAgent *mmdagent, int id, const char *name, int mode, const char *host, int port, const char *exchangename, const char *type, const char *queuename, AudioLipSync *sync, RabbitMQMotionConfig *motion_config)
+RabbitMQ::RabbitMQ(MMDAgent *mmdagent, int id, const char *name, int mode, const char *host, int port, const char *username, const char *password, const char *exchangename, const char *type, const char *queuename, AudioLipSync *sync, RabbitMQMotionConfig *motion_config)
 {
    m_mmdagent = mmdagent;
    m_id = id;
@@ -171,6 +171,8 @@ RabbitMQ::RabbitMQ(MMDAgent *mmdagent, int id, const char *name, int mode, const
    m_mode = mode;
    m_host = MMDAgent_strdup(host);
    m_port = port;
+   m_username = MMDAgent_strdup(username);
+   m_password = MMDAgent_strdup(password);
    m_exchangename = MMDAgent_strdup(exchangename);
    m_queuename = MMDAgent_strdup(queuename);
    m_active = false;
@@ -188,6 +190,8 @@ RabbitMQ::~RabbitMQ()
    delete m_thread;
    if (m_queuename) free(m_queuename);
    if (m_exchangename) free(m_exchangename);
+   if (m_password) free(m_password);
+   if (m_username) free(m_username);
    if (m_host) free(m_host);
    if (m_name) free(m_name);
 }
@@ -228,7 +232,7 @@ void RabbitMQ::run()
       return;
    }
 
-   if (on_amqp_error(amqp_login(conn, "/", 0, 131072, 0, AMQP_SASL_METHOD_PLAIN, "guest", "guest"), "Logging in")) return;
+   if (on_amqp_error(amqp_login(conn, "/", 0, 131072, 0, AMQP_SASL_METHOD_PLAIN, m_username, m_password), "Logging in")) return;
    amqp_channel_open(conn, 1);
    if (on_amqp_error(amqp_get_rpc_reply(conn), "Opening channel")) return;
 
