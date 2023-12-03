@@ -57,6 +57,7 @@
 /* definitions */
 #ifdef WIN32
 #define MMDFiles_snprintf(A,B,...) _snprintf_s(A, B, _TRUNCATE, __VA_ARGS__)
+#include <windows.h>
 #else
 #define MMDFiles_snprintf snprintf
 #include <ctype.h>
@@ -117,6 +118,17 @@ char *MMDFiles_pathdup_from_application_to_system_locale(const char *str);
 
 /* MMDFiles_pathdup_from_system_locale_to_application: convert path charset from system locale to application */
 char *MMDFiles_pathdup_from_system_locale_to_application(const char *str);
+
+#if defined(_WIN32)
+/* MMDFiles_strdup_from_application_to_widechar: convert string charset from application to wide char */
+WCHAR *MMDFiles_strdup_from_application_to_widechar(const char *str);
+/* MMDFiles_strdup_from_widechar_to_application: convert string charset from wide char to application */
+char *MMDFiles_strdup_from_widechar_to_application(const WCHAR *str);
+/* MMDFiles_pathdup_from_application_to_widechar: convert path charset from application to wide char */
+WCHAR *MMDFiles_pathdup_from_application_to_widechar(const char *str);
+/* MMDFiles_pathdup_from_widechar_to_application: convert path charset from wide char to application */
+char *MMDFiles_pathdup_from_widechar_to_application(const WCHAR *str);
+#endif
 
 /* MMDFiles_dirname: get directory name from path */
 char *MMDFiles_dirname(const char *file);

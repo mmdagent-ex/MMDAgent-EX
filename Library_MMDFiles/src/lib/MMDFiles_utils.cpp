@@ -595,6 +595,118 @@ char *MMDFiles_strdup_from_system_locale_to_application(const char *str)
 #endif
 }
 
+#if defined(_WIN32)
+/* MMDFiles_strdup_from_application_to_widechar: convert string charset from application to wide char */
+WCHAR *MMDFiles_strdup_from_application_to_widechar(const char *str)
+{
+   int result;
+   int wideCharSize;
+   WCHAR *wideCharStr;
+
+   if (str == NULL)
+      return NULL;
+
+   result = MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)str, -1, NULL, 0);
+   if (result <= 0) {
+      return NULL;
+   }
+   wideCharSize = result;
+
+   wideCharStr = (WCHAR *)malloc(sizeof(WCHAR) * (wideCharSize + 1));
+   if (wideCharStr == NULL) {
+      return NULL;
+   }
+
+   result = MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)str, -1, (LPWSTR)wideCharStr, wideCharSize);
+   if (result != wideCharSize) {
+      free(wideCharStr);
+      return NULL;
+   }
+
+   return (wideCharStr);
+}
+
+/* MMDFiles_strdup_from_widechar_to_application: convert string charset from wide char to application */
+char *MMDFiles_strdup_from_widechar_to_application(const WCHAR *wstr)
+{
+   int result;
+   size_t size;
+   char *buff;
+
+   if (wstr == NULL)
+      return NULL;
+
+   result = WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)wstr, -1, NULL, 0, NULL, NULL);
+   if (result <= 0)
+      return NULL;
+   size = (size_t)result;
+
+   buff = (char *)malloc(sizeof(char) * (size + 1));
+   if (buff == NULL)
+      return NULL;
+
+   result = WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)wstr, -1, (LPSTR)buff, size, NULL, NULL);
+   if ((size_t)result != size) {
+      free(buff);
+      return NULL;
+   }
+
+   return buff;
+}
+
+/* MMDFiles_pathdup_from_application_to_widechar: convert path charset from application to wide char */
+WCHAR *MMDFiles_pathdup_from_application_to_widechar(const char *str)
+{
+   size_t i, size, inLen;
+   char *inBuff;
+   WCHAR *outBuff;
+
+   if (str == NULL)
+      return NULL;
+
+   inBuff = MMDFiles_strdup(str);
+   if (inBuff == NULL)
+      return NULL;
+   inLen = strlen(inBuff);
+
+   /* convert directory separator */
+   for (i = 0; i < inLen; i += size) {
+      size = MMDFiles_getcharsize(&inBuff[i]);
+      if (size == 1 && MMDFiles_dirseparator(inBuff[i]) == true)
+         inBuff[i] = MMDFILESUTILS_SYSTEMDIRSEPARATOR;
+   }
+
+   outBuff = MMDFiles_strdup_from_application_to_widechar(inBuff);
+   free(inBuff);
+   return outBuff;
+}
+/* MMDFiles_pathdup_from_widechar_to_application: convert path charset from wide char to application */
+char *MMDFiles_pathdup_from_widechar_to_application(const WCHAR *str)
+{
+   size_t i, size, outLen;
+   char *outBuff;
+
+   if (str == NULL)
+      return NULL;
+
+   outBuff = MMDFiles_strdup_from_widechar_to_application(str);
+   if (outBuff == NULL)
+      return NULL;
+
+   outLen = strlen(outBuff);
+
+   /* convert directory separator */
+   for (i = 0; i < outLen; i += size) {
+      size = MMDFiles_getcharsize(&outBuff[i]);
+      if (size == 1 && MMDFiles_dirseparator(outBuff[i]) == true)
+         outBuff[i] = MMDFILES_DIRSEPARATOR;
+   }
+
+   return outBuff;
+}
+
+#endif
+
 /* MMDFiles_dirname: get directory name from path */
 char *MMDFiles_dirname(const char *file)
 {
@@ -650,20 +762,34 @@ char *MMDFiles_basename(const char *file)
 /* MMDFILES_stat: get file attributes */
 MMDFILES_STAT MMDFiles_stat(const char *file)
 {
-   char *path;
    MMDFILES_STAT ret;
 
    if (file == NULL)
       return MMDFILES_STAT_UNKNOWN;
 
-   path = MMDFiles_pathdup_from_application_to_system_locale(file);
+#if defined(_WIN32)
+   WCHAR *wpath = MMDFiles_pathdup_from_application_to_widechar(file);
+   struct _stat st;
+   if (wpath == NULL)
+      return MMDFILES_STAT_UNKNOWN;
+   if (_wstat(wpath, &st) != 0) {
+      free(wpath);
+      return MMDFILES_STAT_UNKNOWN;
+   }
+   free(wpath);
+#else
+   char *path = MMDFiles_pathdup_from_application_to_system_locale(file);
+   struct stat st;
    if (path == NULL)
       return MMDFILES_STAT_UNKNOWN;
-
-   struct stat st;
    if (stat(path, &st) == -1) {
-      ret = MMDFILES_STAT_UNKNOWN;
-   } else if ((st.st_mode & S_IFMT) == S_IFDIR) {
+      free(path);
+      return MMDFILES_STAT_UNKNOWN;
+   }
+   free(path);
+#endif
+
+   if ((st.st_mode & S_IFMT) == S_IFDIR) {
       ret = MMDFILES_STAT_DIRECTORY;
 #ifndef _WIN32
    } else if ((st.st_mode & S_IFMT) == S_IFLNK) {
@@ -675,7 +801,6 @@ MMDFILES_STAT MMDFiles_stat(const char *file)
       ret = MMDFILES_STAT_UNKNOWN;
    }
 
-   free(path);
    return ret;
 }
 
@@ -698,18 +823,29 @@ bool MMDFiles_existdir(const char *dir)
 /* MMDFiles_fopen: get file pointer */
 FILE *MMDFiles_fopen(const char *file, const char *mode)
 {
-   char *path;
    FILE *fp;
 
    if(file == NULL || mode == NULL)
       return NULL;
 
-   path = MMDFiles_pathdup_from_application_to_system_locale(file);
+#if defined(_WIN32)
+   WCHAR *wpath = MMDFiles_pathdup_from_application_to_widechar(file);
+   if (wpath == NULL)
+      return NULL;
+   WCHAR *wmode = MMDFiles_strdup_from_application_to_widechar(mode);
+   if (wmode == NULL) {
+      free(wpath);
+      return NULL;
+   }
+   fp = _wfopen(wpath, wmode);
+   free(wpath);
+#else
+   char *path = MMDFiles_pathdup_from_application_to_system_locale(file);
    if(path == NULL)
       return NULL;
-
    fp = fopen(path, mode);
    free(path);
+#endif
 
    // remove BOM
    if(fp != NULL && strcmp(mode, "r") == 0) {
@@ -728,25 +864,35 @@ FILE *MMDFiles_fopen(const char *file, const char *mode)
 /* MMDFiles_getfsize: get file size */
 size_t MMDFiles_getfsize(const char *file)
 {
-   char *path;
-   struct stat st;
    size_t size;
 
    if (file == NULL)
       return 0;
 
-   path = MMDFiles_pathdup_from_application_to_system_locale(file);
+#if defined(_WIN32)
+   WCHAR *wpath = MMDFiles_pathdup_from_application_to_widechar(file);
+   struct _stat st;
+   if (wpath == NULL)
+      return 0;
+   if (_wstat(wpath, &st) != 0) {
+      free(wpath);
+      return 0;
+   }
+   size = st.st_size;
+   free(wpath);
+#else
+   char *path = MMDFiles_pathdup_from_application_to_system_locale(file);
+   struct stat st;
    if (path == NULL)
       return 0;
-
    if (stat(path, &st) == -1) {
       free(path);
       return 0;
    }
-
    size = st.st_size;
-
    free(path);
+#endif
+
    return size;
 }
 
@@ -863,14 +1009,21 @@ void MMDFiles_alignedfree(void *ptr)
 /* MMDFiles_removefile: remove file */
 bool MMDFiles_removefile(const char *name)
 {
-   char *path;
    int ret;
 
-   path = MMDFiles_pathdup_from_application_to_system_locale(name);
+#if defined(_WIN32)
+   WCHAR *wpath = MMDFiles_pathdup_from_application_to_widechar(name);
+   if (wpath == NULL)
+      return false;
+   ret = _wremove(wpath);
+   free(wpath);
+#else
+   char *path = MMDFiles_pathdup_from_application_to_system_locale(name);
    if (path == NULL)
       return false;
    ret = remove(path);
    free(path);
+#endif
    if (ret != 0)
       return false;
    return true;

@@ -149,13 +149,12 @@ static void hexstr2bin(unsigned char *bin, const unsigned char *str, int len)
 
 static bool getFileSize(const char *filename, size_t *ret)
 {
-   struct stat st;
-
    if (filename == NULL)
       return false;
-   if (stat(filename, &st) == -1)
-      return false;
-   *ret = st.st_size;
+
+   size_t size = MMDFiles_getfsize(filename);
+   *ret = size;
+
    return true;
 }
 
@@ -176,9 +175,9 @@ static unsigned char *newLoadFile(const char *filename, size_t *len)
    } else {
       data = (unsigned char *)malloc(size);
       if (fread(data, 1, size, fp) < size) {
-	fclose(fp);
-	free(data);
-	return NULL;
+      	fclose(fp);
+	      free(data);
+	      return NULL;
       }
       fclose(fp);
    }
@@ -411,24 +410,16 @@ ZFile::~ZFile()
 /* ZFile::openAndLoad: open and load a file */
 bool ZFile::openAndLoad(const char *file)
 {
-   char *path;
-
    if (file == NULL)
-      return false;
-
-   path = MMDFiles_pathdup_from_application_to_system_locale(file);
-   if (path == NULL)
       return false;
 
    /* make sure to close already opened file */
    close();
 
    if (m_key == NULL)
-      m_buffer = newLoadFile(path, &m_length);
+      m_buffer = newLoadFile(file, &m_length);
    else
-      m_buffer = newLoadEncFile(path, &m_length);
-
-   free(path);
+      m_buffer = newLoadEncFile(file, &m_length);
 
    if (m_buffer == NULL)
       return false;

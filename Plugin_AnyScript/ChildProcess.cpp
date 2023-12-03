@@ -214,6 +214,10 @@ bool ChildProcess::runProcess(const char *title, const char *execString)
    s.lpSecurityDescriptor = NULL;
    s.bInheritHandle = TRUE;
 
+   WCHAR *execStringW = MMDFiles_strdup_from_application_to_widechar(execString);
+   if (execStringW == NULL)
+      return false;
+
    HANDLE current = GetCurrentProcess();
 
    /* create pipe for child-to-parent: children write stdout and strerr, parent read */
@@ -238,7 +242,7 @@ bool ChildProcess::runProcess(const char *title, const char *execString)
    }
 
    /* set up child process information */
-   STARTUPINFOA si;
+   STARTUPINFOW si;
    ZeroMemory(&si, sizeof(STARTUPINFO));
    si.cb = sizeof(STARTUPINFO);
    si.dwFlags = STARTF_USESTDHANDLES;
@@ -248,7 +252,7 @@ bool ChildProcess::runProcess(const char *title, const char *execString)
    si.hStdInput = m_hChildIn;
    si.hStdOutput = m_hChildOut;
    //si.hStdError = m_hChildOut;
-   si.lpTitle = (LPTSTR)execString;
+   si.lpTitle = execStringW;
 
    /* create job object */
    m_job = CreateJobObject(NULL, NULL);
@@ -266,7 +270,7 @@ bool ChildProcess::runProcess(const char *title, const char *execString)
    }
 
    /* start process*/
-   if (!CreateProcessA(NULL, (LPTSTR)execString, NULL, NULL, TRUE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &m_process_info)) {
+   if (!CreateProcessW(NULL, execStringW, NULL, NULL, TRUE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &m_process_info)) {
       m_mmdagent->sendLogString(m_id, MLOG_ERROR, "failed to create process: %s", execString);
       return false;
    }

@@ -874,11 +874,19 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
             } else if ((PMX2Recent == false && k == 19) || (PMX2Recent == true && k == 21)) {
                edgeWidth = (float)atof(p);
             } else if ((PMX2Recent == false && k == 24) || (PMX2Recent == true && k == 26)) {
-               if (MMDFiles_strlen(p) > 0)
-                  tex = MMDFiles_strdup(p);
+               if (MMDFiles_strlen(p) > 0) {
+                  if (PMX257format)
+                     tex = MMDFiles_strdup(p);
+                  else
+                     tex = MMDFiles_strdup_from_sjis_to_utf8(p);
+               }
             } else if ((PMX2Recent == false && k == 25) || (PMX2Recent == true && k == 27)) {
-               if (MMDFiles_strlen(p) > 0)
-               sphere = MMDFiles_strdup(p);
+               if (MMDFiles_strlen(p) > 0) {
+                  if (PMX257format)
+                     sphere = MMDFiles_strdup(p);
+                  else
+                     sphere = MMDFiles_strdup_from_sjis_to_utf8(p);
+               }
             } else if ((PMX2Recent == false && k == 26) || (PMX2Recent == true && k == 28)) {
                sphereMode = atoi(p);
             }
