@@ -737,7 +737,7 @@ void PMDModel::setupObjects()
 bool PMDModel::parseExtCsv(const char *file, const char *dir)
 {
    ZFile *zf;
-   char buf[1024];
+   char buf[4096];
    char *p, *q, save;
    unsigned long i, k;
    unsigned long n;
@@ -779,7 +779,7 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
    }
 
    n = 0;
-   while (zf->gets(buf, 1024) != NULL) {
+   while (zf->gets(buf, 4096) != NULL) {
       p = buf;
       q = p;
       while (*q != '\0' && *q != ',') q++;
@@ -1104,6 +1104,8 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
          }
          m_hasExtParam = true;
       } else if (MMDFiles_strequal(p, "VertexMorph") || MMDFiles_strequal(p, "PmxVertexMorph")) {
+         /* format 1: header, name, idx, x, y, z */
+         /* format 2: header, name, local_idx, idx, x, y, z */
          unsigned long numVertexMorphAllocated = 1000;
          unsigned long id;
          unsigned long idx;
@@ -1156,17 +1158,35 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
                }
                if (PMX257format == false)
                   free(s);
-            } else if (k == 2) {
-               idx = atoi(p);
-            } else if (k >= 3 && k <= 5) {
-               f[k - 3] = (float)atof(p);
-               if (k == 5) {
+            } else {
+               if (PMX257format) {
+                  if (k == 3) {
+                     idx = atoi(p);
+                  } else if (k >= 4 && k <= 6) {
+                     f[k - 4] = (float)atof(p);
+                     if (k == 6) {
 #ifdef MMDFILES_CONVERTCOORDINATESYSTEM
-                  pos.setValue(f[0], f[1], -f[2]);
+                        pos.setValue(f[0], f[1], -f[2]);
 #else
-                  pos.setValue(f[0], f[1], f[2]);
+                        pos.setValue(f[0], f[1], f[2]);
 #endif /* MMDFILES_CONVERTCOORDINATESYSTEM */
-                  m_vertexMorphList[id].add(idx, &pos);
+                        m_vertexMorphList[id].add(idx, &pos);
+                     }
+                  }
+               } else {
+                  if (k == 2) {
+                     idx = atoi(p);
+                  } else if (k >= 3 && k <= 5) {
+                     f[k - 3] = (float)atof(p);
+                     if (k == 5) {
+#ifdef MMDFILES_CONVERTCOORDINATESYSTEM
+                        pos.setValue(f[0], f[1], -f[2]);
+#else
+                        pos.setValue(f[0], f[1], f[2]);
+#endif /* MMDFILES_CONVERTCOORDINATESYSTEM */
+                        m_vertexMorphList[id].add(idx, &pos);
+                     }
+                  }
                }
             }
             k++;
