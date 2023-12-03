@@ -169,7 +169,7 @@ static unsigned char *newLoadFile(const char *filename, size_t *len)
    if (getFileSize(filename, &size) == false)
       return NULL;
 
-   fp = fopen(filename, "rb");
+   fp = MMDFiles_fopen(filename, "rb");
    if (fp == NULL) return NULL;
    if (size == 0) {
       data = (unsigned char *)malloc(1);
