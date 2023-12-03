@@ -201,11 +201,15 @@ char *MMDAgent_basename(const char *file)
 char *MMDAgent_fullpathname(const char *file)
 {
 #ifdef _WIN32
-   char buff[MMDAGENT_MAXBUFLEN];
-   DWORD retval = GetFullPathNameA(file, MMDAGENT_MAXBUFLEN, buff, NULL);
+   WCHAR buffw[MMDAGENT_MAXBUFLEN];
+   WCHAR *filew = MMDFiles_strdup_from_application_to_widechar(file);
+   if (filew == NULL)
+      return NULL;
+   DWORD retval = GetFullPathNameW(filew, MMDAGENT_MAXBUFLEN, buffw, NULL);
+   free(filew);
    if (retval == 0)
       return NULL;
-   char *path = MMDFiles_pathdup_from_system_locale_to_application(buff);
+   char *path = MMDFiles_pathdup_from_widechar_to_application(buffw);
    if (path == NULL)
       return NULL;
    return path;
@@ -404,21 +408,28 @@ int MMDAgent_fgettoken(FILE *fp, char *buff)
 /* MMDAgent_pwddup: get current directory */
 char *MMDAgent_pwddup()
 {
-   char buff[MMDAGENT_MAXBUFLEN];
    bool result;
    char *path;
 
 #ifdef _WIN32
-   result = (GetCurrentDirectoryA(MMDAGENT_MAXBUFLEN, buff) != 0) ? true : false;
+   WCHAR buffw[MMDAGENT_MAXBUFLEN];
+   result = (GetCurrentDirectoryW(MMDAGENT_MAXBUFLEN, buffw) != 0) ? true : false;
+   if (result == false)
+      return NULL;
+
+   path = MMDFiles_pathdup_from_widechar_to_application(buffw);
+   if (path == NULL)
+      return NULL;
 #else
+   char buff[MMDAGENT_MAXBUFLEN];
    result = (getcwd(buff, MMDAGENT_MAXBUFLEN) != NULL) ? true : false;
-#endif /* _WIN32 */
-   if(result == false)
+   if (result == false)
       return NULL;
 
    path = MMDFiles_pathdup_from_system_locale_to_application(buff);
-   if(path == NULL)
+   if (path == NULL)
       return NULL;
+#endif /* _WIN32 */
 
    return path;
 }
@@ -427,18 +438,22 @@ char *MMDAgent_pwddup()
 bool MMDAgent_chdir(const char *dir)
 {
    bool result;
-   char *path;
-
-   path = MMDAgent_pathdup_from_application_to_system_locale(dir);
-   if(path == NULL)
-      return false;
 
 #ifdef _WIN32
-   result = SetCurrentDirectoryA(path) != 0 ? true : false;
+   WCHAR *wpath = MMDFiles_pathdup_from_application_to_widechar(dir);
+   if (wpath == NULL)
+      return false;
+
+   result = SetCurrentDirectoryW(wpath) != 0 ? true : false;
+   free(wpath);
 #else
+   char *path = MMDAgent_pathdup_from_application_to_system_locale(dir);
+   if (path == NULL)
+      return false;
+
    result = chdir(path) == 0 ? true : false;
-#endif /* _WIN32 */
    free(path);
+#endif /* _WIN32 */
 
    return result;
 }
@@ -473,23 +488,27 @@ double MMDAgent_diffTime(double now, double past)
 /* MMDAgent_dlopen: open dynamic library */
 void *MMDAgent_dlopen(const char *file)
 {
-   char *path;
    void *d;
 
    if(file == NULL)
       return NULL;
 
-   path = MMDAgent_pathdup_from_application_to_system_locale(file);
-   if(path == NULL)
+#ifdef _WIN32
+   WCHAR *wpath = MMDFiles_pathdup_from_application_to_widechar(file);
+   if (wpath == NULL)
       return NULL;
 
-#ifdef _WIN32
-   d = (void *) LoadLibraryExA(path, NULL, 0);
+   d = (void *) LoadLibraryExW(wpath, NULL, 0);
+   free(wpath);
 #else
+   char *path = MMDAgent_pathdup_from_application_to_system_locale(file);
+   if (path == NULL)
+      return NULL;
+
    d = dlopen(path, RTLD_NOW);
+   free(path);
 #endif /* _WIN32 */
 
-   free(path);
    return d;
 }
 
@@ -519,7 +538,7 @@ DIRECTORY *MMDAgent_opendir(const char *name)
 #ifdef _WIN32
    DIRECTORY *dir;
    char buff[MMDAGENT_MAXBUFLEN];
-   char *path;
+   WCHAR *wpath;
 
    if(name == NULL)
       return NULL;
@@ -529,15 +548,17 @@ DIRECTORY *MMDAgent_opendir(const char *name)
    else
       MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%c*", name, MMDAGENT_DIRSEPARATOR);
 
-   path = MMDAgent_pathdup_from_application_to_system_locale(buff);
-   if(path == NULL)
+   wpath = MMDFiles_pathdup_from_application_to_widechar(buff);
+   if(wpath == NULL)
       return NULL;
 
    dir = (DIRECTORY *) malloc(sizeof(DIRECTORY));
-   dir->data = malloc(sizeof(WIN32_FIND_DATAA));
-   dir->find = FindFirstFileA(path, (WIN32_FIND_DATAA *) dir->data);
+   if (dir == NULL)
+      return NULL;
+   dir->data = malloc(sizeof(WIN32_FIND_DATAW));
+   dir->find = FindFirstFileW(wpath, (WIN32_FIND_DATAW *) dir->data);
    dir->first = true;
-   free(path);
+   free(wpath);
    if(dir->find == INVALID_HANDLE_VALUE) {
       free(dir->data);
       free(dir);
@@ -585,7 +606,7 @@ void MMDAgent_closedir(DIRECTORY *dir)
 bool MMDAgent_readdir(DIRECTORY *dir, char *name)
 {
 #ifdef _WIN32
-   WIN32_FIND_DATAA *dp;
+   WIN32_FIND_DATAW *dp;
 #else
    struct dirent *dp;
 #endif /* _WIN32 */
@@ -600,18 +621,18 @@ bool MMDAgent_readdir(DIRECTORY *dir, char *name)
    if(dir->first == true) {
       char *buff;
       dir->first = false;
-      dp = (WIN32_FIND_DATAA *) dir->data;
-      buff = MMDFiles_pathdup_from_system_locale_to_application(dp->cFileName); /* if no file, does it work well? */
+      dp = (WIN32_FIND_DATAW *) dir->data;
+      buff = MMDFiles_pathdup_from_widechar_to_application(dp->cFileName); /* if no file, does it work well? */
       strcpy(name, buff);
       free(buff);
       return true;
-   } else if(FindNextFileA(dir->find, (WIN32_FIND_DATAA *) dir->data) == 0) {
+   } else if(FindNextFileW(dir->find, (WIN32_FIND_DATAW *) dir->data) == 0) {
       strcpy(name, "");
       return false;
    } else {
       char *buff;
-      dp = (WIN32_FIND_DATAA *) dir->data;
-      buff = MMDFiles_pathdup_from_system_locale_to_application(dp->cFileName);
+      dp = (WIN32_FIND_DATAW *) dir->data;
+      buff = MMDFiles_pathdup_from_widechar_to_application(dp->cFileName);
       strcpy(name, buff);
       free(buff);
       return true;
@@ -640,24 +661,31 @@ float MMDAgent_roundf(float f)
 /* MMDAgent_mkdir: make directory */
 bool MMDAgent_mkdir(const char *name)
 {
+#ifdef _WIN32
+   WCHAR *wpath;
+
+   wpath = MMDFiles_pathdup_from_application_to_widechar(name);
+   if (wpath == NULL)
+      return false;
+
+   if(!CreateDirectoryW(wpath, NULL)) {
+      free(wpath);
+      return false;
+   }
+   free(wpath);
+#else
    char *path;
 
    path = MMDFiles_pathdup_from_application_to_system_locale(name);
-   if(path == NULL)
+   if (path == NULL)
       return false;
 
-#ifdef _WIN32
-   if(!CreateDirectoryA(path, NULL)) {
-      free(path);
-      return false;
-   }
-#else
    if(mkdir(path, S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH | S_IXOTH | S_IXOTH) != 0) {
       free(path);
       return false;
    }
-#endif /* _WIN32 */
    free(path);
+#endif /* _WIN32 */
 
    return true;
 }
@@ -667,7 +695,11 @@ bool MMDAgent_rmdir(const char *name)
 {
    char buff1[MMDAGENT_MAXBUFLEN];
    char buff2[MMDAGENT_MAXBUFLEN];
+#ifdef _WIN32
+   WCHAR *wp;
+#else
    char *p;
+#endif
    DIRECTORY *dir;
 
    dir = MMDAgent_opendir(name);
@@ -677,24 +709,28 @@ bool MMDAgent_rmdir(const char *name)
             continue;
          MMDAgent_snprintf(buff2, MMDAGENT_MAXBUFLEN, "%s%c%s", name, MMDAGENT_DIRSEPARATOR, buff1);
          MMDAgent_rmdir(buff2);
-         p = MMDFiles_pathdup_from_application_to_system_locale(buff2);
 #ifdef _WIN32
-         DeleteFileA(p);
-         RemoveDirectoryA(p);
+         wp = MMDFiles_pathdup_from_application_to_widechar(buff2);
+         DeleteFileW(wp);
+         RemoveDirectoryW(wp);
+         free(wp);
 #else
+         p = MMDFiles_pathdup_from_application_to_system_locale(buff2);
          remove(p);
          rmdir(p);
-#endif /* _WIN32 */
          free(p);
+#endif /* _WIN32 */
       }
       MMDAgent_closedir(dir);
-      p = MMDFiles_pathdup_from_application_to_system_locale(name);
 #ifdef _WIN32
-      RemoveDirectoryA(p);
+      wp = MMDFiles_pathdup_from_application_to_widechar(name);
+      RemoveDirectoryW(wp);
+      free(wp);
 #else
+      p = MMDFiles_pathdup_from_application_to_system_locale(name);
       rmdir(p);
-#endif /* _WIN32 */
       free(p);
+#endif /* _WIN32 */
    }
    return true;
 }
@@ -708,6 +744,25 @@ bool MMDAgent_removefile(const char *name)
 /* MMDAgent_rename: rename file or directory */
 bool MMDAgent_rename(const char *oldname, const char *newname)
 {
+#ifdef _WIN32
+   WCHAR *oldpathw, *newpathw;
+   int ret;
+
+   oldpathw = MMDFiles_pathdup_from_application_to_widechar(oldname);
+   if (oldpathw == NULL)
+      return false;
+   newpathw = MMDFiles_pathdup_from_application_to_widechar(newname);
+   if (newpathw == NULL) {
+      free(oldpathw);
+      return false;
+   }
+   ret = _wrename(oldpathw, newpathw);
+   free(oldpathw);
+   free(newpathw);
+   if (ret != 0)
+      return false;
+   return true;
+#else
    char *oldpath, *newpath;
    int ret;
 
@@ -725,6 +780,7 @@ bool MMDAgent_rename(const char *oldname, const char *newname)
    if (ret != 0)
       return false;
    return true;
+#endif
 }
 
 /* MMDAgent_tmpdirdup: duplicate temporary directory name */
@@ -741,7 +797,7 @@ char *MMDAgent_tmpdirdup()
    MMDAgent_snprintf(buff1, MMDAGENT_MAXBUFLEN, "%s%d%s%d", "MMDAgent-", getuid(), "-", getpid());
 #endif /* _WIN32 && __ANDROID__ */
 
-   path = MMDFiles_pathdup_from_system_locale_to_application(buff1);
+   path = MMDFiles_strdup(buff1);
    if(path == NULL)
       return NULL;
 
@@ -1118,34 +1174,35 @@ char *MMDAgent_tailpath(const char *file, int targettaillen)
 /* MMDAgent_openExternal: open file or directory with external application */
 bool MMDAgent_openExternal(const char *file, const char *app_path)
 {
-   char *path;
-   char *app = NULL;
-
    if (file == NULL)
       return false;
 
-   path = MMDFiles_pathdup_from_application_to_system_locale(file);
-   if (path == NULL)
+#if defined(_WIN32)
+   WCHAR *pathw;
+   WCHAR *appw = NULL;
+
+   pathw = MMDFiles_pathdup_from_application_to_widechar(file);
+   if (pathw == NULL)
       return false;
 
    if (app_path)
-      app = MMDFiles_pathdup_from_application_to_system_locale(app_path);
+      appw = MMDFiles_pathdup_from_application_to_widechar(app_path);
 
-#if defined(_WIN32)
    HRESULT hr;
    hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
-   if (app == NULL)
-      ShellExecute(NULL, NULL, path, NULL, NULL, SW_SHOWNORMAL);
+   if (appw == NULL)
+      ShellExecuteW(NULL, NULL, pathw, NULL, NULL, SW_SHOWNORMAL);
    else
-      ShellExecute(NULL, "open", app, path, NULL, SW_SHOWNORMAL);
+      ShellExecuteW(NULL, L"open", appw, pathw, NULL, SW_SHOWNORMAL);
 
    if (hr == S_OK || hr == S_FALSE)
       CoUninitialize();
+
+   if (appw)
+      free(appw);
+   free(pathw);
 #endif /* _WIN32 */
 
-   if (app)
-      free(app);
-   free(path);
    return true;
 }
 

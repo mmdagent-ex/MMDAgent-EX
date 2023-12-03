@@ -380,7 +380,6 @@ void PMDMaterial::setExtParam(bool edge, float edgeSize, float *col, float alpha
 {
    unsigned long i;
    char buf[MMDFILES_MAXBUFLEN];
-   char *name;
    bool ret;
 
    if (col == NULL) {
@@ -415,29 +414,25 @@ void PMDMaterial::setExtParam(bool edge, float edgeSize, float *col, float alpha
 
    ret = true;
    if (texFile != NULL) {
-      name = MMDFiles_strdup_from_sjis_to_utf8(texFile);
-      MMDFiles_snprintf(buf, MMDFILES_MAXBUFLEN, "%s%c%s", dir, MMDFILES_DIRSEPARATOR, name);
-      m_texture = textureLoader->load(buf, name, false, false);
+      MMDFiles_snprintf(buf, MMDFILES_MAXBUFLEN, "%s%c%s", dir, MMDFILES_DIRSEPARATOR, texFile);
+      m_texture = textureLoader->load(buf, texFile, false, false);
       if (!m_texture) {
          ret = false;
       }
-      free(name);
    }
    if (sphereFile != NULL && (sphereMode == 1 || sphereMode == 2)) {
-      name = MMDFiles_strdup_from_sjis_to_utf8(sphereFile);
-      MMDFiles_snprintf(buf, MMDFILES_MAXBUFLEN, "%s%c%s", dir, MMDFILES_DIRSEPARATOR, name);
+      MMDFiles_snprintf(buf, MMDFILES_MAXBUFLEN, "%s%c%s", dir, MMDFILES_DIRSEPARATOR, sphereFile);
       if (texFile != NULL) {
-         m_additionalTexture = textureLoader->load(buf, name, true, sphereMode == 2 ? true : false);
+         m_additionalTexture = textureLoader->load(buf, sphereFile, true, sphereMode == 2 ? true : false);
          if (!m_additionalTexture) {
             ret = false;
          }
       } else {
-         m_texture = textureLoader->load(buf, name, true, sphereMode == 2 ? true : false);
+         m_texture = textureLoader->load(buf, sphereFile, true, sphereMode == 2 ? true : false);
          if (!m_texture) {
             ret = false;
          }
       }
-      free(name);
    }
    if (ret == false && m_textureFile != NULL) {
       /* if failed to load textures in ExtCsv, try default */
