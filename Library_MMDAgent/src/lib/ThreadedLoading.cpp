@@ -70,8 +70,7 @@ void ThreadedLoading::run(JobLink *job)
    case TASK_MODELCHANGE:
       /* read the model and load textures */
       if (job->pmd->read(job->fileName, job->mmdagent->getBulletPhysics(), job->mmdagent->getSystemTexture()) == false) {
-         delete job->pmd;
-         job->pmd = NULL;
+         job->hasError = true;
       }
       break;
    case TASKNUM:
@@ -95,6 +94,11 @@ bool ThreadedLoading::startModelChangeThread(const char *fileName, const char *m
    if (id < 0)
       return false;
 
+   if (MMDAgent_exist(fileName) == false) {
+      m_mmdagent->sendLogString(0, MLOG_ERROR, "changeModel: not found: %s", fileName);
+      return false;
+   }
+
    j = new JobLink();
    j->tid = TASK_MODELCHANGE;
    j->modelId = id;
@@ -104,6 +108,7 @@ bool ThreadedLoading::startModelChangeThread(const char *fileName, const char *m
    j->pmd = new(ptr) PMDModel();
    j->mmdagent = m_mmdagent;
    j->uplink = this;
+   j->hasError = false;
    j->finished = false;
    j->thread_id = glfwCreateThread(localThreadMain, j);
    if (j->thread_id == -1)
@@ -124,28 +129,35 @@ void ThreadedLoading::update()
    j = m_root;
    while (j) {
       if (j->finished) {
-         switch (j->tid) {
-         case TASK_MODELCHANGE:
-            if (j->pmd) {
-               /* lock pmd object */
-               m_mmdagent->getModelList()[j->modelId].lock();
-               /* delete current model before object setup to avoid physics fractuate */
-               m_mmdagent->getModelList()[j->modelId].deleteModel();
-               /* set up OpenGL and Bulletphysics after threaded loading in main thread */
-               j->pmd->setupObjects();
-               /* do change the model using the loaded model */
-               m_mmdagent->changeModel(j->targetModelAlias, j->fileName, j->pmd);
-               /* unlock pmd object */
-               m_mmdagent->getModelList()[j->modelId].unlock();
-               /* reset progress counter */
-               if (j->modelId >= 0 && j->modelId < m_mmdagent->getNumModel())
-                  m_mmdagent->getModelList()[j->modelId].setLoadingProgressRate(-1.0f);
-               /* model has been passed under main thread, so just kill link here */
-               j->pmd = NULL;
+         if (j->hasError) {
+            m_mmdagent->sendLogString(0, MLOG_ERROR, "changeModel: %s cannot be loaded.", j->fileName);
+            j->pmd->~PMDModel();
+            MMDFiles_alignedfree(j->pmd);
+            j->pmd = NULL;
+         } else {
+            switch (j->tid) {
+            case TASK_MODELCHANGE:
+               if (j->pmd) {
+                  /* lock pmd object */
+                  m_mmdagent->getModelList()[j->modelId].lock();
+                  /* delete current model before object setup to avoid physics fractuate */
+                  m_mmdagent->getModelList()[j->modelId].deleteModel();
+                  /* set up OpenGL and Bulletphysics after threaded loading in main thread */
+                  j->pmd->setupObjects();
+                  /* do change the model using the loaded model */
+                  m_mmdagent->changeModel(j->targetModelAlias, j->fileName, j->pmd);
+                  /* unlock pmd object */
+                  m_mmdagent->getModelList()[j->modelId].unlock();
+                  /* reset progress counter */
+                  if (j->modelId >= 0 && j->modelId < m_mmdagent->getNumModel())
+                     m_mmdagent->getModelList()[j->modelId].setLoadingProgressRate(-1.0f);
+                  /* model has been passed under main thread, so just kill link here */
+                  j->pmd = NULL;
+               }
+               break;
+            case TASKNUM:
+               break;
             }
-            break;
-         case TASKNUM:
-            break;
          }
          tmp = j->next;
          delete j;
