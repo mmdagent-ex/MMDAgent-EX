@@ -33,6 +33,7 @@ public:
       PMDModel *pmd;
       MMDAgent *mmdagent;
       ThreadedLoading *uplink;
+      bool hasError;
       bool finished;
       GLFWthread thread_id;
       JobLink *next;
@@ -46,6 +47,7 @@ public:
          next = NULL;
          thread_id = -1;
          uplink = NULL;
+         hasError = false;
          finished = false;
       }
       ~JobLink() {
