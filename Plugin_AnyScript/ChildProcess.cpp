@@ -367,6 +367,7 @@ bool ChildProcess::stopProcess()
 #ifdef CHILDPROCESS_WIN32
    /* force stop child processes attached to the job object */
    CloseHandle(m_job);
+   m_threadId = -1;
 #endif
 #ifdef CHILDPROCESS_UNIX
    /* force stop child processes */
