@@ -1424,7 +1424,8 @@ bool MMDAgent::removeBoneControl(const char *modelAlias, const char *boneName)
    } else {
       m_model[id].unsetBoneFaceControl(control);
    }
-   delete control;
+   control->~BoneFaceControl();
+   MMDFiles_alignedfree(control);
 
    return true;
 }
@@ -1464,7 +1465,8 @@ bool MMDAgent::removeMorphControl(const char *modelAlias, const char *morphName)
    } else {
       m_model[id].unsetBoneFaceControl(control);
    }
-   delete control;
+   control->~BoneFaceControl();
+   MMDFiles_alignedfree(control);
 
    return true;
 }
