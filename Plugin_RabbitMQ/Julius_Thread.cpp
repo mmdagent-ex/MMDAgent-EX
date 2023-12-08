@@ -389,7 +389,7 @@ bool AudioProcess::audioInitialize(Recog *recog)
    adin->ad_read = local_read;
    adin->ad_input_name = local_input_name;
    adin->silence_cut_default = TRUE;
-   adin->enable_thread = TRUE;
+   adin->enable_thread = FALSE;
 
    /* stand-by A/D-in, dealing 48kHz-to-16kHz downsampling */
    if (recog->jconf->input.use_ds48to16) {
