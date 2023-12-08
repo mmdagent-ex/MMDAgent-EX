@@ -174,8 +174,15 @@ void Flite_plus_hts_engine::getPhonemeSequence(char *str, int strlen)
    int fperiod;
    int sampling_frequency;
    char *ch, *start, *end;
+   int len;
+   int maxlen;
+   int sublen;
 
    strcpy(str, "");
+   len = 0;
+   maxlen = strlen - 1;
+   if (maxlen < 1)
+      return;
 
    if(m_numStyles <= 0)
       return;
@@ -194,22 +201,31 @@ void Flite_plus_hts_engine::getPhonemeSequence(char *str, int strlen)
    feature = &feature[1];
 
    for (i = 0; i < size; i++) {
-      if (i > 0)
-         strcat(str, ",");
-
+      if (i > 0) {
+         if (len >= maxlen) return;
+         str[len++] = ',';
+      }
       /* get phoneme from full-context label */
       start = strchr(feature[i], '-');
       end = strchr(feature[i], '+');
       if (start != NULL && end != NULL) {
-         for (ch = start + 1; ch != end; ch++)
-            MMDAgent_snprintf(str, strlen, "%s%c", str, *ch);
+         for (ch = start + 1; ch != end; ch++) {
+            if (len >= maxlen) return;
+            str[len++] = *ch;
+         }
       } else {
-         strcat(str, feature[i]);
+         sublen = MMDAgent_strlen(feature[i]);
+         for (j = 0; j < sublen; j++) {
+            if (len >= maxlen) return;
+            str[len++] = feature[i][j];
+         }
       }
       /* get ms */
       for (j = 0, k = 0; j < nstate; j++)
          k += (HTS_Engine_get_state_duration(&m_engine, i * nstate + j) * fperiod * 1000) / sampling_frequency;
-      MMDAgent_snprintf(str, strlen, "%s,%d", str, k);
+      if (strlen - len - 1 <= 0) return;
+      MMDAgent_snprintf(&str[len], strlen - len - 1, ",%d", k);
+      len = MMDAgent_strlen(str);
    }
 }
 
