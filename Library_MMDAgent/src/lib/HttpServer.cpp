@@ -67,12 +67,10 @@ void HttpServer::clear()
 {
    httplib::Server *svr = (httplib::Server *)m_server;
 
-   if (m_thread >= 0) {
-      glfwDestroyThread(m_thread);
-      if (svr) {
-         svr->stop();
-         delete svr;
-      }
+   if (svr) {
+      svr->wait_until_ready();
+      svr->stop();
+      delete svr;
    }
 
    for (int i = 0; i < m_historyLen; i++) {
