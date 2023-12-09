@@ -54,25 +54,6 @@
 /* POSSIBILITY OF SUCH DAMAGE.                                       */
 /* ----------------------------------------------------------------- */
 
-/* definitions */
-
-#define LOGTEXT_COLOR          1.0f,0.7f,0.3f,0.7f /* default text color */
-#define LOGTEXT_COLOR_ERROR    1.0f,0.0f,0.0f,0.8f /* text color for error text */
-#define LOGTEXT_COLOR_WARNING  1.0f,0.6f,0.0f,0.8f /* text color for warning text */
-#define LOGTEXT_COLOR_STATUS   0.0f,0.7f,0.4f,0.7f /* text color for status text*/
-#define LOGTEXT_COLOR_SENT     1.0f,0.9f,0.0f,0.7f /* text color for sent text */
-#define LOGTEXT_COLOR_CAPTURED 0.3f,0.2f,0.0f,0.7f /* text color for captured text */
-#define LOGTEXT_COLOR_NARROW   0.7f,1.0f,0.2f,0.7f /* text color for narrowing */
-#define LOGTEXT_BGCOLOR        0.0f,0.0f,0.0f,0.8f /* background color */
-#define LOGTEXT_BGCOLOR_TYPING 0.3f,0.6f,0.1f,0.8f /* background color while typing narrowing */
-#define LOGTEXT_MAXLINELEN     256
-#define LOGTEXT_MAXNLINES      512
-#define LOGTEXT_SCROLLBARWIDTH 0.4f                /* scroll bar width */
-
-#define LOGTEXT_TYPINGDURATIONFRAME 90.0f
-#define LOGTEXT_STATETRANSITIONFRAME 6.0f
-#define LOGTEXT_TEXTTRANSITIONFRAME 10.0f
-
 /* LogText: log text area behind character */
 class LogText
 {

@@ -59,6 +59,26 @@
 #include <stdarg.h>
 #include "MMDAgent.h"
 
+/* definitions */
+
+#define LOGTEXT_COLOR          1.0f,0.7f,0.3f,0.7f /* default text color */
+#define LOGTEXT_COLOR_ERROR    1.0f,0.0f,0.0f,0.8f /* text color for error text */
+#define LOGTEXT_COLOR_WARNING  1.0f,0.6f,0.0f,0.8f /* text color for warning text */
+#define LOGTEXT_COLOR_STATUS   0.0f,0.7f,0.4f,0.7f /* text color for status text*/
+#define LOGTEXT_COLOR_SENT     1.0f,0.9f,0.0f,0.7f /* text color for sent text */
+#define LOGTEXT_COLOR_CAPTURED 0.6f,0.4f,0.0f,0.7f /* text color for captured text */
+#define LOGTEXT_COLOR_NARROW   0.7f,1.0f,0.2f,0.7f /* text color for narrowing */
+#define LOGTEXT_BGCOLOR        0.0f,0.0f,0.0f,0.8f /* background color */
+#define LOGTEXT_BGCOLOR_TYPING 0.3f,0.6f,0.1f,0.8f /* background color while typing narrowing */
+#define LOGTEXT_BGCOLOR_UPDATE 0.7f,0.1f,0.0f      /* background color for update indicator */
+#define LOGTEXT_MAXLINELEN     256
+#define LOGTEXT_MAXNLINES      512
+#define LOGTEXT_SCROLLBARWIDTH 0.4f                /* scroll bar width */
+
+#define LOGTEXT_TYPINGDURATIONFRAME 90.0f
+#define LOGTEXT_STATETRANSITIONFRAME 6.0f
+#define LOGTEXT_TEXTTRANSITIONFRAME 30.0f
+
 /* LogText::initialize: initialize logger */
 void LogText::initialize()
 {
@@ -484,20 +504,6 @@ void LogText::renderMain(float w, float h, float fullScale, float textScale, flo
    while (i < size) {
       if (m_noShowFlag[j] == false && k-- <= 0) {
          glTranslatef(0.0f, 0.85f, 0.0f);
-         switch (m_flagList[j]) {
-         case MLOG_ERROR:
-            glColor4f(LOGTEXT_COLOR_ERROR); break;
-         case MLOG_WARNING:
-            glColor4f(LOGTEXT_COLOR_WARNING); break;
-         case MLOG_STATUS:
-            glColor4f(LOGTEXT_COLOR_STATUS); break;
-         case MLOG_MESSAGE_SENT:
-            glColor4f(LOGTEXT_COLOR_SENT); break;
-         case MLOG_MESSAGE_CAPTURED:
-            glColor4f(LOGTEXT_COLOR_CAPTURED); break;
-         default:
-            glColor4f(LOGTEXT_COLOR); break;
-         }
          if (m_drawElements[j].numIndices == 0 && m_elementErrorFlag[j] == false) {
             if (m_font->getTextDrawElements(m_textList[j], &(m_drawElements[j]), 0, 0.0f, 0.0f, 0.0f) == false) {
                m_drawElements[j].textLen = 0; /* reset */
@@ -507,8 +513,43 @@ void LogText::renderMain(float w, float h, float fullScale, float textScale, flo
          }
          if (m_drawElements[j].numIndices > 0) {
             glPushMatrix();
+            if (m_transRateList[j] < 1.0f) {
+               // hightlighting background for new logs
+               glDisable(GL_TEXTURE_2D);
+               glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+               glColor4f(LOGTEXT_BGCOLOR_UPDATE, 1.0f - m_transRateList[j]);
+               vertices[0] = 0.0f;
+               vertices[1] = -0.2f;
+               vertices[2] = -0.03f;
+               vertices[3] = w;
+               vertices[4] = -0.2f;
+               vertices[5] = -0.03f;
+               vertices[6] = 0.0f;
+               vertices[7] = 0.65f;
+               vertices[8] = -0.03f;
+               vertices[9] = w;
+               vertices[10] = 0.65f;
+               vertices[11] = -0.03f;
+               glVertexPointer(3, GL_FLOAT, 0, vertices);
+               glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+               glEnable(GL_TEXTURE_2D);
+               glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+            }
+            switch (m_flagList[j]) {
+            case MLOG_ERROR:
+               glColor4f(LOGTEXT_COLOR_ERROR); break;
+            case MLOG_WARNING:
+               glColor4f(LOGTEXT_COLOR_WARNING); break;
+            case MLOG_STATUS:
+               glColor4f(LOGTEXT_COLOR_STATUS); break;
+            case MLOG_MESSAGE_SENT:
+               glColor4f(LOGTEXT_COLOR_SENT); break;
+            case MLOG_MESSAGE_CAPTURED:
+               glColor4f(LOGTEXT_COLOR_CAPTURED); break;
+            default:
+               glColor4f(LOGTEXT_COLOR); break;
+            }
             glScalef(0.9f, 0.9f, 0.9f);
-            glRotatef((1.0f - m_transRateList[j]) * 90.0f, 1.0f, 0.0f, 0.0f);
             glVertexPointer(3, GL_FLOAT, 0, m_drawElements[j].vertices);
             glTexCoordPointer(2, GL_FLOAT, 0, m_drawElements[j].texcoords);
             glDrawElements(GL_TRIANGLES, m_drawElements[j].numIndices, GL_INDICES, (const GLvoid *)m_drawElements[j].indices);
