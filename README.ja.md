@@ -134,3 +134,10 @@ MMDAgent:
 - Akinobu Lee (Nagoya Institute of Technology, Japan)
 - Keiichiro Oura (Nagoya Institute of Technology, Japan)
 - Daisuke Yamamoto (Nagoya Institute of Technology, Japan)
+
+## logo
+
+<img width="480" alt="snapshot" src="logo.png"/>
+
+- Font: [Audiowide](https://fonts.google.com/specimen/Audiowide)
+- Edge width: 6pt
