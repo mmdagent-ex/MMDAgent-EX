@@ -135,4 +135,4 @@ MMDAgent:
 <img width="480" alt="snapshot" src="logo.png"/>
 
 - Font: [Audiowide](https://fonts.google.com/specimen/Audiowide)
-- Edge width: 6pt
+
