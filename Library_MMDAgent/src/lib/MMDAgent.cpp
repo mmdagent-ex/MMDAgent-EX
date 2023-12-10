@@ -82,6 +82,7 @@
 #define SPLASHSCREEN_DURATION_BEFOREFADE (SPLASHSCREEN_DURATION_1WAIT + SPLASHSCREEN_DURATION_2APPEAR + SPLASHSCREEN_DURATION_3STAY)
 #define SPLASHSCREEN_DURATION_ALL (SPLASHSCREEN_DURATION_BEFOREFADE + SPLASHSCREEN_DURATION_4FADE)
 #define SPLASHSCREEN_DURATION_TRANS    (MMDAGENT_STARTANIMATIONFRAME * 0.7f)
+#define CENTER_LOGO_WIDTH_RATE          0.3f
 
 #ifdef __ANDROID__
 /* debug function to get audio api name */
@@ -1655,6 +1656,7 @@ void MMDAgent::initialize()
    m_keyHandler.setup(this);
    m_caption = NULL;
    m_httpServer = NULL;
+   m_logoTex = NULL;
 
    m_errorMessages[0] = '\0';
    memset(&m_elemErrorMessage, 0, sizeof(FTGLTextDrawElements));
@@ -1813,6 +1815,9 @@ void MMDAgent::clear()
 
    if (m_httpServer)
       delete m_httpServer;
+
+   if (m_logoTex)
+      delete m_logoTex;
 
    if (m_elemErrorMessage.vertices) free(m_elemErrorMessage.vertices);
    if (m_elemErrorMessage.texcoords) free(m_elemErrorMessage.texcoords);
@@ -2075,6 +2080,16 @@ bool MMDAgent::setupSystem(const char *systemDirName, const char *pluginDirName,
    /* setup caption */
    m_caption = new Caption();
    m_caption->setup(this, m_moduleId);
+
+   /* setup logo */
+   if (m_logoTex)
+      delete m_logoTex;
+   MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%c%s", m_appDirName, MMDAGENT_DIRSEPARATOR, "logo.png");
+   m_logoTex = new PMDTexture;
+   if (m_logoTex->load(buff) == false) {
+      delete m_logoTex;
+      m_logoTex = NULL;
+   }
 
    m_enable = true;
 
@@ -2514,6 +2529,12 @@ bool MMDAgent::updateAndRender()
       }
       m_timer->setup();
       m_timer->startAdjustment();
+      if (m_splash == NULL) {
+         /* render for the first frame before message processing start */
+         if (renderScene() != true)
+            return false;
+      }
+      return true;
    }
 
    if (m_contentInErrorPrompt) {
@@ -3486,6 +3507,25 @@ void MMDAgent::renderInterContentTransition(float width, float height, float cur
    v[2] = v[5] = v[8] = v[11] = 0.9f;
    GLindices idx[6] = { 0, 1, 2, 0, 2, 3 };
    float r;
+   /* for logo rendering */
+   GLfloat logo_vertices[12];
+   GLfloat logo_texcoords[8] = { 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
+   float logoWidth;
+
+   if (m_logoTex) {
+      logoWidth = width * CENTER_LOGO_WIDTH_RATE;
+      float logoHeight = logoWidth * (float)(m_logoTex->getHeight()) / (float)(m_logoTex->getWidth());
+      float logoX1 = (width - logoWidth) * 0.5f;
+      float logoY1 = (height - logoHeight) * 0.5f;
+      float logoX2 = width - logoX1;
+      float logoY2 = height - logoY1;
+      float logoZ = 1.0f;
+      logo_vertices[0] = logo_vertices[3] = logoX1;
+      logo_vertices[4] = logo_vertices[7] = logoY1;
+      logo_vertices[1] = logo_vertices[10] = logoY2;
+      logo_vertices[6] = logo_vertices[9] = logoX2;
+      logo_vertices[2] = logo_vertices[5] = logo_vertices[8] = logo_vertices[11] = logoZ;
+   }
 
    r = (float)currentFrame / maxFrame;
 
@@ -3572,6 +3612,20 @@ void MMDAgent::renderInterContentTransition(float width, float height, float cur
          glVertexPointer(3, GL_FLOAT, 0, v);
          glDrawElements(GL_TRIANGLES, 6, GL_INDICES, (const GLvoid *)idx);
       }
+   }
+   if (m_logoTex) {
+      float rate = r;
+      if (rate > 1.0f) rate = 1.0f;
+      glEnable(GL_TEXTURE_2D);
+      glBindTexture(GL_TEXTURE_2D, m_logoTex->getID());
+      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+      glVertexPointer(3, GL_FLOAT, 0, logo_vertices);
+      glTexCoordPointer(2, GL_FLOAT, 0, logo_texcoords);
+      glColor4f(1.0f, 1.0f, 1.0f, rate);
+      glDrawElements(GL_TRIANGLES, 6, GL_INDICES, (const GLvoid *)idx);
+      glBindTexture(GL_TEXTURE_2D, 0);
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+      glDisable(GL_TEXTURE_2D);
    }
 }
 
