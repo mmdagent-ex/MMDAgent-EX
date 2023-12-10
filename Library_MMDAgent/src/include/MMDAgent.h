@@ -361,6 +361,8 @@ private:
    char m_errorMessages[MMDAGENT_MAXBUFLEN];
    FTGLTextDrawElements m_elemErrorMessage;
 
+   PMDTexture *m_logoTex;
+
    /* getNewModelId: return new model ID */
    int getNewModelId();
 
