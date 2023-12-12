@@ -4966,10 +4966,12 @@ void MMDAgent::procDisplayRigidBodyMessage()
 
    if (m_dispBulletBodyFlag == true) {
       m_dispBulletBodyFlag = false;
-      m_offscreen->resume();
+      if (m_offscreen)
+         m_offscreen->resume();
    } else {
       m_dispBulletBodyFlag = true;
-      m_offscreen->pause();
+      if (m_offscreen)
+         m_offscreen->pause();
    }
 }
 
@@ -4984,10 +4986,12 @@ void MMDAgent::procDisplayWireMessage()
 
    glGetIntegerv(GL_POLYGON_MODE, polygonMode);
    if (polygonMode[1] == GL_LINE) {
-      m_offscreen->resume();
+      if (m_offscreen)
+         m_offscreen->resume();
       glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
    } else {
-      m_offscreen->pause();
+      if (m_offscreen)
+         m_offscreen->pause();
       glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
    }
 #endif /* !MMDAGENT_DONTRENDERDEBUG */
