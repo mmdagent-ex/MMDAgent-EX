@@ -112,11 +112,14 @@ public:
    /* ~PMDTexture: destructor */
    ~PMDTexture();
 
-   /* load: load from file name */
+   /* load: load image from file name as texture */
    bool load(const char *fileName, bool sphereFlag = false, bool sphereAddFlag = false);
 
    /* loadPNG: load PNG texture */
    bool loadPNG(const char *fileName);
+
+   /* loadImage: load image from file name as an image */
+   bool loadImage(const char *fileName);
 
    /* getID: get OpenGL texture ID */
    GLuint getID();

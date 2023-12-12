@@ -496,7 +496,7 @@ bool Menu::loadIcon(const char *appDirName)
    MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%c%s", appDirName, MMDAGENT_DIRSEPARATOR, MENU_ICONPATH);
 
    tex = new PMDTexture;
-   if (tex->load(buff)) {
+   if (tex->loadImage(buff)) {
       m_icon = tex;
    } else {
       delete tex;
@@ -1217,7 +1217,7 @@ int Menu::add(const char *name, int priority, void(*func)(int id, int row, void 
          m_stem[i].priority = priority;
          if (imageFile) {
             tex = new PMDTexture;
-            if (tex->load(imageFile))
+            if (tex->loadImage(imageFile))
                m_stem[i].bgImage = tex;
             else
                delete tex;
@@ -1305,7 +1305,7 @@ bool Menu::setItem(int id, int row, const char *label, const char *imagefile, co
    m_stem[id].image[row] = NULL;
    if (imagefile) {
       tex = new PMDTexture;
-      if (tex->load(imagefile))
+      if (tex->loadImage(imagefile))
          m_stem[id].image[row] = tex;
       else
          delete tex;
