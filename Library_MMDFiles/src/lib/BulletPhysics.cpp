@@ -410,6 +410,9 @@ void BulletPhysics::debugDisplay()
       m_fboInitialized = true;
    }
 
+   /* get status about wire mode */
+   glGetIntegerv(GL_POLYGON_MODE, polygonMode);
+
    if (m_fboDisabled == true) {
       glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
       glDisable(GL_LIGHTING);
@@ -431,15 +434,15 @@ void BulletPhysics::debugDisplay()
    GLint viewport[4];
    glGetIntegerv(GL_VIEWPORT, viewport);
 
-   /* get status about wire mode */
-   glGetIntegerv(GL_POLYGON_MODE, polygonMode);
-
    /* switch to fill on wire mode */
    if (polygonMode[1] == GL_LINE)
       glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
    /* draw bodies to texture */
+   GLfloat bkColor[4];
+   glGetFloatv(GL_COLOR_CLEAR_VALUE, bkColor);
    glBindFramebuffer(GL_FRAMEBUFFER, m_fboID);
+   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
    glViewport(0, 0, BULLETPHYSICS_DEBUG_TEXTURE_SIZE, BULLETPHYSICS_DEBUG_TEXTURE_SIZE);
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
    glDisable(GL_LIGHTING);
@@ -455,6 +458,7 @@ void BulletPhysics::debugDisplay()
    glEnable(GL_DEPTH_TEST);
    glEnable(GL_LIGHTING);
    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+   glClearColor(bkColor[0], bkColor[1], bkColor[2], bkColor[3]);
 
    /* restore viewport */
    glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
@@ -508,7 +512,6 @@ void BulletPhysics::debugDisplay()
    glPopMatrix();
    glMatrixMode(GL_MODELVIEW);
    glEnable(GL_LIGHTING);
-
    /* switch to line on wire mode */
    if (polygonMode[1] == GL_LINE)
       glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
