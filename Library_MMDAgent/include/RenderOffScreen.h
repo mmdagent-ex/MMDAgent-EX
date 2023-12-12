@@ -41,6 +41,9 @@ private:
    float m_intensity;      /* intensity of effect */
    float m_scalingFactor;  /* scale of effect */
 
+   Render *m_render;       /* render buffer */
+   int m_pauseCount;       /* pause call counter */
+
    /* initialize: initialzie Render */
    void initialize();
 
@@ -67,8 +70,11 @@ public:
    /* getInfoLog: get info log */
    const char *getInfoLog();
 
+   /* updateRender: update render status */
+   void updateRender();
+
    /* setup: initialize and setup */
-   bool setup(int width, int height);
+   bool setup(Render *render, int width, int height);
 
    /* changeScreenSize: change screen size */
    void changeScreenSize(int width, int height);
@@ -79,31 +85,25 @@ public:
    /* finish: finish off-screen rendering */
    void finish();
 
-   /* getFrameBufferId: get frame buffer id */
-   GLuint getFrameBufferId();
+   /* pause: pause */
+   void pause();
 
-   /* getFrameBufferRequireInit: return flag if the current frame buffer requires surface initialization */
-   bool getFrameBufferRequireInit();
+   /* resume: resume */
+   void resume();
 
-   /* setFrameBufferRequireInit: set flag if the current frame buffer requires surface initialization */
-   void setFrameBufferRequireInit(bool flag);
+   /* setParam: set intensity and scaling parameters */
+   void setParam(float intensity, float scaling);
 
    /* getIntensity: get intensity */
    float getIntensity();
 
-   /* setIntensity: set intensity */
-   void setIntensity(float f);
-
-   /* toggleIntensity: toggle between a set of intensity values */
-   void toggleIntensity();
-
    /* getScaling: get scaling */
    float getScaling();
 
-   /* setScaling: set scaling */
-   void setScaling(float f);
+   /* setRelativeIntensity: set relative intensity */
+   void setRelativeIntensity(float addval);
 
-   /* toggleScaling: toggle between a set of scaling values */
-   void toggleScaling();
+   /* setRelativeScaling: set relative scaling */
+   void setRelativeScaling(float mulval);
 
 };

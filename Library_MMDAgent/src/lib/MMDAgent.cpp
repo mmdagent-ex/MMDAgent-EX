@@ -2063,17 +2063,10 @@ bool MMDAgent::setupSystem(const char *systemDirName, const char *pluginDirName,
 #ifndef NO_OFFSCREEN_RENDERING
    /* setup off-screen rendering */
    m_offscreen = new RenderOffScreen();
-   if (m_offscreen->setup(m_screenSize[0], m_screenSize[1]) == false) {
+   if (m_offscreen->setup(m_render, m_screenSize[0], m_screenSize[1]) == false) {
       sendLogString(m_moduleId, MLOG_ERROR, "off-screen rendering failed: %s", m_offscreen->getInfoLog());
       delete m_offscreen;
       m_offscreen = NULL;
-   }
-   if (m_offscreen) {
-      m_render->setDefaultFrameBufferId(m_offscreen->getFrameBufferId());
-      if (m_offscreen->getFrameBufferRequireInit()) {
-         m_render->initSurface();
-         m_offscreen->setFrameBufferRequireInit(false);
-      }
    }
 #endif /* NO_OFFSCREEN_RENDERING */
 
@@ -2375,15 +2368,8 @@ bool MMDAgent::setupWorld()
    setButtonsInDir(m_configDirName);
 
    /* set off-screen rendering */
-   if (m_offscreen && m_option->getUseDiffusionFilter() == true) {
-      m_offscreen->setIntensity(m_option->getDiffusionFilterIntensity());
-      m_offscreen->setScaling(m_option->getDiffusionFilterScale());
-      m_render->setDefaultFrameBufferId(m_offscreen->getFrameBufferId());
-      if (m_offscreen->getFrameBufferRequireInit()) {
-         m_render->initSurface();
-         m_offscreen->setFrameBufferRequireInit(false);
-      }
-   }
+   if (m_offscreen && m_option->getUseDiffusionFilter() == true)
+      m_offscreen->setParam(m_option->getDiffusionFilterIntensity(), m_option->getDiffusionFilterScale());
 
    /* set parallel skinning thread num */
    omp_set_num_threads(m_option->getParallelSkinningNumthreads());
@@ -4978,7 +4964,13 @@ void MMDAgent::procDisplayRigidBodyMessage()
    if(m_enable == false)
       return;
 
-   m_dispBulletBodyFlag = !m_dispBulletBodyFlag;
+   if (m_dispBulletBodyFlag == true) {
+      m_dispBulletBodyFlag = false;
+      m_offscreen->resume();
+   } else {
+      m_dispBulletBodyFlag = true;
+      m_offscreen->pause();
+   }
 }
 
 /* MMDAnget::procDisplayWireMessage: process display wire message */
@@ -4991,10 +4983,13 @@ void MMDAgent::procDisplayWireMessage()
       return;
 
    glGetIntegerv(GL_POLYGON_MODE, polygonMode);
-   if (polygonMode[1] == GL_LINE)
+   if (polygonMode[1] == GL_LINE) {
+      m_offscreen->resume();
       glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-   else
+   } else {
+      m_offscreen->pause();
       glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+   }
 #endif /* !MMDAGENT_DONTRENDERDEBUG */
 }
 
@@ -5208,12 +5203,7 @@ void MMDAgent::procShaderEffectMessage()
    if (m_offscreen == NULL)
       return;
 
-   m_offscreen->toggleIntensity();
-   m_render->setDefaultFrameBufferId(m_offscreen->getFrameBufferId());
-   if (m_offscreen->getFrameBufferRequireInit()) {
-      m_render->initSurface();
-      m_offscreen->setFrameBufferRequireInit(false);
-   }
+   m_offscreen->setRelativeIntensity(0.2f);
 }
 
 /* MMDAgent::procShaderEffectScalingMessage: process shader effect scaling message */
@@ -5225,7 +5215,7 @@ void MMDAgent::procShaderEffectScalingMessage()
    if (m_offscreen == NULL)
       return;
 
-   m_offscreen->toggleScaling();
+   m_offscreen->setRelativeScaling(1.4f);
 }
 
 /* MMDAgent::procDisplayLogMessage: process display log message */
