@@ -192,6 +192,8 @@ void RenderOffScreen::initialize()
    m_enabled = false;
    m_intensity = 0.0f;
    m_scalingFactor = 1.0f;
+   m_render = NULL;
+   m_pauseCount = 0;
 }
 
 /* RenderOffScreen::clear: free */
@@ -347,11 +349,27 @@ void RenderOffScreen::clearBuffers()
    m_buffersRequireInit = false;
 }
 
-/* RenderOffScreen::setup: set up */
-bool RenderOffScreen::setup(int width, int height)
+/* RenderOffScreen::updateRender: update render status */
+void RenderOffScreen::updateRender()
 {
+   if (m_render == NULL)
+      return;
+
+   m_render->setDefaultFrameBufferId(m_framebuffer);
+   if (m_buffersRequireInit) {
+      m_render->initSurface();
+      m_buffersRequireInit = false;
+   }
+}
+
+/* RenderOffScreen::setup: set up */
+bool RenderOffScreen::setup(Render *render, int width, int height)
+{
+   m_render = render;
    m_width = width;
    m_height = height;
+
+   updateRender();
 
    return true;
 }
@@ -497,22 +515,33 @@ void RenderOffScreen::finish()
    glEnable(GL_DEPTH_TEST);
 }
 
-/* RenderOffScreen::getFrameBufferId: get frame buffer id */
-GLuint RenderOffScreen::getFrameBufferId()
+/* RenderOffScreen::pause: pause */
+void RenderOffScreen::pause()
 {
-   return m_framebuffer;
+   if (m_pauseCount == 0) {
+      if (m_enabled == true) {
+         clearBuffers();
+         m_enabled = false;
+         updateRender();
+      }
+   }
+   m_pauseCount++;
 }
 
-/* RenderOffScreen::getFrameBufferRequireInit: return flag if the current frame buffer requires surface initialization */
-bool RenderOffScreen::getFrameBufferRequireInit()
+/* RenderOffScreen::resume: resume */
+void RenderOffScreen::resume()
 {
-   return m_buffersRequireInit;
-}
+   if (m_pauseCount <= 0)
+      return;
 
-/* RenderOffScreen::setFrameBufferRequireInit: set flag if the current frame buffer requires surface initialization */
-void RenderOffScreen::setFrameBufferRequireInit(bool flag)
-{
-   m_buffersRequireInit = flag;
+   m_pauseCount--;
+   if (m_pauseCount == 0) {
+      if (m_intensity > 0.0f) {
+         initBuffers();
+         m_enabled = true;
+         updateRender();
+      }
+   }
 }
 
 /* RenderOffScreen::changeScreenSize: change screen size */
@@ -562,10 +591,10 @@ float RenderOffScreen::getIntensity()
    return m_intensity;
 }
 
-/* RenderOffScreen::setIntensity: set intensity */
-void RenderOffScreen::setIntensity(float f)
+/* RenderOffScreen::setParam: set intensity and scaling parameters */
+void RenderOffScreen::setParam(float intensity, float scaling)
 {
-   m_intensity = f;
+   m_intensity = intensity;
    if (m_enabled == false && m_intensity > 0.0f) {
       m_enabled = true;
       initBuffers();
@@ -573,21 +602,24 @@ void RenderOffScreen::setIntensity(float f)
       clearBuffers();
       m_enabled = false;
    }
+   m_scalingFactor = scaling;
+   updateRender();
 }
 
-/* RenderOffScreen::toggleIntensity: toggle between a set of intensity values */
-void RenderOffScreen::toggleIntensity()
+/* RenderOffScreen::setRelativeIntensity: set relative intensity */
+void RenderOffScreen::setRelativeIntensity(float addval)
 {
    if (m_intensity == 0.0f) {
       m_enabled = true;
       initBuffers();
    }
-   m_intensity += 0.2f;
+   m_intensity += addval;
    if (m_intensity > 1.0f) {
       clearBuffers();
       m_enabled = false;
       m_intensity = 0.0f;
    }
+   updateRender();
 }
 
 /* RenderOffScreen::getScaling: get scaling */
@@ -596,16 +628,10 @@ float RenderOffScreen::getScaling()
    return m_scalingFactor;
 }
 
-/* RenderOffScreen::setScaling: set scaling */
-void RenderOffScreen::setScaling(float f)
+/* RenderOffScreen::setRelativeScaling: set relative scaling */
+void RenderOffScreen::setRelativeScaling(float mulval)
 {
-   m_scalingFactor = f;
-}
-
-/* RenderOffScreen::toggleScaling: toggle between a set of scaling values */
-void RenderOffScreen::toggleScaling()
-{
-   m_scalingFactor *= 1.4f;
+   m_scalingFactor *= mulval;
    if (m_scalingFactor > 5.0f) {
       m_scalingFactor = 1.0f;
    }
