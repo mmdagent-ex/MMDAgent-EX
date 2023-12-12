@@ -194,7 +194,6 @@
 #include "GL/glfw.h"
 
 class MMDAgent;
-class SplashScreen;
 class LogToFile;
 
 #include "MMDAgent_utils.h"
@@ -330,8 +329,6 @@ private:
    bool m_contentUpdateStarted;    /* true when content update check was started */
    bool m_contentUpdateChecked;    /* true when content update check was done */
    int m_contentUpdateWait;        /* 0: not waiting, 1: system update is waiting 2: content update is waiting */
-   SplashScreen *m_splash;         /* splash screen renderer */
-   bool m_inihibitSplash;          /* true when skip slpash screen at start up */
    bool m_contentLaunched;         /* true when content was fully launched */
    bool m_contentDocViewing;       /* true when viewing content documents */
    LogToFile *m_logToFile;         /* logging class */
@@ -664,9 +661,6 @@ public:
    /* getArguments: return arguments given at start up */
    char **getArguments(int *num_ret);
 
-   /* inhibitSplash: skip showing splash screen at start up  */
-   void inhibitSplash();
-
    /* procWindowDestroyMessage: process window destroy message */
    void procWindowDestroyMessage();
 
@@ -857,57 +851,6 @@ public:
 
    /* getKeyHandler: get key handler */
    KeyHandler *getKeyHandler();
-};
-
-class SplashScreen {
-private:
-   PMDTexture *m_tex;
-   int m_screenWidth;
-   int m_screenHeight;
-   float m_width;
-   float m_height;
-   double m_duration;
-   double m_maxDuration;
-   double m_transFrame;
-   Timer *m_timer;
-   GLfloat m_vertices[12];
-   GLfloat m_texcoords[8];
-   bool m_active;
-
-   /* initialize: initialize SplashScreen */
-   void initialize();
-
-   /* clear: free SplashScreen */
-   void clear();
-
-   /* updateScreen: update screen parameter */
-   bool updateScreen(MMDAgent *mmdagent);
-
-public:
-
-   /* SplashScreen: constructor */
-   SplashScreen();
-
-   /* ~SplashScreen: destructor */
-   ~SplashScreen();
-
-   /* start: start */
-   bool start(const char *appDirName);
-
-   /* render: render */
-   bool render(MMDAgent *mmdagent);
-
-   /* end: end */
-   void end();
-
-   /* setActiveFlag: set active flag */
-   void setActiveFlag(bool flag);
-
-   /* isActive: return true when active */
-   bool isActive();
-
-   /* terminate: terminate animation */
-   void terminate();
 };
 
 class LogToFile {

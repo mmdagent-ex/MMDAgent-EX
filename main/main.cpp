@@ -1033,7 +1033,7 @@ static void openURI(const char *urlstring)
 }
 
 /* commonMain: common main function */
-int commonMain(int argc, char **argv, const char *systemDirName, const char *pluginDirName, const char *systemConfigFileName, const char *systemDownloadURI, bool inhibitSplashFlag)
+int commonMain(int argc, char **argv, const char *systemDirName, const char *pluginDirName, const char *systemConfigFileName, const char *systemDownloadURI)
 {
    enable = false;
 
@@ -1064,10 +1064,6 @@ int commonMain(int argc, char **argv, const char *systemDirName, const char *plu
    glfwInit();
    void* ptr = MMDFiles_alignedmalloc(sizeof(MMDAgent), 16);
    mmdagent = new(ptr) MMDAgent();
-
-   /* set if splash screen should be skipped */
-   if (inhibitSplashFlag == true)
-      mmdagent->inhibitSplash();
 
    /* setup system */
    if (mmdagent->setupSystem(systemDirName, pluginDirName, systemConfigFileName, systemDownloadURI, MAIN_TITLE) == false) {
@@ -1227,7 +1223,7 @@ int commonMainExec(int argc, char **argv)
    }
 
    /* run MMDAgent */
-   result = commonMain(argc, argv, systemDirName, pluginDirName, systemConfigFileName, sysDownloadURI, argc > 1 ? true : false);
+   result = commonMain(argc, argv, systemDirName, pluginDirName, systemConfigFileName, sysDownloadURI);
 
    /* free */
    free(systemDirName);
@@ -1459,7 +1455,7 @@ void android_main(struct android_app *app)
    }
 
    /* run MMDAgent */
-   result = commonMain(argc, argv, systemDirName, pluginDirName, systemConfigFileName, sysDownloadURI, false);
+   result = commonMain(argc, argv, systemDirName, pluginDirName, systemConfigFileName, sysDownloadURI);
 
    /* free */
    for(i = 0; i < 2; i++)
