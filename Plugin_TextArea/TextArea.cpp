@@ -333,7 +333,7 @@ void TextArea::setText(const char *text)
    if (MMDAgent_exist(p)) {
       /* image */
       m_imageTexture[m_bid] = new PMDTexture;
-      if (m_imageTexture[m_bid]->load(p) == true) {
+      if (m_imageTexture[m_bid]->loadImage(p) == true) {
          m_mmdagent->sendLogString(m_id, MLOG_STATUS, "image \"%s\", %d x %d", p, m_imageTexture[m_bid]->getWidth(), m_imageTexture[m_bid]->getHeight());
          is_image = true;
       } else {

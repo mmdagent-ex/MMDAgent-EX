@@ -994,7 +994,7 @@ PMDTexture::~PMDTexture()
    clear();
 }
 
-/* PMDTexture::load: load from file (multi-byte character) */
+/* PMDTexture::load: load image from file name as texture  */
 bool PMDTexture::load(const char *fileName, bool sphereFlag, bool sphereAddFlag)
 {
    bool ret = true;
@@ -1077,6 +1077,87 @@ bool PMDTexture::load(const char *fileName, bool sphereFlag, bool sphereAddFlag)
 #else
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+#endif /* __ANDROID__ || TARGET_OS_IPHONE */
+   if (m_components == 3) {
+      format = GL_RGB;
+      glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+   } else {
+      format = GL_RGBA;
+      glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+   }
+   m_format = format;
+
+   if (m_isAnimated) {
+      m_restFrame = 0.0;
+      m_currentFrame = 0;
+      glTexImage2D(GL_TEXTURE_2D, 0, format, m_width, m_height, 0, format, GL_UNSIGNED_BYTE, m_animationData[0]);
+   } else {
+      glTexImage2D(GL_TEXTURE_2D, 0, format, m_width, m_height, 0, format, GL_UNSIGNED_BYTE, m_textureData);
+   }
+
+   /* set highest priority to this texture to tell OpenGL to keep textures in GPU memory */
+   priority = 1.0f;
+   glPrioritizeTextures(1, &m_id, &priority);
+
+   /* free the texture data from CPU memory */
+   if (m_textureData) {
+      free(m_textureData);
+      m_textureData = NULL;
+   }
+
+   return true;
+}
+
+/* PMDTexture::loadImage: load image from file name as an image */
+bool PMDTexture::loadImage(const char *fileName)
+{
+   bool ret = true;
+   size_t len;
+   GLint format;
+   float priority;
+
+   clear();
+   len = MMDFiles_strlen(fileName);
+   if (len <= 0)
+      return false;
+
+   /* read texture bitmap from the file into textureData */
+   if (MMDFiles_strtailmatch(fileName, ".bmp") || MMDFiles_strtailmatch(fileName, ".BMP")) {
+      ret = loadBMP(fileName);
+   } else if (MMDFiles_strtailmatch(fileName, ".tga") || MMDFiles_strtailmatch(fileName, ".TGA")) {
+      ret = loadTGA(fileName);
+   } else if (MMDFiles_strtailmatch(fileName, ".png") || MMDFiles_strtailmatch(fileName, ".PNG")) {
+      ret = loadPNG(fileName);
+   } else if (MMDFiles_strtailmatch(fileName, ".jpg") || MMDFiles_strtailmatch(fileName, ".JPG") || MMDFiles_strtailmatch(fileName, ".jpeg") || MMDFiles_strtailmatch(fileName, ".JPEG")) {
+      ret = loadJPG(fileName);
+   } else {
+      /* unknown file suffix */
+      return false;
+   }
+
+   if (ret == false) {
+      /* failed to read and decode file */
+      return false;
+   }
+
+   /* generate texture */
+   glGenTextures(1, &m_id);
+   glBindTexture(GL_TEXTURE_2D, m_id);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+#if defined(__ANDROID__) || TARGET_OS_IPHONE
+   if (isPowerOfTwo(m_width) && isPowerOfTwo(m_height)) {
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+   } else {
+      /* some Android device cannot do GL_REPEAT on non-power-of-two sizes */
+      /* since MMD seems to run with no error with edge clamp, use it */
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+   }
+#else
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 #endif /* __ANDROID__ || TARGET_OS_IPHONE */
    if (m_components == 3) {
       format = GL_RGB;

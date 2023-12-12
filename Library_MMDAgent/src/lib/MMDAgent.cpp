@@ -2066,7 +2066,7 @@ bool MMDAgent::setupSystem(const char *systemDirName, const char *pluginDirName,
       delete m_logoTex;
    MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%c%s", m_appDirName, MMDAGENT_DIRSEPARATOR, "logo.png");
    m_logoTex = new PMDTexture;
-   if (m_logoTex->load(buff) == false) {
+   if (m_logoTex->loadImage(buff) == false) {
       delete m_logoTex;
       m_logoTex = NULL;
    }

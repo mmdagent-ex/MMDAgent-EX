@@ -132,7 +132,7 @@ bool Button::Set::setup(MMDAgent *mmdagent, int id, const char *imagePath, const
       return false;
    }
    tex = new PMDTexture;
-   if (tex->load(imagePath)) {
+   if (tex->loadImage(imagePath)) {
       m_image = tex;
    } else {
       delete tex;

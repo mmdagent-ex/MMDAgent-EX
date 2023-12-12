@@ -281,7 +281,7 @@ bool Stage::loadFrameTexture(const char *file)
    glActiveTexture(GL_TEXTURE0);
    glClientActiveTexture(GL_TEXTURE0);
    glEnable(GL_TEXTURE_2D);
-   ret = tex->load(file);
+   ret = tex->loadImage(file);
    glDisable(GL_TEXTURE_2D);
    if (ret == false) {
       delete tex;

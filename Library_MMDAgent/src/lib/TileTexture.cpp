@@ -103,7 +103,7 @@ bool TileTexture::load(const char *file)
    glActiveTexture(GL_TEXTURE0);
    glClientActiveTexture(GL_TEXTURE0);
    glEnable(GL_TEXTURE_2D);
-   ret = m_texture.load(file);
+   ret = m_texture.loadImage(file);
    glDisable(GL_TEXTURE_2D);
 
    if (ret == false)
