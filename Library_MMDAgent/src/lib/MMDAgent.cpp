@@ -75,14 +75,7 @@
 #define LASTPLAYEDDATAPATH "_lastplayed"
 #endif
 
-#define SPLASHSCREEN_DURATION_1WAIT     4.0
-#define SPLASHSCREEN_DURATION_2APPEAR  15.0
-#define SPLASHSCREEN_DURATION_3STAY    30.0
-#define SPLASHSCREEN_DURATION_4FADE    10.0
-#define SPLASHSCREEN_DURATION_BEFOREFADE (SPLASHSCREEN_DURATION_1WAIT + SPLASHSCREEN_DURATION_2APPEAR + SPLASHSCREEN_DURATION_3STAY)
-#define SPLASHSCREEN_DURATION_ALL (SPLASHSCREEN_DURATION_BEFOREFADE + SPLASHSCREEN_DURATION_4FADE)
-#define SPLASHSCREEN_DURATION_TRANS    (MMDAGENT_STARTANIMATIONFRAME * 0.7f)
-#define CENTER_LOGO_WIDTH_RATE          0.3f
+#define CENTER_LOGO_SIZE_RATE          0.3f
 
 #ifdef __ANDROID__
 /* debug function to get audio api name */
@@ -1631,8 +1624,6 @@ void MMDAgent::initialize()
    m_contentUpdateStarted = false;
    m_contentUpdateChecked = false;
    m_contentUpdateWait = 0;
-   m_splash = NULL;
-   m_inihibitSplash = false;
    m_logToFile = NULL;
    m_logUploader = NULL;
    m_contentLaunched = false;
@@ -1788,8 +1779,6 @@ void MMDAgent::clear()
       delete m_screen;
    if (m_option)
       delete m_option;
-   if (m_splash)
-      delete m_splash;
    if (m_logToFile)
       delete m_logToFile;
    if (m_logUploader)
@@ -1871,8 +1860,6 @@ bool MMDAgent::restart(const char *systemDirName, const char *pluginDirName, con
    m_argc = argc;
    m_screenSize[0] = w;
    m_screenSize[1] = h;
-   /* inhibit splash screen at restart */
-   m_inihibitSplash = true;
    /* execute setup with current arguments */
    ret = setupSystem(systemDirName, pluginDirName, systemConfigFileName, sysDownloadURL, title);
    if (ret == true)
@@ -2498,28 +2485,11 @@ bool MMDAgent::updateAndRender()
          /* get and set user context */
          getUserContext(m_configFileName);
       }
-      /* ready for splash screen rendering */
-      if (m_inihibitSplash == true) {
-         if (m_splash != NULL) {
-            delete m_splash;
-            m_splash = NULL;
-         }
-      } else if (m_splash == NULL) {
-         m_splash = new SplashScreen;
-         if (m_splash->start(m_appDirName) == true) {
-            m_splash->setActiveFlag(true);
-         } else {
-            /* failed, skip it */
-            m_splash->setActiveFlag(false);
-         }
-      }
       m_timer->setup();
       m_timer->startAdjustment();
-      if (m_splash == NULL) {
-         /* render for the first frame before message processing start */
-         if (renderScene() != true)
-            return false;
-      }
+      /* render for the first frame before message processing start */
+      if (renderScene() != true)
+         return false;
       return true;
    }
 
@@ -2546,19 +2516,6 @@ bool MMDAgent::updateAndRender()
       /* execute plugin start functions */
       m_plugin->execAppStart(this);
       m_pluginStarted = true;
-   }
-
-   if (m_splash && m_splash->isActive()) {
-      /* showing splash screen */
-      if (m_splash->render(this) == true)
-         /* skip content playing */
-         return true;
-      /* end of splash screen */
-      m_splash->end();
-      m_splash->setActiveFlag(false);
-      m_render->updateProjectionMatrix();
-      m_timer->setup();
-      m_timer->startAdjustment();
    }
 
    /* show doc on first time */
@@ -3492,15 +3449,20 @@ void MMDAgent::renderInterContentTransition(float width, float height, float cur
    GLfloat v[12];
    v[2] = v[5] = v[8] = v[11] = 0.9f;
    GLindices idx[6] = { 0, 1, 2, 0, 2, 3 };
-   float r;
+   float progress, r;
    /* for logo rendering */
    GLfloat logo_vertices[12];
    GLfloat logo_texcoords[8] = { 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
-   float logoWidth;
+   float logoWidth, logoHeight;
 
    if (m_logoTex) {
-      logoWidth = width * CENTER_LOGO_WIDTH_RATE;
-      float logoHeight = logoWidth * (float)(m_logoTex->getHeight()) / (float)(m_logoTex->getWidth());
+      if (width > height) {
+         logoHeight = height * CENTER_LOGO_SIZE_RATE;
+         logoWidth = logoHeight * (float)(m_logoTex->getWidth()) / (float)(m_logoTex->getHeight());
+      } else {
+         logoWidth = width * CENTER_LOGO_SIZE_RATE;
+         logoHeight = logoWidth * (float)(m_logoTex->getHeight()) / (float)(m_logoTex->getWidth());
+      }
       float logoX1 = (width - logoWidth) * 0.5f;
       float logoY1 = (height - logoHeight) * 0.5f;
       float logoX2 = width - logoX1;
@@ -3513,10 +3475,11 @@ void MMDAgent::renderInterContentTransition(float width, float height, float cur
       logo_vertices[2] = logo_vertices[5] = logo_vertices[8] = logo_vertices[11] = logoZ;
    }
 
-   r = (float)currentFrame / maxFrame;
+   progress = (float)currentFrame / maxFrame;
 
    if (patternId == 0) {
       /* pattern 1 */
+      r = progress;
       if (r > 0.8f)
          r = 2.0f;
       else
@@ -3554,9 +3517,9 @@ void MMDAgent::renderInterContentTransition(float width, float height, float cur
       float fshift = 0.1f;
       float fsize = 1.0f - fshift * 5.0f;
       for (int i = 0; i < 6; i++) {
-         float rr = r - fshift * i;
+         float rr = progress - fshift * i;
          if (closing == false)
-            rr = r - fshift * (5 - i);
+            rr = progress - fshift * (5 - i);
          rr /= fsize;
          float wr;
          if (rr < 0.0f)
@@ -3600,7 +3563,9 @@ void MMDAgent::renderInterContentTransition(float width, float height, float cur
       }
    }
    if (m_logoTex) {
-      float rate = r;
+      /* 0.0 from 0 to 0.25, 1.0 from 0.75 to 1.0*/
+      float rate = progress * 2.5f - 1.25f;
+      if (rate < 0.0f) rate = 0.0f;
       if (rate > 1.0f) rate = 1.0f;
       glEnable(GL_TEXTURE_2D);
       glBindTexture(GL_TEXTURE_2D, m_logoTex->getID());
@@ -4683,12 +4648,6 @@ char **MMDAgent::getArguments(int *num_ret)
    return m_argv;
 }
 
-/* MMDAgent::inhibitSplash: skip showing splash screen at start up  */
-void MMDAgent::inhibitSplash()
-{
-   m_inihibitSplash = true;
-}
-
 /* MMDAgent::procWindowDestroyMessage: process window destroy message */
 void MMDAgent::procWindowDestroyMessage()
 {
@@ -4722,12 +4681,6 @@ void MMDAgent::procMouseLeftButtonDownMessage(int x, int y, bool withCtrl, bool 
 {
    if(m_enable == false)
       return;
-
-   /* if tapped while splash screen, termiante it */
-   if (m_splash && m_splash->isActive()) {
-      m_splash->terminate();
-      return;
-   }
 
    /* start hold */
    m_mousePosX = x;
@@ -5310,12 +5263,6 @@ bool MMDAgent::procKeyMessage(int key, int action)
    if (m_enable == false)
       return false;
 
-   /* if key pushed while splash screen, terminate it */
-   if (action == GLFW_PRESS && m_splash && m_splash->isActive()) {
-      m_splash->terminate();
-      return true;
-   }
-
    if (action == GLFW_PRESS && m_loggerLog && m_loggerLog->isTypingActive()) {
       /* typing for narrowing */
       if (key == GLFW_KEY_ESC) {
@@ -5352,12 +5299,6 @@ bool MMDAgent::procCharMessage(char c)
 
    if (m_enable == false)
       return false;
-
-   /* if typed while splash screen, terminate it */
-   if (m_splash && m_splash->isActive()) {
-      m_splash->terminate();
-      return true;
-   }
 
    if (m_loggerLog && m_loggerLog->isTypingActive()) {
       /* typing for narrowing */
@@ -6738,213 +6679,6 @@ void MMDAgent::setOptionalStatusString(const char *str)
 KeyHandler *MMDAgent::getKeyHandler()
 {
    return &m_keyHandler;
-}
-
-/* SplashScreen::initialize: initialize SplashScreen */
-void SplashScreen::initialize()
-{
-   m_tex = NULL;
-   m_screenWidth = 0;
-   m_screenHeight = 0;
-   m_width = 0;
-   m_height = 0;
-   m_duration = 0.0;
-   m_maxDuration = SPLASHSCREEN_DURATION_BEFOREFADE + SPLASHSCREEN_DURATION_TRANS;
-   m_transFrame = 0.0;
-   m_timer = NULL;
-   m_active = false;
-   m_vertices[0] = m_vertices[2] = m_vertices[3] = m_vertices[4] = m_vertices[5] = m_vertices[7] = m_vertices[8] = m_vertices[11] = 0.0f;
-   m_vertices[1] = m_vertices[6] = m_vertices[9] = m_vertices[10] = 1.0f;
-   m_texcoords[0] = m_texcoords[1] = m_texcoords[2] = m_texcoords[7] = 0.0f;
-   m_texcoords[3] = m_texcoords[4] = m_texcoords[5] = m_texcoords[6] = 1.0f;
-}
-
-/* SplashScreen::clear: free SplashScreen */
-void SplashScreen::clear()
-{
-   if (m_tex)
-      delete m_tex;
-   if (m_timer)
-      delete m_timer;
-   initialize();
-}
-
-/* SplashScreen::SplashScreen: constructor */
-SplashScreen::SplashScreen()
-{
-   initialize();
-}
-
-/* SplashScreen::~SplashScreen: destructor */
-SplashScreen::~SplashScreen()
-{
-   clear();
-}
-
-/* SplashScreen::updateScreen: update screen parameter */
-bool SplashScreen::updateScreen(MMDAgent *mmdagent)
-{
-   float r, offset;
-
-   int w, h;
-   mmdagent->getWindowSize(&w, &h);
-   if (m_screenWidth != w || m_screenHeight != h) {
-      m_screenWidth = w;
-      m_screenHeight = h;
-      m_vertices[0] = m_vertices[2] = m_vertices[3] = m_vertices[4] = m_vertices[5] = m_vertices[7] = m_vertices[8] = m_vertices[11] = 0.0f;
-      m_vertices[1] = m_vertices[6] = m_vertices[9] = m_vertices[10] = 1.0f;
-      if (m_screenWidth > m_screenHeight) {
-         r = m_screenWidth / (float)m_screenHeight;
-         offset = (r - 1.0f) * 0.5f;
-         m_vertices[0] = m_vertices[3] = offset;
-         m_vertices[6] = m_vertices[9] = r - offset;
-         m_width = r;
-         m_height = 1.0f;
-      } else {
-         r = m_screenHeight / (float)m_screenWidth;
-         offset = (r - 1.0f) * 0.5f;
-         m_vertices[4] = m_vertices[7] = offset;
-         m_vertices[1] = m_vertices[10] = r - offset;
-         m_width = 1.0f;
-         m_height = r;
-      }
-      return true;
-   }
-   return false;
-}
-
-/* SplashScreen::start: start */
-bool SplashScreen::start(const char *appDirName)
-{
-   char buff[MMDAGENT_MAXBUFLEN];
-
-   MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%c%s", appDirName, MMDAGENT_DIRSEPARATOR, "splash.png");
-   m_tex = new PMDTexture;
-   if (m_tex->load(buff) == false) {
-      delete m_tex;
-      m_tex = NULL;
-      return false;
-   }
-
-   m_timer = new Timer;
-   m_timer->setup();
-
-   glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-
-   glDisable(GL_LIGHTING);
-   glMatrixMode(GL_PROJECTION);
-   glPushMatrix();
-   glLoadIdentity();
-   MMDAgent_setOrtho(0.0f, m_width, 0.0f, m_height, -1.0f, 1.0f);
-   glMatrixMode(GL_MODELVIEW);
-   glPushMatrix();
-   glLoadIdentity();
-   glActiveTexture(GL_TEXTURE0);
-   glClientActiveTexture(GL_TEXTURE0);
-   glEnable(GL_TEXTURE_2D);
-   glEnableClientState(GL_VERTEX_ARRAY);
-   glVertexPointer(3, GL_FLOAT, 0, m_vertices);
-   glBindTexture(GL_TEXTURE_2D, m_tex->getID());
-   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-   glTexCoordPointer(2, GL_FLOAT, 0, m_texcoords);
-
-   return true;
-}
-
-/* SplashScreen::render: render */
-bool SplashScreen::render(MMDAgent *mmdagent)
-{
-   GLindices indices[] = { 0, 1, 2, 0, 2, 3 };
-   float c = 0.0f;
-
-   if (m_duration >= m_maxDuration) {
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      glfwSwapBuffers();
-      return false;
-   }
-
-   if (updateScreen(mmdagent)) {
-      glMatrixMode(GL_PROJECTION);
-      glLoadIdentity();
-      MMDAgent_setOrtho(0.0f, m_width, 0.0f, m_height, -1.0f, 1.0f);
-      glMatrixMode(GL_MODELVIEW);
-      glVertexPointer(3, GL_FLOAT, 0, m_vertices);
-   }
-
-   m_duration += m_timer->getFrameInterval();
-   if (m_duration > m_maxDuration)
-      m_duration = m_maxDuration;
-
-   if (m_duration < SPLASHSCREEN_DURATION_1WAIT)
-      c = 0.0f;
-   else if (m_duration < SPLASHSCREEN_DURATION_1WAIT + SPLASHSCREEN_DURATION_2APPEAR)
-      c = (float)((m_duration - SPLASHSCREEN_DURATION_1WAIT) / SPLASHSCREEN_DURATION_2APPEAR);
-   else if (m_duration <  SPLASHSCREEN_DURATION_BEFOREFADE)
-      c = 1.0f;
-   else if (m_duration < SPLASHSCREEN_DURATION_ALL)
-      c = 1.0f - (float)((m_duration - SPLASHSCREEN_DURATION_BEFOREFADE) / SPLASHSCREEN_DURATION_4FADE);
-
-   m_transFrame = m_duration - SPLASHSCREEN_DURATION_BEFOREFADE;
-
-   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-   if (m_transFrame <= 0.0) {
-      /* render logo only */
-      glEnable(GL_TEXTURE_2D);
-      glBindTexture(GL_TEXTURE_2D, m_tex->getID());
-      glColor4f(1.0f, 1.0f, 1.0f, c);
-      glDrawElements(GL_TRIANGLES, 6, GL_INDICES, (const GLvoid *)indices);
-   } else {
-      if (m_duration < SPLASHSCREEN_DURATION_ALL) {
-         /* render logo before transition */
-         glEnable(GL_TEXTURE_2D);
-         glBindTexture(GL_TEXTURE_2D, m_tex->getID());
-         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-         glVertexPointer(3, GL_FLOAT, 0, m_vertices);
-         glColor4f(1.0f, 1.0f, 1.0f, c);
-         glDrawElements(GL_TRIANGLES, 6, GL_INDICES, (const GLvoid *)indices);
-         glBindTexture(GL_TEXTURE_2D, 0);
-         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-      }
-      /* render transition */
-      mmdagent->renderInterContentTransition(m_width, m_height, (float)m_transFrame, MMDAGENT_STARTANIMATIONFRAME * 0.7f, 0, true);
-   }
-
-   glfwSwapBuffers();
-
-   return true;
-}
-
-/* SplashScreen::end: end */
-void SplashScreen::end()
-{
-   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-   glDisable(GL_TEXTURE_2D);
-
-   glDisableClientState(GL_VERTEX_ARRAY);
-   glEnable(GL_LIGHTING);
-   glPopMatrix();
-   glMatrixMode(GL_PROJECTION);
-   glPopMatrix();
-   glMatrixMode(GL_MODELVIEW);
-}
-
-/* SplashScreen::setActiveFlag: set active flag */
-void SplashScreen::setActiveFlag(bool flag)
-{
-   m_active = flag;
-}
-
-/* SplashScreen::isActive: return true when active */
-bool SplashScreen::isActive()
-{
-   return m_active;
-}
-
-/* SplashScreen::terminate: terminate animation */
-void SplashScreen::terminate()
-{
-   m_duration = m_maxDuration;
 }
 
 /* LogToFile::initialize: initialize LogToFile */
