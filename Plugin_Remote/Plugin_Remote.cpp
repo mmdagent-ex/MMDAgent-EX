@@ -189,8 +189,6 @@ private:
    int m_len;
    int m_bp;
 
-   Speak m_speak;
-
    char m_statusString[MMDAGENT_MAXBUFLEN];
    bool m_statusStringUpdated;
    FTGLTextDrawElements m_elem;
@@ -465,8 +463,6 @@ public:
 
       m_thread = new Thread;
       m_thread->setup();
-
-      m_speak.setup(mmdagent, id);
    }
 
    // start main thread
@@ -1028,7 +1024,7 @@ public:
       return;
    }
 
-   void avatarUpdateMaxVol(float frame)
+   void avatarUpdateMaxVol(float frame, float speak_max_vol)
    {
       int vmax, v;
 
@@ -1044,7 +1040,7 @@ public:
                vmax = v;
          }
       }
-      v = m_speak.getMaxVol();
+      v = speak_max_vol;
       if (vmax < v)
          vmax = v;
       if (vmax == 0) {
@@ -1062,14 +1058,13 @@ public:
       m_maxVolUpdateFrame = PLUGIN_REMOTE_UPDATE_MAXVOL_FRAMES;
    }
 
-   void avatarUpdate(float frames)
+   void avatarUpdate(float frames, float speak_max_vol)
    {
       for (int i = 0; i < PLUGIN_REMOTE_MAXCLIENT; i++) {
          if (m_avatar[i])
             m_avatar[i]->update(frames);
       }
-      m_speak.update(frames);
-      avatarUpdateMaxVol(frames);
+      avatarUpdateMaxVol(frames, speak_max_vol);
       updateDisplayStatus();
       if (m_displayStatusFrame > 0.0) {
          m_displayStatusFrame -= frames;
@@ -1084,7 +1079,6 @@ public:
          if (m_avatar[i])
             m_avatar[i]->setEnableFlag(flag);
       }
-      m_speak.setAvatarEnableFlag(flag);
    }
 
    bool startLogging(const char *filename)
@@ -1105,11 +1099,6 @@ public:
       if (m_fpLog != NULL)
          fclose(m_fpLog);
       m_fpLog = NULL;
-   }
-
-   void speak(const char *modelName, const char *filename)
-   {
-      m_speak.startSpeakingThread(modelName, filename);
    }
 
    void updateDisplayStatus()
@@ -1236,6 +1225,8 @@ static bool status = false;
 static bool configured = false;
 static bool send_log = false;  // true: send log, false: send message
 
+static Speak speak;
+
 /* extAppStart: initialize controller */
 EXPORT void extAppStart(MMDAgent *mmdagent)
 {
@@ -1279,12 +1270,31 @@ EXPORT void extAppStart(MMDAgent *mmdagent)
       configured = false;
       enabled = false;
    }
+
+   speak.setup(mmdagent, mid);
+
 }
 
 /* extProcMessage: process message */
 EXPORT void extProcMessage(MMDAgent *mmdagent, const char *type, const char *args)
 {
    char buff[MMDAGENT_MAXBUFLEN];
+
+   if (MMDAgent_strequal(type, PLUGIN_COMMAND_SPEAK_START)) {
+      mmdagent->sendLogString(mid, MLOG_MESSAGE_CAPTURED, "%s|%s", type, args);
+      if (args) {
+         char *buff = MMDAgent_strdup(args);
+         char *modelName, *filename, *save;
+         modelName = MMDAgent_strtok(buff, "|", &save);
+         if (modelName) {
+            filename = MMDAgent_strtok(NULL, "|\r\n", &save);
+            if (filename)
+               speak.startSpeakingThread(modelName, filename);
+         }
+         free(buff);
+      }
+   }
+
    if (configured == false)
       return;
 
@@ -1308,8 +1318,10 @@ EXPORT void extProcMessage(MMDAgent *mmdagent, const char *type, const char *arg
       mmdagent->sendLogString(mid, MLOG_MESSAGE_CAPTURED, "%s|%s", type, args);
       if (enabled == true && plugin.is_active()) {
          if (MMDAgent_strequal(args, "DISABLE")) {
+            speak.setAvatarEnableFlag(false);
             plugin.avatarSetEnableFlag(false);
          } else if (MMDAgent_strequal(args, "ENABLE")) {
+            speak.setAvatarEnableFlag(true);
             plugin.avatarSetEnableFlag(true);
          }
       }
@@ -1329,19 +1341,6 @@ EXPORT void extProcMessage(MMDAgent *mmdagent, const char *type, const char *arg
             mmdagent->sendLogString(mid, MLOG_STATUS, "stop logging data sent from remote\n");
          }
          plugin.stopLogging();
-      }
-   } else if (MMDAgent_strequal(type, PLUGIN_COMMAND_SPEAK_START)) {
-      mmdagent->sendLogString(mid, MLOG_MESSAGE_CAPTURED, "%s|%s", type, args);
-      if (enabled == true && args) {
-         char *buff = MMDAgent_strdup(args);
-         char *modelName, *filename, *save;
-         modelName = MMDAgent_strtok(buff, "|", &save);
-         if (modelName) {
-            filename = MMDAgent_strtok(NULL, "|\r\n", &save);
-            if (filename)
-               plugin.speak(modelName, filename);
-         }
-         free(buff);
       }
    } else if (MMDAgent_strequal(type, MMDAGENT_EVENT_MODELADD)) {
       /* model is not set up for local lip sync, capture first model load and set up later */
@@ -1373,6 +1372,7 @@ EXPORT void extProcMessage(MMDAgent *mmdagent, const char *type, const char *arg
 /* extUpdate: update */
 EXPORT void extUpdate(MMDAgent *mmdagent, double deltaFrame)
 {
+   speak.update((float)deltaFrame);
    if (configured == false)
       return;
    if (enabled == true && plugin.is_active() == true) {
@@ -1394,7 +1394,7 @@ EXPORT void extUpdate(MMDAgent *mmdagent, double deltaFrame)
          mmdagent->sendMessage(mid, type, "%s", args);
       }
    }
-   plugin.avatarUpdate((float)deltaFrame);
+   plugin.avatarUpdate((float)deltaFrame, speak.getMaxVol());
    plugin.updateStatusString();
 }
 
