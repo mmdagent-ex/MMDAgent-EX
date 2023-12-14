@@ -820,7 +820,7 @@ void InfoText::render()
 bool InfoText::processMessage(const char *type, char *argv[], int num)
 {
    if (MMDAgent_strequal(type, MMDAGENT_INFOTEXT_SHOWFILECOMMAND)) {
-      /* INFOTEXT_SHOWFILE|filepath|title|buttonLabels(|scale(|BACKGROUNDCOLOR|TEXTCOLOR)) */
+      /* INFOTEXT_FILE|filepath|title|buttonLabels(|scale(|BACKGROUNDCOLOR|TEXTCOLOR)) */
       /* scale default: 1.0 */
       /* COLOR should be RRGGBB or RRGGBBAA */
       if (num < 3) {
@@ -842,7 +842,7 @@ bool InfoText::processMessage(const char *type, char *argv[], int num)
       setTextColor(num >= 6 ? argv[5] : NULL);
       show();
    } else if (MMDAgent_strequal(type, MMDAGENT_INFOTEXT_SHOWSTRINGCOMMAND)) {
-      /* INFOTEXT_SHOWSTRING|text|title|buttonLabels(|scale(|BACKGROUNDCOLOR|TEXTCOLOR)) */
+      /* INFOTEXT_STRING|text|title|buttonLabels(|scale(|BACKGROUNDCOLOR|TEXTCOLOR)) */
       /* scale default: 1.0 */
       /* COLOR should be RRGGBB or RRGGBBAA */
       if (num < 3) {

@@ -260,8 +260,6 @@ bool Avatar::processMessage(const char *AVString)
    char buff3[MMDAGENT_MAXBUFLEN];
    char *p, *save = NULL;
    int n = 0;
-   float rx, ry, rz;
-   float rx2, ry2, rz2;
    btVector3 pos;
    btQuaternion rot, rotSave, rot2;
    const btQuaternion norot(btScalar(0.0f), btScalar(0.0f), btScalar(0.0f), btScalar(1.0f));
