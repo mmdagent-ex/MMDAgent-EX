@@ -96,7 +96,8 @@ void PMDRigidBody::clear()
       btAlignedFree(m_kinematicMotionState);
    }
    if (m_body) {
-      m_world->removeCollisionObject(m_body); /* release body */
+      if (m_world)
+         m_world->removeCollisionObject(m_body); /* release body */
       delete m_body;
    }
    if (m_shape)

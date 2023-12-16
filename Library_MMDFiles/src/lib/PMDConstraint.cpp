@@ -69,7 +69,8 @@ void PMDConstraint::initialize()
 void PMDConstraint::clear()
 {
    if (m_constraint) {
-      m_world->removeConstraint(m_constraint);
+      if (m_world)
+         m_world->removeConstraint(m_constraint);
       delete m_constraint;
    }
 
