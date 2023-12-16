@@ -107,6 +107,9 @@ public:
    /* getName: get name */
    char *getName();
 
+   /* setName: set face name */
+   void setName(const char *name);
+
    /* getWeight: get weight */
    float getWeight();
 

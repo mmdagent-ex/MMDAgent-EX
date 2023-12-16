@@ -148,6 +148,9 @@ public:
    /* getName: get bone name */
    char *getName();
 
+   /* setName: set bone name */
+   void setName(const char *name);
+
    /* getType: get bone type */
    unsigned char getType();
 
