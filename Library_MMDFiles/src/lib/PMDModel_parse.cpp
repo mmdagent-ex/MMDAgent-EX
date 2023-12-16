@@ -740,17 +740,16 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
    char buf[4096];
    char *p, *q, save;
    unsigned long i, k;
-   unsigned long n;
+   unsigned long numMaterial;
    float col[4];
    float alpha, edgeWidth;
    bool face, edge, shadow, shadowMap;
    char *s, *tex, *sphere;
    unsigned short sphereMode;
-   bool hasMissingBone = false;
-   short hasBoneNum = 0;
    bool PMX2Recent = false;
    unsigned int surface_idx = 0;
    bool PMX257format = false;
+   unsigned short numBone;
 
    /*
 
@@ -778,7 +777,9 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
       return false;
    }
 
-   n = 0;
+   /* 1st pass: check format, and get bone names */
+   /* assuming that ext file contains the same bone list keeping order in pmd */
+   numBone = 0;
    while (zf->gets(buf, 4096) != NULL) {
       p = buf;
       q = p;
@@ -790,8 +791,7 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
          PMX257format = true;
          PMX2Recent = true;
          continue;
-      }
-      if (MMDFiles_strequal(p, ";Material") || MMDFiles_strequal(p, ";Bone") || MMDFiles_strequal(p, ";Joint")) {
+      } else if (MMDFiles_strequal(p, ";Material") || MMDFiles_strequal(p, ";Bone") || MMDFiles_strequal(p, ";Joint")) {
          /* check if this is an csv file built by recent PMXEditor */
          unsigned int numField;
          if (MMDFiles_strequal(p, ";Material"))
@@ -823,7 +823,66 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
          if (k >= numField)
             PMX2Recent = true;
          continue;
+      } else if (MMDFiles_strequal(p, "Bone") || MMDFiles_strequal(p, "PmxBone")) {
+         char *s;
+
+         m_hasExtBoneParam = true;
+
+         k = 1;
+         *q = save;
+         while (*q != '\0') {
+            if (*q == '"') q++;
+            if (*q == '\0') break;
+            p = q + 1;
+            if (*p == '\0') break;
+            if (*p == ',') {
+               q = p;
+               k++;
+               continue;
+            }
+            if (*p == '"') p++;
+            q = p;
+            while (*q != '\0' && *q != ',' && *q != '"') q++;
+            save = *q;
+            *q = '\0';
+            if (q - 1 >= p && *(q - 1) == '"') *(q - 1) = '\0';
+            if (k == 1) {
+               /* bone name */
+               if (numBone >= m_numBone)
+                  continue;
+               if (PMX257format)
+                  s = p;
+               else
+                  s = MMDFiles_strdup_from_sjis_to_utf8(p);
+               if (MMDFiles_strequal(m_boneList[numBone].getName(), s) == false) {
+                  // override the name of the bone with the newly given name
+                  m_boneList[numBone].setName(s);
+                  // add mapping from the new name to the bone
+                  m_name2bone.add(s, MMDFiles_strlen(s), &(m_boneList[numBone]));
+               }
+               if (PMX257format == false)
+                  free(s);
+            }
+            k++;
+            *q = save;
+         }
+         numBone++;
+         m_hasExtParam = true;
       }
+   }
+   if (numBone > 0 && numBone != m_numBone)
+      return false;
+
+   /* 2nd pass: parse all */
+   zf->rewind();
+   numMaterial = 0;
+   while (zf->gets(buf, 4096) != NULL) {
+      p = buf;
+      q = p;
+      while (*q != '\0' && *q != ',') q++;
+      save = *q;
+      *q = '\0';
+
       if (MMDFiles_strequal(p, "Material") || MMDFiles_strequal(p, "PmxMaterial")) {
          for (i = 0; i < 4; i++) col[i] = 0.0f;
          alpha = 1.0f;
@@ -893,11 +952,11 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
             k++;
             *q = save;
          }
-         if (n >= m_numMaterial)
+         if (numMaterial >= m_numMaterial)
             continue;
          /* set EXT parameters to the material */
-         m_material[n].setName(s);
-         m_material[n].setExtParam(edge, edgeWidth, &(col[0]), alpha, face, shadow, shadowMap, tex, sphere, sphereMode, dir, &m_textureLoader);
+         m_material[numMaterial].setName(s);
+         m_material[numMaterial].setExtParam(edge, edgeWidth, &(col[0]), alpha, face, shadow, shadowMap, tex, sphere, sphereMode, dir, &m_textureLoader);
          if (s && PMX257format == false)
             free(s);
          if (tex)
@@ -905,8 +964,8 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
          if (sphere)
             free(sphere);
          m_hasExtParam = true;
-         n++;
-         m_loadingProgressRate = 0.1f + (0.7f * n) / m_numMaterial;
+         numMaterial++;
+         m_loadingProgressRate = 0.1f + (0.7f * numMaterial) / m_numMaterial;
 #ifdef MY_EXTRADEFORMATION
       } else if (MMDFiles_strequal(p, "Vertex") || MMDFiles_strequal(p, "PmxVertex")) {
          unsigned long idx;
@@ -1463,14 +1522,13 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
             *q = '\0';
             if (q - 1 >= p && *(q - 1) == '"') *(q - 1) = '\0';
             if (k == 1) {
-               /* bone name */
-               if (PMX257format) {
-                  bone = getBone(p);
-               } else {
+               if (PMX257format)
+                  s = p;
+               else
                   s = MMDFiles_strdup_from_sjis_to_utf8(p);
-                  bone = getBone(s);
+               bone = getBone(s);
+               if (PMX257format == false)
                   free(s);
-               }
             } else if (k == 3) {
                processLayer = (short)atoi(p);
             } else if (k == 4) {
@@ -1495,9 +1553,7 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
             k++;
             *q = save;
          }
-         if (bone == NULL) {
-            hasMissingBone = true;
-         } else {
+         if (bone) {
             if (afterPhysics) {
                bone->enableProcessingAfterPhysics();
             } else {
@@ -1510,7 +1566,6 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
             if (move_add) {
                bone->setFollowMove(follow_rate, boneTarget);
             }
-            hasBoneNum++;
          }
          m_hasExtParam = true;
       } else if (MMDFiles_strequal(p, "Face") || MMDFiles_strequal(p, "PmxFace")) {
@@ -1552,10 +1607,6 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
    if (surface_idx > 0 && surface_idx * 3 != m_numSurface) {
       return false;
    }
-
-   /* enable ext-based bone update algorithm only when bone list matches 1 to 1 */
-   if (hasMissingBone == true || hasBoneNum != m_numBone)
-      m_hasExtBoneParam = false;
 
    /* make name index */
    for (unsigned short j = 0; j < m_numBoneMorph; j++) {

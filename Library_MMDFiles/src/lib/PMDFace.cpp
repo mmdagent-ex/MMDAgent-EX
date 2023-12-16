@@ -181,6 +181,14 @@ char *PMDFace::getName()
    return m_name;
 }
 
+/* PMDFace::setName: set face name */
+void PMDFace::setName(const char *name)
+{
+   if (m_name)
+      free(m_name);
+   m_name = MMDFiles_strdup(name);
+}
+
 /* PMDFace::getWeight: get weight */
 float PMDFace::getWeight()
 {

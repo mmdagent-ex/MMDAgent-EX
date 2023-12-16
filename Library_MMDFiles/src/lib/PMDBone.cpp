@@ -311,6 +311,14 @@ char *PMDBone::getName()
    return m_name;
 }
 
+/* PMDBone;:setName: set bone name */
+void PMDBone::setName(const char *name)
+{
+   if (m_name)
+      free(m_name);
+   m_name = MMDFiles_strdup(name);
+}
+
 /* PMDBone::getType: get bone type */
 unsigned char PMDBone::getType()
 {
