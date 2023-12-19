@@ -1041,9 +1041,11 @@ void _glfwPlatformSetWindowTitle( const char *title )
 #ifdef MMDAGENT
 void _glfwPlatformEnableFullScreen()
 {
+   [_glfwWin.window toggleFullScreen:true];
 }
 void _glfwPlatformDisableFullScreen()
 {
+   [_glfwWin.window toggleFullScreen:false];
 }
 void _glfwPlatformGetRenderingSize( int *width, int *height)
 {
