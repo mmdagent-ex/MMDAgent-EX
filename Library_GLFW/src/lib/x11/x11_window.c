@@ -1643,10 +1643,12 @@ void _glfwPlatformSetWindowTitle( const char *title )
 #ifdef MMDAGENT
 void _glfwPlatformEnableFullScreen( void )
 {
+    enterFullscreenMode();
 }
 
 void _glfwPlatformDisableFullScreen( void )
 {
+    leaveFullscreenMode();
 }
 
 void _glfwPlatformGetWindowPlacementInfo(int *x, int *y, int *width, int *height, int *maximized, int *fullscreen)
