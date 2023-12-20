@@ -1345,18 +1345,6 @@ void PMDTexture::setAnimationSpeedRate(double rate)
    m_animSpeedRate = rate;
 }
 
-/* PMDTexture::getData: get data */
-unsigned char *PMDTexture::getData()
-{
-   return m_textureData;
-}
-
-/* PMDTexture::getDataLength: get data length */
-unsigned int PMDTexture::getDataLength()
-{
-   return m_textureDataLen;
-}
-
 /* PMDTexture::getComponentNum: get component num */
 int PMDTexture::getComponentNum()
 {

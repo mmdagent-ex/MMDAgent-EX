@@ -151,12 +151,6 @@ public:
    /* setAnimationSpeedRate: set animatin speed rate */
    void setAnimationSpeedRate(double rate);
 
-   /* getData: get data */
-   unsigned char *getData();
-
-   /* getDataLength: get data length */
-   unsigned int getDataLength();
-
    /* getComponentNum: get component num */
    int getComponentNum();
 
