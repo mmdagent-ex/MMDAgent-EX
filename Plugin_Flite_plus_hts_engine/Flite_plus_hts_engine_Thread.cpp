@@ -295,6 +295,12 @@ void Flite_plus_hts_engine_Thread::run()
          if (MMDAgent_strequal(m_styleNames[index], style))
             break;
       if (index >= m_numStyles) { /* unknown style */
+         if (chara)
+            free(chara);
+         if (style)
+            free(style);
+         if (text)
+            free(text);
          m_speaking = false;
          continue;
       }
