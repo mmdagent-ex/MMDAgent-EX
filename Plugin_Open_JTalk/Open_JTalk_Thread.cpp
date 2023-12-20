@@ -335,8 +335,14 @@ void Open_JTalk_Thread::run()
          if (MMDAgent_strequal(m_styleNames[index], style))
             break;
       if (index >= m_numStyles) { /* unknown style */
-         m_mmdagent->sendLogString(m_id, MLOG_WARNING, "style \"%s\" not found, falling back to default", style);
-         index = 0;
+         if (chara)
+            free(chara);
+         if (style)
+            free(style);
+         if (text)
+            free(text);
+         m_speaking = false;
+         continue;
       }
 
       /* send SYNTH_EVENT_START */
