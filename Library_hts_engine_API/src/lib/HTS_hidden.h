@@ -163,6 +163,9 @@ void HTS_Audio_write(HTS_Audio * audio, short data);
 /* HTS_Audio_flush: flush remain data */
 void HTS_Audio_flush(HTS_Audio * audio);
 
+void HTS_Audio_start(HTS_Audio *audio);
+void HTS_Audio_stop(HTS_Audio *audio);
+
 /* HTS_Audio_clear: free audio */
 void HTS_Audio_clear(HTS_Audio * audio);
 

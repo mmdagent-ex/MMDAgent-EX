@@ -310,6 +310,14 @@ void HTS_Audio_clear(HTS_Audio * audio)
    HTS_Audio_initialize(audio);
 }
 
+void HTS_Audio_start(HTS_Audio *audio)
+{
+}
+
+void HTS_Audio_stop(HTS_Audio *audio)
+{
+}
+
 #endif                          /* AUDIO_PLAY_WIN32 */
 
 #ifdef AUDIO_PLAY_PORTAUDIO
@@ -416,10 +424,6 @@ void HTS_Audio_set_parameter(HTS_Audio * audio, size_t sampling_frequency, size_
    if (sampling_frequency == 0 || max_buff_size == 0)
       return;
 
-   audio->audio_interface = HTS_AudioInterface_open(sampling_frequency, max_buff_size);
-   if (audio->audio_interface == NULL)
-      return;
-
    audio->sampling_frequency = sampling_frequency;
    audio->max_buff_size = max_buff_size;
    audio->buff = (short *) HTS_calloc(max_buff_size, sizeof(short));
@@ -465,12 +469,25 @@ void HTS_Audio_clear(HTS_Audio * audio)
       return;
    audio_interface = (HTS_AudioInterface *) audio->audio_interface;
 
-   HTS_Audio_flush(audio);
-   HTS_AudioInterface_close(audio_interface);
    if (audio->buff != NULL)
       HTS_free(audio->buff);
    HTS_Audio_initialize(audio);
 }
+
+void HTS_Audio_start(HTS_Audio *audio)
+{
+   audio->audio_interface = HTS_AudioInterface_open(sampling_frequency, max_buff_size);
+   if (audio->audio_interface == NULL)
+      return;
+}
+
+void HTS_Audio_stop(HTS_Audio *audio)
+{
+   HTS_Audio_flush(audio);
+   HTS_AudioInterface_close(audio_interface);
+
+}
+
 
 #endif                          /* AUDIO_PLAY_PORTAUDIO */
 
@@ -498,6 +515,14 @@ void HTS_Audio_flush(HTS_Audio * audio)
 
 /* HTS_Audio_clear: free audio */
 void HTS_Audio_clear(HTS_Audio * audio)
+{
+}
+
+void HTS_Audio_start(HTS_Audio *audio)
+{
+}
+
+void HTS_Audio_stop(HTS_Audio *audio)
 {
 }
 
