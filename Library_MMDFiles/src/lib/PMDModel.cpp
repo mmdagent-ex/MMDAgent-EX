@@ -381,6 +381,7 @@ bool PMDModel::read(const char *file, BulletPhysics *bullet, SystemTexture *syst
    zf->close();
 
    if (ret == false) {
+      m_textureLoader.freeTextureWorkArea();
       free(dir);
       return ret;
    }
@@ -389,6 +390,7 @@ bool PMDModel::read(const char *file, BulletPhysics *bullet, SystemTexture *syst
    if (loadTeX == false) {
       m_loadingProgressRate = 0.1f;
       if (parseExtCsv(extname, dir) == false) {
+         m_textureLoader.freeTextureWorkArea();
          free(extname);
          return false;
       }
@@ -399,8 +401,10 @@ bool PMDModel::read(const char *file, BulletPhysics *bullet, SystemTexture *syst
 
    /* do model structure setup */
    ret = setupModel();
-   if (ret == false)
+   if (ret == false) {
+      m_textureLoader.freeTextureWorkArea();
       return false;
+   }
 
    m_loadingProgressRate = 0.9f;
 
