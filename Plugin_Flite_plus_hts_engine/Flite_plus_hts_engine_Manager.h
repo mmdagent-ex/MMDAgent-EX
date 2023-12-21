@@ -128,4 +128,7 @@ public:
 
    /* stop: stop synthesis */
    void stop(const char *str);
+
+   /* stopAll: stop all synthesis */
+   void stopAll();
 };
