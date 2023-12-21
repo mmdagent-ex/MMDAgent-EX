@@ -87,6 +87,8 @@ private:
    char **m_modelNames;    /* model names */
    int m_numStyles;        /* number of styles */
    char **m_styleNames;    /* style names */
+   char *m_dicDir;         /* dictionary directory */
+   double *m_weights;      /* weights */
 
    ZFileKey *m_key;        /* encryption file key */
    bool m_keyInit;         /* true when initialized */

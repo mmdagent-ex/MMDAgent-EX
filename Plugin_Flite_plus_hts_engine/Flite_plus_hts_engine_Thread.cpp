@@ -97,6 +97,7 @@ void Flite_plus_hts_engine_Thread::initialize()
    m_modelNames = NULL;
    m_numStyles = 0;
    m_styleNames = NULL;
+   m_weights = NULL;
 
    m_key = NULL;
    m_keyInit = false;
@@ -145,6 +146,9 @@ void Flite_plus_hts_engine_Thread::clear()
          free(m_styleNames[i]);
       free(m_styleNames);
    }
+
+   if (m_weights)
+      free(m_weights);
 
    if (m_key)
       delete m_key;
@@ -264,13 +268,9 @@ bool Flite_plus_hts_engine_Thread::load(MMDAgent *mmdagent, int id, const char *
       return false;
    }
 
-   /* load models for TTS */
-   if (m_flite_plus_hts_engine.load(m_modelNames, m_numModels, weights, m_numStyles) != true) {
-      free(weights);
-      clear();
-      return false;
-   }
-   free(weights);
+   if (m_weights)
+      free(m_weights);
+   m_weights = weights;
 
    return true;
 }
@@ -303,6 +303,10 @@ void Flite_plus_hts_engine_Thread::run()
    char lip[MMDAGENT_MAXBUFLEN];
    char *chara, *style, *text;
    int index;
+
+   /* load models for TTS */
+   if (m_flite_plus_hts_engine.load(m_modelNames, m_numModels, m_weights, m_numStyles) != true)
+      return;
 
    while (m_kill == false) {
       /* wait text */
