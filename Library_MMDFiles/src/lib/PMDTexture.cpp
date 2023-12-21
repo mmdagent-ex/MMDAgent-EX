@@ -65,6 +65,47 @@
 // length of frame for animation speed change
 #define ANIMATION_SPEED_CHANGE_FRAME 15.0
 
+
+/* TextureLoadMemory: constructor */
+TextureLoadMemory::TextureLoadMemory()
+{
+   m_memory = NULL;
+   m_size = 0;
+}
+
+/* TextureLoadMemory: destructor */
+TextureLoadMemory::~TextureLoadMemory()
+{
+   freeMemory();
+}
+
+/* TextureLoadMemory::allocMemory: allocate memory */
+void TextureLoadMemory::allocMemory(unsigned int size)
+{
+   freeMemory();
+   m_memory = malloc(size);
+   m_size = size;
+}
+
+/* TextureLoadMemory::freeMemory: free memory*/
+void TextureLoadMemory::freeMemory()
+{
+   if (m_memory)
+      free(m_memory);
+   m_memory = NULL;
+   m_size = 0;
+}
+
+/* TextureLoadMemory::getMemory: get memory */
+void *TextureLoadMemory::getMemory(unsigned int size)
+{
+   if (m_size < size) {
+      m_memory = realloc(m_memory, size);
+      m_size = size;
+   }
+   return m_memory;
+}
+
 #pragma pack(push, 1)
 
 /* BMPPallete: pallete for BMP */
@@ -370,7 +411,10 @@ bool PMDTexture::loadBMP(const char *fileName)
 
    /* prepare texture data area */
    m_textureDataLen = m_width * m_height * 4;
-   m_textureData = (unsigned char *) malloc (m_textureDataLen);
+   if (assignTextureDataStorage(m_textureDataLen) == false) {
+      delete zf;
+      return false;
+   }
 
    lineByte = (m_width * bit) / 8;
    if ((lineByte % 4) != 0)
@@ -572,7 +616,10 @@ bool PMDTexture::loadTGA(const char *fileName)
 
    /* prepare texture data area */
    m_textureDataLen = m_width * m_height * 4;
-   m_textureData = (unsigned char *) malloc(m_textureDataLen);
+   if (assignTextureDataStorage(m_textureDataLen) == false) {
+      delete zf;
+      return false;
+   }
    ptmp = m_textureData;
 
    m_isTransparent = false;
@@ -818,7 +865,12 @@ bool PMDTexture::loadPNG(const char *fileName)
       }
    } else {
       m_textureDataLen = png_get_rowbytes(png_ptr, info_ptr) * imageHeight;
-      m_textureData = (unsigned char *)malloc(m_textureDataLen);
+      if (assignTextureDataStorage(m_textureDataLen) == false) {
+         png_destroy_read_struct(&png_ptr, NULL, NULL);
+         fclose(fp);
+         delete zf;
+         return false;
+      }
       lineBuf = (png_bytep *)malloc(sizeof(png_bytep) * imageHeight);
       for (i = 0; i < imageHeight; i++)
          lineBuf[i] = &(m_textureData[png_get_rowbytes(png_ptr, info_ptr) * i]);
@@ -904,7 +956,12 @@ bool PMDTexture::loadJPG(const char *fileName)
    jpeg_start_decompress(&jpegDecompressor);
    buff = (JSAMPROW) malloc(jpegDecompressor.output_width * jpegDecompressor.output_components);
    m_textureDataLen = jpegDecompressor.output_height * jpegDecompressor.output_width * jpegDecompressor.output_components;
-   m_textureData = (unsigned char *) malloc(m_textureDataLen);
+   if (assignTextureDataStorage(m_textureDataLen) == false) {
+      jpeg_destroy_decompress(&jpegDecompressor);
+      fclose(fp);
+      delete zf;
+      return false;
+   }
    for (i = 0; jpegDecompressor.output_scanline < jpegDecompressor.output_height; i++) {
       jpeg_read_scanlines(&jpegDecompressor, &buff, 1);
       memcpy(&m_textureData[i * jpegDecompressor.output_width * jpegDecompressor.output_components], buff, jpegDecompressor.output_width * jpegDecompressor.output_components);
@@ -941,6 +998,7 @@ void PMDTexture::initialize()
    m_components = 3;
    m_textureData = NULL;
    m_textureDataLen = 0;
+   m_attachedWorkArea = NULL;
    m_isAnimated = false;
    m_numFrames = 0;
    m_animationData = NULL;
@@ -963,8 +1021,7 @@ void PMDTexture::clear()
 {
    if (m_id != PMDTEXTURE_UNINITIALIZEDID)
       glDeleteTextures(1, &m_id);
-   if (m_textureData)
-      free(m_textureData);
+   releaseTextureDataStorage();
    if (m_animationData) {
       for (int i = 0; i < (int)m_numFrames; i++)
          if (m_animationData[i]) free(m_animationData[i]);
@@ -982,6 +1039,30 @@ void PMDTexture::clear()
    initialize();
 }
 
+/* PMDTexture::assignTextureDataStorage: assign texture data storage */
+bool PMDTexture::assignTextureDataStorage(unsigned int size)
+{
+   if (m_attachedWorkArea)
+      m_textureData = (unsigned char *)m_attachedWorkArea->getMemory(size);
+   else
+      m_textureData = (unsigned char *)malloc(size);
+
+   if (m_textureData == NULL)
+      return false;
+   return true;
+}
+
+/* PMDTexture::releaseTextureDataStorage: release texture data storage */
+void PMDTexture::releaseTextureDataStorage()
+{
+   if (m_attachedWorkArea == NULL) {
+      if (m_textureData) {
+         free(m_textureData);
+         m_textureData = NULL;
+      }
+   }
+}
+
 /* constructor */
 PMDTexture::PMDTexture()
 {
@@ -995,7 +1076,7 @@ PMDTexture::~PMDTexture()
 }
 
 /* PMDTexture::load: load image from file name as texture  */
-bool PMDTexture::load(const char *fileName, bool sphereFlag, bool sphereAddFlag)
+bool PMDTexture::load(const char *fileName, bool sphereFlag, bool sphereAddFlag, TextureLoadMemory *workarea)
 {
    bool ret = true;
    size_t len;
@@ -1011,6 +1092,8 @@ bool PMDTexture::load(const char *fileName, bool sphereFlag, bool sphereAddFlag)
    len = MMDFiles_strlen(fileName);
    if (len <= 0)
       return false;
+
+   m_attachedWorkArea = workarea;
 
    m_isSphereMap = sphereFlag;
    m_isSphereMapAdd = sphereAddFlag;
@@ -1100,10 +1183,7 @@ bool PMDTexture::load(const char *fileName, bool sphereFlag, bool sphereAddFlag)
    glPrioritizeTextures(1, &m_id, &priority);
 
    /* free the texture data from CPU memory */
-   if (m_textureData) {
-      free(m_textureData);
-      m_textureData = NULL;
-   }
+   releaseTextureDataStorage();
 
    return true;
 }
@@ -1181,10 +1261,7 @@ bool PMDTexture::loadImage(const char *fileName)
    glPrioritizeTextures(1, &m_id, &priority);
 
    /* free the texture data from CPU memory */
-   if (m_textureData) {
-      free(m_textureData);
-      m_textureData = NULL;
-   }
+   releaseTextureDataStorage();
 
    return true;
 }

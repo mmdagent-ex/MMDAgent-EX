@@ -56,6 +56,29 @@
 
 #define PMDTEXTURE_UNINITIALIZEDID 0xFFFFFFFF
 
+/* TextureLoadMemory: sharable work area for texture loading */
+class TextureLoadMemory
+{
+public:
+   void *m_memory;         /* memory */
+   unsigned int m_size;    /* size */
+
+   /* constructor */
+   TextureLoadMemory();
+
+   /* destructor */
+   ~TextureLoadMemory();
+
+   /* allocMemory: allocate memory */
+   void allocMemory(unsigned int size);
+
+   /* freeMemory: free memory*/
+   void freeMemory();
+
+   /* getMemory: get memory */
+   void *getMemory(unsigned int size);
+};
+
 /* PMDTexture: texture of PMD */
 class PMDTexture
 {
@@ -68,8 +91,9 @@ private:
    int m_width;                  /* texture image width */
    int m_height;                 /* texture image height */
    unsigned char m_components;   /* number of components (3 for RGB, 4 for RGBA) */
-   unsigned char *m_textureData; /* texel data */
-   unsigned int m_textureDataLen;
+   unsigned char *m_textureData;   /* locally allocated texel data */
+   unsigned int m_textureDataLen;  /* size of m_textureData */
+   TextureLoadMemory *m_attachedWorkArea; /* given shared work area for texture loading */
    bool m_isAnimated;                /* true when this is animated texture */
    int m_numFrames;                  /* number of defined frames in animated texture */
    unsigned char **m_animationData;  /* buffer to hold frame images */
@@ -104,6 +128,12 @@ private:
    /* clear: free texture */
    void clear();
 
+   /* assignTextureDataStorage: assign texture data storage */
+   bool assignTextureDataStorage(unsigned int size);
+
+   /* releaseTextureDataStorage: release texture data storage */
+   void releaseTextureDataStorage();
+
 public:
 
    /* PMDTexture: constructor */
@@ -113,7 +143,7 @@ public:
    ~PMDTexture();
 
    /* load: load image from file name as texture */
-   bool load(const char *fileName, bool sphereFlag = false, bool sphereAddFlag = false);
+   bool load(const char *fileName, bool sphereFlag = false, bool sphereAddFlag = false, TextureLoadMemory *workarea = NULL);
 
    /* loadPNG: load PNG texture */
    bool loadPNG(const char *fileName);

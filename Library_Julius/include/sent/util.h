@@ -47,7 +47,7 @@
  * can be allocated for a small memory requirement.
  *
  */
-#define MYBMALLOC_BLOCK_SIZE 10000
+#define MYBMALLOC_BLOCK_SIZE 100000
 
 /// Information of allocated memory block for mybmalloc()
 typedef struct _bmalloc_base {
