@@ -460,6 +460,7 @@ static void HTS_Window_initialize(HTS_Window * win)
    win->l_width = NULL;
    win->r_width = NULL;
    win->coefficient = NULL;
+   win->coef_mem = NULL;
    win->max_width = 0;
 }
 
@@ -468,13 +469,14 @@ static void HTS_Window_clear(HTS_Window * win)
 {
    size_t i;
 
-   if (win->coefficient != NULL) {
+   if (win->coef_mem != NULL) {
       for (i = 0; i < win->size; i++) {
-         win->coefficient[i] += win->l_width[i];
-         HTS_free(win->coefficient[i]);
+         HTS_free(win->coef_mem[i]);
       }
-      HTS_free(win->coefficient);
+      HTS_free(win->coef_mem);
    }
+   if (win->coefficient != NULL)
+      HTS_free(win->coefficient);
    if (win->l_width)
       HTS_free(win->l_width);
    if (win->r_width)
@@ -499,6 +501,7 @@ static HTS_Boolean HTS_Window_load(HTS_Window * win, HTS_File ** fp, size_t size
    win->l_width = (int *) HTS_calloc(win->size, sizeof(int));
    win->r_width = (int *) HTS_calloc(win->size, sizeof(int));
    win->coefficient = (double **) HTS_calloc(win->size, sizeof(double *));
+   win->coef_mem = (double **)HTS_calloc(win->size, sizeof(double *));
    /* set delta coefficents */
    for (i = 0; i < win->size; i++) {
       if (HTS_get_token_from_fp(fp[i], buff) == FALSE) {
@@ -512,7 +515,8 @@ static HTS_Boolean HTS_Window_load(HTS_Window * win, HTS_File ** fp, size_t size
          }
       }
       /* read coefficients */
-      win->coefficient[i] = (double *) HTS_calloc(fsize, sizeof(double));
+      win->coef_mem[i] = (double *)HTS_calloc(fsize, sizeof(double));
+      win->coefficient[i] = win->coef_mem[i];
       for (j = 0; j < fsize; j++) {
          if (HTS_get_token_from_fp(fp[i], buff) == FALSE) {
             result = FALSE;

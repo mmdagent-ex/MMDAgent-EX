@@ -96,6 +96,7 @@ typedef struct _HTS_Window {
    int *l_width;                /* left width of windows */
    int *r_width;                /* right width of windows */
    double **coefficient;        /* window coefficient */
+   double **coef_mem;           /* window coefficient memory allocation */
    size_t max_width;            /* maximum width of windows */
 } HTS_Window;
 
