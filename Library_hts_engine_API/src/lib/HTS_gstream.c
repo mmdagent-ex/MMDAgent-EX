@@ -131,6 +131,9 @@ HTS_Boolean HTS_GStreamSet_create(HTS_GStreamSet * gss, HTS_PStreamSet * pss, si
       return FALSE;
    }
 
+   if (audio)
+      HTS_Audio_start(audio);
+
    /* synthesize speech waveform */
    HTS_Vocoder_initialize(&v, gss->gstream[0].vector_length - 1, stage, use_log_gain, sampling_rate, fperiod);
    if (gss->nstream >= 3)
@@ -142,8 +145,10 @@ HTS_Boolean HTS_GStreamSet_create(HTS_GStreamSet * gss, HTS_PStreamSet * pss, si
       HTS_Vocoder_synthesize(&v, gss->gstream[0].vector_length - 1, gss->gstream[1].par[i][0], &gss->gstream[0].par[i][0], nlpf, lpf, alpha, beta, volume, &gss->gspeech[j], audio);
    }
    HTS_Vocoder_clear(&v);
-   if (audio)
+   if (audio) {
       HTS_Audio_flush(audio);
+      HTS_Audio_stop(audio);
+   }
 
    return TRUE;
 }
