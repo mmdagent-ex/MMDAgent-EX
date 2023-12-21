@@ -345,9 +345,6 @@ static void HTS_AudioInterface_close(HTS_AudioInterface * audio_interface)
 {
    PaError err;
 
-   err = Pa_StopStream(audio_interface->stream);
-   if (err != paNoError)
-      HTS_error(0, "hts_engine: Cannot stop your output audio device.\n");
    err = Pa_CloseStream(audio_interface->stream);
    if (err != paNoError)
       HTS_error(0, "hts_engine: Failed to close your output audio device.\n");
@@ -363,36 +360,6 @@ static HTS_AudioInterface *HTS_AudioInterface_open(size_t sampling_frequency, si
 
    audio_interface = HTS_calloc(1, sizeof(HTS_AudioInterface));
    audio_interface->stream = NULL;
-
-   err = Pa_Initialize();
-   if (err != paNoError) {
-      HTS_error(0, "hts_engine: Failed to initialize your output audio device to play waveform.\n");
-      HTS_free(audio_interface);
-      return NULL;
-   }
-
-   audio_interface->parameters.device = Pa_GetDefaultOutputDevice();
-   audio_interface->parameters.channelCount = 1;
-   audio_interface->parameters.sampleFormat = paInt16;
-   audio_interface->parameters.suggestedLatency = Pa_GetDeviceInfo(audio_interface->parameters.device)->defaultLowOutputLatency;
-   audio_interface->parameters.hostApiSpecificStreamInfo = NULL;
-
-   err = Pa_OpenStream(&audio_interface->stream, NULL, &audio_interface->parameters, sampling_frequency, max_buff_size, paClipOff, NULL, NULL);
-   if (err != paNoError) {
-      HTS_error(0, "hts_engine: Failed to open your output audio device to play waveform.\n");
-      Pa_Terminate();
-      HTS_free(audio_interface);
-      return NULL;
-   }
-
-   err = Pa_StartStream(audio_interface->stream);
-   if (err != paNoError) {
-      HTS_error(0, "hts_engine: Failed to start your output audio device to play waveform.\n");
-      Pa_CloseStream(audio_interface->stream);
-      Pa_Terminate();
-      HTS_free(audio_interface);
-      return NULL;
-   }
 
    return audio_interface;
 }
@@ -422,6 +389,10 @@ void HTS_Audio_set_parameter(HTS_Audio * audio, size_t sampling_frequency, size_
    HTS_Audio_clear(audio);
 
    if (sampling_frequency == 0 || max_buff_size == 0)
+      return;
+
+   audio->audio_interface = HTS_AudioInterface_open(audio->sampling_frequency, audio->max_buff_size);
+   if (audio->audio_interface == NULL)
       return;
 
    audio->sampling_frequency = sampling_frequency;
@@ -469,6 +440,7 @@ void HTS_Audio_clear(HTS_Audio * audio)
       return;
    audio_interface = (HTS_AudioInterface *) audio->audio_interface;
 
+   HTS_AudioInterface_close(audio_interface);
    if (audio->buff != NULL)
       HTS_free(audio->buff);
    HTS_Audio_initialize(audio);
@@ -476,16 +448,56 @@ void HTS_Audio_clear(HTS_Audio * audio)
 
 void HTS_Audio_start(HTS_Audio *audio)
 {
-   audio->audio_interface = HTS_AudioInterface_open(sampling_frequency, max_buff_size);
-   if (audio->audio_interface == NULL)
+   HTS_AudioInterface *audio_interface = (HTS_AudioInterface *) audio->audio_interface;
+   PaError err;
+
+   if (audio_interface == NULL) return;
+
+   if (audio_interface->stream == NULL) {
+      err = Pa_Initialize();
+      if (err != paNoError) {
+         HTS_error(0, "hts_engine: Failed to initialize your output audio device to play waveform.\n");
+         HTS_free(audio_interface);
+         audio->audio_interface = NULL;
+         return;
+      }
+      audio_interface->parameters.device = Pa_GetDefaultOutputDevice();
+      audio_interface->parameters.channelCount = 1;
+      audio_interface->parameters.sampleFormat = paInt16;
+      audio_interface->parameters.suggestedLatency = Pa_GetDeviceInfo(audio_interface->parameters.device)->defaultLowOutputLatency;
+      audio_interface->parameters.hostApiSpecificStreamInfo = NULL;
+      err = Pa_OpenStream(&audio_interface->stream, NULL, &audio_interface->parameters, audio->sampling_frequency, audio->max_buff_size, paClipOff, NULL, NULL);
+      if (err != paNoError) {
+         HTS_error(0, "hts_engine: Failed to open your output audio device to play waveform.\n");
+         Pa_Terminate();
+         HTS_free(audio_interface);
+         audio->audio_interface = NULL;
+         return;
+      }
+   }
+   
+   err = Pa_StartStream(audio_interface->stream);
+   if (err != paNoError) {
+      HTS_error(0, "hts_engine: Failed to start your output audio device to play waveform.\n");
+      Pa_CloseStream(audio_interface->stream);
+      Pa_Terminate();
+      HTS_free(audio_interface);
+      audio->audio_interface = NULL;
       return;
+   }
 }
 
 void HTS_Audio_stop(HTS_Audio *audio)
 {
-   HTS_Audio_flush(audio);
-   HTS_AudioInterface_close(audio_interface);
+   HTS_AudioInterface *audio_interface = (HTS_AudioInterface *) audio->audio_interface;
+   PaError err;
 
+   if (audio->audio_interface == NULL) return;
+
+   HTS_Audio_flush(audio);
+   err = Pa_StopStream(audio_interface->stream);
+   if (err != paNoError)
+      HTS_error(0, "hts_engine: Cannot stop your output audio device.\n");
 }
 
 
