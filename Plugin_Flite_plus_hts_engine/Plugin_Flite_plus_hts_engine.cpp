@@ -88,6 +88,7 @@
 static int mid;
 static Flite_plus_hts_engine_Manager flite_plus_hts_engine_manager;
 static bool enable;
+static bool error_config;
 
 /* extAppStart: load amodels and start thread */
 EXPORT void extAppStart(MMDAgent *mmdagent)
@@ -107,12 +108,20 @@ EXPORT void extAppStart(MMDAgent *mmdagent)
       config[len - 3] = 'f';
       config[len - 2] = 'p';
       config[len - 1] = 'h';
-      flite_plus_hts_engine_manager.loadAndStart(mmdagent, mid, config);
+      if (flite_plus_hts_engine_manager.loadAndStart(mmdagent, mid, config) == false) {
+         if (config)
+            free(config);
+         error_config = true;
+         enable = false;
+         return;
+      }
+      mmdagent->sendLogString(mid, MLOG_STATUS, "config file %s", config);
    }
 
    if(config)
       free(config);
 
+   error_config = false;
    enable = true;
    mmdagent->sendMessage(mid, MMDAGENT_EVENT_PLUGINENABLE, "%s", PLUGINFLITEHTSENGINE_NAME);
 }
@@ -123,21 +132,31 @@ EXPORT void extProcMessage(MMDAgent *mmdagent, const char *type, const char *arg
    if(enable == true) {
       if(MMDAgent_strequal(type, MMDAGENT_COMMAND_PLUGINDISABLE)) {
          if(MMDAgent_strequal(args, PLUGINFLITEHTSENGINE_NAME)) {
+            mmdagent->sendLogString(mid, MLOG_MESSAGE_CAPTURED, "%s|%s", type, args);
             enable = false;
             mmdagent->sendMessage(mid, MMDAGENT_EVENT_PLUGINDISABLE, "%s", PLUGINFLITEHTSENGINE_NAME);
          }
       } else if (flite_plus_hts_engine_manager.isRunning()) {
          if (MMDAgent_strequal(type, PLUGINFLITEHTSENGINE_STARTCOMMAND)) {
+            mmdagent->sendLogString(mid, MLOG_MESSAGE_CAPTURED, "%s|%s", type, args);
             flite_plus_hts_engine_manager.synthesis(args);
          } else if (MMDAgent_strequal(type, PLUGINFLITEHTSENGINE_STOPCOMMAND)) {
+            mmdagent->sendLogString(mid, MLOG_MESSAGE_CAPTURED, "%s|%s", type, args);
             flite_plus_hts_engine_manager.stop(args);
          }
       }
    } else {
       if(MMDAgent_strequal(type, MMDAGENT_COMMAND_PLUGINENABLE)) {
          if(MMDAgent_strequal(args, PLUGINFLITEHTSENGINE_NAME)) {
-            enable = true;
-            mmdagent->sendMessage(mid, MMDAGENT_EVENT_PLUGINENABLE, "%s", PLUGINFLITEHTSENGINE_NAME);
+            mmdagent->sendLogString(mid, MLOG_MESSAGE_CAPTURED, "%s|%s", type, args);
+            if (error_config == false) {
+               enable = true;
+               mmdagent->sendMessage(mid, MMDAGENT_EVENT_PLUGINENABLE, "%s", PLUGINFLITEHTSENGINE_NAME);
+            }
+         }
+      } else if (MMDAgent_strequal(type, PLUGINFLITEHTSENGINE_STARTCOMMAND)) {
+         if (error_config == true) {
+            mmdagent->sendLogString(mid, MLOG_WARNING, "%s: not configured, \"%s\" ignored", PLUGINFLITEHTSENGINE_NAME, type);
          }
       }
    }
@@ -146,5 +165,6 @@ EXPORT void extProcMessage(MMDAgent *mmdagent, const char *type, const char *arg
 /* extAppEnd: stop and free thread */
 EXPORT void extAppEnd(MMDAgent *mmdagent)
 {
+   flite_plus_hts_engine_manager.stopAll();
    flite_plus_hts_engine_manager.stopAndRelease();
 }

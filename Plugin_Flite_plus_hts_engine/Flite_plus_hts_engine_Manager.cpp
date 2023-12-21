@@ -220,6 +220,9 @@ Flite_plus_hts_engine_Manager::~Flite_plus_hts_engine_Manager()
 /* Flite_plus_hts_engine_Manager::loadAndStart: load and start thread */
 bool Flite_plus_hts_engine_Manager::loadAndStart(MMDAgent *mmdagent, int id, const char *config)
 {
+   Flite_plus_hts_engine_Link *link;
+   bool ret;
+
    clear();
 
    m_mmdagent = mmdagent;
@@ -231,11 +234,18 @@ bool Flite_plus_hts_engine_Manager::loadAndStart(MMDAgent *mmdagent, int id, con
       return false;
    }
 
+   /* test config loading */
+   link = new Flite_plus_hts_engine_Link;
+   ret = link->flite_plus_hts_engine_thread.load(m_mmdagent, m_id, m_config);
+   delete link;
+   if (ret == false)
+      return false;
+
    glfwInit();
    m_mutex = glfwCreateMutex();
    m_cond = glfwCreateCond();
    m_thread = glfwCreateThread(mainThread, this);
-   if(m_mutex == NULL || m_cond == NULL || m_thread < 0) {
+   if (m_mutex == NULL || m_cond == NULL || m_thread < 0) {
       clear();
       return false;
    }
@@ -260,7 +270,11 @@ void Flite_plus_hts_engine_Manager::run()
    /* create initial threads */
    for(i = 0; i < FLITEPLUSHTSENGINEMANAGER_INITIALNTHREAD; i++) {
       link = new Flite_plus_hts_engine_Link;
-      if(link->flite_plus_hts_engine_thread.loadAndStart(m_mmdagent, m_id, m_config) == false)
+      if (link->flite_plus_hts_engine_thread.load(m_mmdagent, m_id, m_config) == false) {
+         m_mmdagent->sendLogString(m_id, MLOG_ERROR, "failed to open config file \"%s\"", m_config);
+         ret = false;
+      }
+      if (link->flite_plus_hts_engine_thread.start() == false)
          ret = false;
       link->next = m_list;
       m_list = link;
@@ -285,21 +299,28 @@ void Flite_plus_hts_engine_Manager::run()
          style = MMDAgent_strtok(NULL, "|", &save);
          text = MMDAgent_strtok(NULL, "|", &save);
 
-         if(chara != NULL && style != NULL && text != NULL) {
+         if (chara == NULL || style == NULL || text == NULL) {
+            m_mmdagent->sendLogString(m_id, MLOG_ERROR, "message corrupted");
+         } else {
             /* check character */
             for(i = 0, link = m_list; link; link = link->next, i++)
                if(link->flite_plus_hts_engine_thread.checkCharacter(chara) == true)
                   break;
             if(link) {
-               if(link->flite_plus_hts_engine_thread.isSpeaking() == true)
+               if (link->flite_plus_hts_engine_thread.isSpeaking() == true) {
+                  m_mmdagent->sendLogString(m_id, MLOG_STATUS, "character \"%s\" is burged in", chara);
                   link->flite_plus_hts_engine_thread.stop(); /* if the same character is speaking, stop immediately */
+               }
             } else {
                for(i = 0, link = m_list; link; link = link->next, i++)
                   if(link->flite_plus_hts_engine_thread.isRunning() == true && link->flite_plus_hts_engine_thread.isSpeaking() == false)
                      break;
                if(link == NULL) {
                   link = new Flite_plus_hts_engine_Link;
-                  link->flite_plus_hts_engine_thread.loadAndStart(m_mmdagent, m_id, m_config);
+                  if (link->flite_plus_hts_engine_thread.load(m_mmdagent, m_id, m_config) == false)
+                     return;
+                  if (link->flite_plus_hts_engine_thread.start() == false)
+                     return;
                   link->next = m_list;
                   m_list = link;
                }
@@ -353,5 +374,15 @@ void Flite_plus_hts_engine_Manager::stop(const char *str)
          link->flite_plus_hts_engine_thread.stop();
          return;
       }
+   }
+}
+
+/* Flite_plus_hts_engine_Manager::stopAll: stop all synthesis */
+void Flite_plus_hts_engine_Manager::stopAll()
+{
+   Flite_plus_hts_engine_Link *link;
+
+   for (link = m_list; link; link = link->next) {
+      link->flite_plus_hts_engine_thread.stop();
    }
 }

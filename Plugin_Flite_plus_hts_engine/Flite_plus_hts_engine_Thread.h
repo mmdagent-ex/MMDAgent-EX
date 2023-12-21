@@ -88,6 +88,9 @@ private:
    int m_numStyles;        /* number of styles */
    char **m_styleNames;    /* style names */
 
+   ZFileKey *m_key;        /* encryption file key */
+   bool m_keyInit;         /* true when initialized */
+
    /* initialize: initialize thread */
    void initialize();
 
@@ -102,8 +105,11 @@ public:
    /* ~Flite_plus_hts_engine_Thread: thread destructor */
    ~Flite_plus_hts_engine_Thread();
 
-   /* loadAndStart: load models and start thread */
-   bool loadAndStart(MMDAgent *mmdagent, int id, const char *config);
+   /* load: load models */
+   bool load(MMDAgent *mmdagent, int id, const char *config);
+
+   /* start: start thread */
+   bool start();
 
    /* stopAndRelease: stop thread and free Flite_HTS_Engine */
    void stopAndRelease();

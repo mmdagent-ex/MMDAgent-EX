@@ -97,6 +97,9 @@ void Flite_plus_hts_engine_Thread::initialize()
    m_modelNames = NULL;
    m_numStyles = 0;
    m_styleNames = NULL;
+
+   m_key = NULL;
+   m_keyInit = false;
 }
 
 /* Flite_plus_hts_engine_Thread::clear: free thread */
@@ -143,6 +146,9 @@ void Flite_plus_hts_engine_Thread::clear()
       free(m_styleNames);
    }
 
+   if (m_key)
+      delete m_key;
+
    initialize();
 }
 
@@ -158,30 +164,47 @@ Flite_plus_hts_engine_Thread::~Flite_plus_hts_engine_Thread()
    clear();
 }
 
-/* Flite_plus_hts_engine_Thread::loadAndStart: load models and start thread */
-bool Flite_plus_hts_engine_Thread::loadAndStart(MMDAgent *mmdagent, int id, const char *config)
+/* Flite_plus_hts_engine_Thread::load: load models */
+bool Flite_plus_hts_engine_Thread::load(MMDAgent *mmdagent, int id, const char *config)
 {
    int i, j, k;
    char buff[MMDAGENT_MAXBUFLEN];
-   FILE *fp;
+   ZFile *zf;
    bool err = false;
    double *weights;
 
+   m_mmdagent = mmdagent;
+   m_id = id;
+
+   /* load encryption key once */
+   if (m_keyInit == false) {
+      m_key = new ZFileKey();
+      if (m_key->loadKeyDir(m_mmdagent->getConfigDirName()) == false) {
+         delete m_key;
+         m_key = NULL;
+      }
+      m_keyInit = true;
+   }
+
    /* load config file */
-   fp = MMDAgent_fopen(config, "r");
-   if (fp == NULL)
+   zf = new ZFile(m_key);
+   if (zf->openAndLoad(config) == false) {
+      delete zf;
       return false;
+   }
 
    /* number of speakers */
-   i = MMDAgent_fgettoken(fp, buff);
+   i = zf->gettoken(buff);
    if (i <= 0) {
-      fclose(fp);
+      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "failed to get number of speakers in config file \"%s\", may be corrupted", config);
+      delete zf;
       clear();
       return false;
    }
    m_numModels = MMDAgent_str2int(buff);
    if (m_numModels <= 0) {
-      fclose(fp);
+      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "failed to get number of models in config file \"%s\", may be corrupted", config);
+      delete zf;
       clear();
       return false;
    }
@@ -189,28 +212,31 @@ bool Flite_plus_hts_engine_Thread::loadAndStart(MMDAgent *mmdagent, int id, cons
    /* model names */
    m_modelNames = (char **) malloc(sizeof(char *) * m_numModels);
    for (i = 0; i < m_numModels; i++) {
-      j = MMDAgent_fgettoken(fp, buff);
+      j = zf->gettoken(buff);
       if (j <= 0)
          err = true;
       m_modelNames[i] = MMDAgent_strdup(buff);
    }
    if (err) {
-      fclose(fp);
+      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "failed to get model names in config file \"%s\", may be corrupted", config);
+      delete zf;
       clear();
       return false;
    }
 
    /* number of speaking styles */
-   i = MMDAgent_fgettoken(fp, buff);
+   i = zf->gettoken(buff);
    if (i <= 0) {
-      fclose(fp);
+      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "failed to get number of speaking styles in config file \"%s\", may be corrupted", config);
+      delete zf;
       clear();
       return false;
    }
    m_numStyles = MMDAgent_str2int(buff);
    if (m_numStyles <= 0) {
+      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "failed to get number of speaking styles in config file \"%s\", may be corrupted", config);
       m_numStyles = 0;
-      fclose(fp);
+      delete zf;
       clear();
       return false;
    }
@@ -219,19 +245,20 @@ bool Flite_plus_hts_engine_Thread::loadAndStart(MMDAgent *mmdagent, int id, cons
    m_styleNames = (char **) calloc(m_numStyles, sizeof(char *));
    weights = (double *) calloc((3 * m_numModels + 4) * m_numStyles, sizeof(double));
    for (i = 0; i < m_numStyles; i++) {
-      j = MMDAgent_fgettoken(fp, buff);
+      j = zf->gettoken(buff);
       if(j <= 0)
          err = true;
       m_styleNames[i] = MMDAgent_strdup(buff);
       for (j = 0; j < 3 * m_numModels + 4; j++) {
-         k = MMDAgent_fgettoken(fp, buff);
+         k = zf->gettoken(buff);
          if (k <= 0)
             err = true;
          weights[(3 * m_numModels + 4) * i + j] = MMDAgent_str2float(buff);
       }
    }
-   fclose(fp);
+   delete zf;
    if(err) {
+      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "failed to get style names and weights in config file \"%s\", may be corrupted", config);
       free(weights);
       clear();
       return false;
@@ -245,15 +272,18 @@ bool Flite_plus_hts_engine_Thread::loadAndStart(MMDAgent *mmdagent, int id, cons
    }
    free(weights);
 
-   m_mmdagent = mmdagent;
-   m_id = id;
+   return true;
+}
 
+/* Flite_plus_hts_engine_Thread::start: start thread */
+bool Flite_plus_hts_engine_Thread::start()
+{
    /* start thread */
    glfwInit();
    m_mutex = glfwCreateMutex();
    m_cond = glfwCreateCond();
    m_thread = glfwCreateThread(mainThread, this);
-   if(m_mutex == NULL || m_cond == NULL || m_thread < 0) {
+   if (m_mutex == NULL || m_cond == NULL || m_thread < 0) {
       clear();
       return false;
    }
@@ -408,7 +438,8 @@ void Flite_plus_hts_engine_Thread::stop()
       glfwLockMutex(m_mutex);
 
       /* stop lip sync */
-      m_mmdagent->sendMessage(m_id, FLITEPLUSHTSENGINETHREAD_COMMANDSTOPLIP, "%s", m_charaBuff);
+      if (m_charaBuff)
+         m_mmdagent->sendMessage(m_id, FLITEPLUSHTSENGINETHREAD_COMMANDSTOPLIP, "%s", m_charaBuff);
 
       /* release buffer mutex */
       glfwUnlockMutex(m_mutex);
