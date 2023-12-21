@@ -371,6 +371,9 @@ bool PMDModel::read(const char *file, BulletPhysics *bullet, SystemTexture *syst
    /* initialize loading rate */
    m_loadingProgressRate = 0.0f;
 
+   /* pre-fetch common texture loading work area */
+   m_textureLoader.allocateTextureWorkArea(4096 * 4096 * 4);
+
    /* initialize and load from the data memories */
    ret = parse(zf->getData(), (unsigned long)zf->getSize(), bullet, systex, dir, loadTeX);
 
@@ -400,6 +403,9 @@ bool PMDModel::read(const char *file, BulletPhysics *bullet, SystemTexture *syst
       return false;
 
    m_loadingProgressRate = 0.9f;
+
+   m_textureLoader.freeTextureWorkArea();
+
 
    return true;
 }

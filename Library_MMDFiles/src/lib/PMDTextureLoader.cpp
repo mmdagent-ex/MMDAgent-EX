@@ -113,6 +113,7 @@ void PMDTextureLoader::initialize()
 {
    m_root = NULL;
    m_hasError = false;
+   m_textureLoadMemory = NULL;
 }
 
 /* PMDTextureLoader::clear: free texture loader  */
@@ -120,6 +121,8 @@ void PMDTextureLoader::clear()
 {
    TextureLink *tmp = m_root;
    TextureLink *next;
+
+   freeTextureWorkArea();
 
    while (tmp) {
       next = tmp->next;
@@ -160,7 +163,7 @@ PMDTexture *PMDTextureLoader::load(const char *filePath, const char *fileBaseNam
    if (tex == NULL) {
       /* not exist, try to load */
       tex = new PMDTexture;
-      if (tex->load(filePath, sphereFlag, sphereAddFlag) == false) {
+      if (tex->load(filePath, sphereFlag, sphereAddFlag, m_textureLoadMemory) == false) {
          /* failed, store with failed status */
          store(NULL, filePath, fileBaseName);
          m_hasError = true;
@@ -221,4 +224,21 @@ bool PMDTextureLoader::setAnimationSpeedRate(const char *fileName, double rate)
    }
 
    return(ret);
+}
+
+/* PMDTextureLoader::allocateTextureWorkArea: allocate texture work area */
+void PMDTextureLoader::allocateTextureWorkArea(unsigned int size)
+{
+   freeTextureWorkArea();
+   m_textureLoadMemory = new TextureLoadMemory();
+   m_textureLoadMemory->allocMemory(size);
+}
+
+/* PMDTextureLoader::freeTextureWorkArea: free texture work area */
+void PMDTextureLoader::freeTextureWorkArea()
+{
+   if (m_textureLoadMemory) {
+      delete m_textureLoadMemory;
+      m_textureLoadMemory = NULL;
+   }
 }

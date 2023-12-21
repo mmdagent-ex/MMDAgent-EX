@@ -69,6 +69,7 @@ private:
 
    TextureLink *m_root; /* linked list of textures currently loaded */
    bool m_hasError;     /* true then some error occured at texture loading */
+   TextureLoadMemory *m_textureLoadMemory;  /* common texture loading work area */
 
    /* lookup: lookup texture in cache */
    PMDTexture *lookup(const char *filePath, bool *alreadyFailRet);
@@ -104,4 +105,11 @@ public:
 
    /* setAnimationSpeedRate: set animation speed rate of a texture */
    bool setAnimationSpeedRate(const char *fileName, double rate);
+
+   /* allocateTextureWorkArea: allocate texture work area */
+   void allocateTextureWorkArea(unsigned int size);
+
+   /* freeTextureWorkArea: free texture work area */
+   void freeTextureWorkArea();
+
 };
