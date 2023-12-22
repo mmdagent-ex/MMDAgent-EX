@@ -1036,10 +1036,6 @@ static void enterFullscreenMode( void )
         _glfwWin.Saver.changed = GL_TRUE;
     }
 
-    _glfwSetVideoMode( _glfwWin.screen,
-                       &_glfwWin.width, &_glfwWin.height,
-                       &_glfwWin.refreshRate );
-
     if( _glfwWin.hasEWMH &&
         _glfwWin.wmState != None &&
         _glfwWin.wmStateFullscreen != None )
@@ -1093,7 +1089,9 @@ static void enterFullscreenMode( void )
     {
         // In override-redirect mode, we have divorced ourselves from the
         // window manager, so we need to do everything manually
-
+        _glfwSetVideoMode( _glfwWin.screen,
+                           &_glfwWin.width, &_glfwWin.height,
+                           &_glfwWin.refreshRate );
         XRaiseWindow( _glfwLibrary.display, _glfwWin.window );
         XSetInputFocus( _glfwLibrary.display, _glfwWin.window,
                         RevertToParent, CurrentTime );
