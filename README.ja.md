@@ -4,47 +4,7 @@
 [![ja](https://img.shields.io/badge/lang-ja-blue.svg)](README.ja.md)
 
 ---
-
-## クローンする前に
-
-このプロジェクトはGit LFS (Large File Storage) を使用してバイナリデータを管理しています。Git LFSがインストールされていない場合、バイナリデータが正しくクローンされません。**プロジェクトをクローンする前に** Git LFSをインストールするか、あるいは [GitHub Desktop](https://desktop.github.com/) などの LFS に対応した Git ツールを使って下さい。
-
-Git LFSをインストールする場合の手順は以下の通りです：
-
-### Linux/Ubuntu
-
-インストール
-
-```shell
-sudo apt install git-lfs
-```
-
-確認
-
-```shell
-git lfs version
-```
-
-### macOS
-
-インストール
-
-```shell
-brew install git-lfs
-```
-
-確認
-
-```shell
-git lfs version
-```
-
-### Windows
-
-[Git LFSのダウンロードページ](https://git-lfs.com/)からWindows用のインストーラーをダウンロードし、実行します。
-インストーラーに従ってGit LFSをインストールしてください。
-
----
+> 注意：このレポジトリでは大きいモデルファイルをホストするために Git LFS (Large File Storage) を使っています。**clone前にGit LFSをインストールするか、 [GitHub Desktop](https://desktop.github.com/) などの LFS に対応した Git ツールを使って下さい**。詳しい手順は[公式サイト](https://mmdagent-ex.dev/ja/) をご覧ください。
 
 ## これはなに？
 
@@ -54,16 +14,9 @@ MMDAgent は2011年に音声インタラクションの研究開発のための�
 
 MMDAgent-EX は MMD (MikuMikuDance) 互換の独自のOpenGLベースの描画エンジンを持ち、MMDの形式の3Dモデルとモーションを用いて対話キャラクターを構築することができます。Juliusや Open JTalk などの名工大で開発された音声認識・音声合成エンジンを持つほか、FSTベースの状態遷移型の原始的な対話スクリプト機能を内蔵しており、これ単体で音声対話システムを構築することが可能です。また、Python等のスクリプト言語と接続することができ、任意のクラウド音声認識・音声合成エンジンや ChatGPT 等の LLM をモジュールとして追加することができます。また、ソケット接続による外部制御にも対応していますので、既存の対話応答生成システムの入出力フロントエンドとして用いることもできます。
 
-(注意事項)
-
-- 本レポジトリに含まれるのは MMDAgent-EX のシステム（本体＋プラグイン）のみです。
-- 3Dモデルや対話スクリプト等のコンテンツファイル（アセット）は別途ご用意ください。
-
 ## ドキュメント
 
-全てのドキュメントは [開発サイト](https://mmdagent-ex.dev/ja/) にあります。
-
-本レポジトリにはツールのみが含まれています。システムとして動作させるためには、本ツールのほかに、CGモデルやモーション、対話スクリプトといったモジュールやコンテンツが必要です。別途ご準備ください。
+全てのドキュメントは [公式サイト](https://mmdagent-ex.dev/ja/) にあります。
 
 ## ライセンス
 
@@ -120,7 +73,17 @@ MMDAgent-EX のコードは Apache License, Version 2.0 で提供されていま
 
 ## リンク
 
-- [名工大 李 研究室](https://www.slp.nitech.ac.jp/)
+- [オフィシャルサイト](https://mmdagent-ex.dev/ja/)
+- 関連レポジトリ:
+  - [Exampleコンテンツ](https://github.com/mmdagent-ex/example)
+  - [CGアバター ジェネ / Gene](https://github.com/mmdagent-ex/gene)
+  - [CGアバター うか / Uka](https://github.com/mmdagent-ex/uka)
+
+## Contacts
+
+- Twitter/X [@MMDAgentEX](https://twitter.com/MMDAgentEX)（更新情報等お知らせ）
+- mmdagent-ex-official@lee-lab.org （研究・開発・許諾等ご相談）
+- 開発元：[名古屋工業大学 李 研究室](https://www.slp.nitech.ac.jp/)
 
 ## Acknowledgments
 

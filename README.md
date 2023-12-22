@@ -5,42 +5,7 @@
 
 ---
 
-## Cloning the Project
-
-This project uses Git LFS (Large File Storage) to manage binary files. If Git LFS is not installed in your environment, this project would not be cloned correctly.
-
-Before cloning the project, **please make sure to install Git LFS**. Or you should use some **LFS-enabled Git app** such as [GitHub Desktop](https://desktop.github.com/).
-
-### Installing Git LFS on Linux/Ubuntu
-
-```shell
-sudo apt install git-lfs
-```
-
-Verify:
-
-```shell
-git lfs version
-```
-
-### Installing Git LFS on macOS
-
-```shell
-brew install git-lfs
-```
-
-Verify:
-
-```shell
-git lfs version
-```
-
-###  Installing Git LFS onWindows
-
-1. Download the Git LFS installer for Windows from the [Git LFS download page](https://git-lfs.github.com/) and run it.
-2. Follow the installer instructions to install Git LFS.
-
----
+> Notice: this repository uses Git LFS (Large File Storage) to serve large model files.  **Make sure to install Git LFS before cloning this repository**.  See [the site](https://mmdagent-ex.dev/) for details.
 
 ## What is this?
 
@@ -50,15 +15,9 @@ MMDAgent was developed at Nagoya Institute of Technology since 2011 as an open-s
 
 MMDAgent-EX has its own OpenGL-based rendering engine compatible with MMD (MikuMikuDance), and can create interactive characters using 3D models and motion data in MMD format. It also includes speech recognition and synthesis engines developed at Nagoya Institute of Technology, such as Julius and Open JTalk, as well as an embedded FST-based state-transition primitive dialogue scripting feature, allowing you to build voice dialogue systems independently. Aside from the internal engines, it can be easily connected to other scripts like Python, so you can add another modules such as cloud-based speech recognition, speech synthesis engines, or large language models like ChatGPT with this system. Furthermore, it supports external control via socket connections, making it suitable for use as the input/output frontend for existing dialogue systems.
 
-Short Notice:
-
-- This repository contains no content assets (3D model, dialogue script, etc.).
-
 ## Documents
 
-All up-to-date documents are at the [development site](https://mmdagent-ex.dev/).
-
-This repository just contains the system. Content asset (3D model, dialogue script, etc.) is not included in this system.
+All documents are available at the [official site](https://mmdagent-ex.dev/).
 
 ## License
 
@@ -115,7 +74,17 @@ Disallowed usage of our software:
 
 ## Links
 
-- [Lee-Lab, Nitech](https://www.slp.nitech.ac.jp/en/)
+- [Official site](https://mmdagent-ex.dev/)
+- Related repositories:
+  - [Example content](https://github.com/mmdagent-ex/example)
+  - [CG Avatar Gene](https://github.com/mmdagent-ex/gene)
+  - [CG Avatar Uka](https://github.com/mmdagent-ex/uka)
+
+## Contacts
+
+- Twitter/X [@MMDAgentEX](https://twitter.com/MMDAgentEX)（for announcements）
+- mmdagent-ex-official@lee-lab.org (for inquiries about research, development, and licensing)
+-  [Lee Laboratory, Nagoya Institute of Technology](https://www.slp.nitech.ac.jp/en/)
 
 ## Acknowledgments
 
