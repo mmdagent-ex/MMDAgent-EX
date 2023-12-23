@@ -16,4 +16,5 @@ repository-code: 'https://github.com/mmdagent-ex/MMDAgent-EX'
 url: 'https://mmdagent-ex.dev/'
 license: Apache-2.0
 version: 1.0.0
-date-released: '2023-12-10'
+date-released: '2023-12-25'
+doi: 10.5281/zenodo.10427369
