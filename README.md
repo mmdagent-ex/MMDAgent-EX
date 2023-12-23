@@ -86,6 +86,29 @@ Disallowed usage of our software:
 - mmdagent-ex-official@lee-lab.org (for inquiries about research, development, and licensing)
 -  [Lee Laboratory, Nagoya Institute of Technology](https://www.slp.nitech.ac.jp/en/)
 
+## Citation
+
+**APA**
+
+```text
+Lee, A. (2023). MMDAgent-EX (Version 1.0.0) [Computer software]. https://doi.org/10.5281/zenodo.10427369
+```
+
+**BibTeX**
+
+```text
+@software{Lee_MMDAgent-EX_2023,
+  author = {Lee, Akinobu},
+  doi = {10.5281/zenodo.10427369},
+  license = {Apache-2.0},
+  month = dec,
+  title = {{MMDAgent-EX}},
+  url = {https://github.com/mmdagent-ex/MMDAgent-EX},
+  version = {1.0.0},
+  year = {2023}
+}
+```
+
 ## Acknowledgments
 
 MMDAgent-EX:
