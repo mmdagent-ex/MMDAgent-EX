@@ -635,6 +635,7 @@ bool MMDAgent::addMotion(const char *modelAlias, const char *motionAlias, const 
    int id;
    VMD *vmd;
    char *name;
+   MotionPlayer *motionPlayer;
 
    /* motion file */
    if (MMDAgent_exist(fileName) == false) {
@@ -650,7 +651,7 @@ bool MMDAgent::addMotion(const char *modelAlias, const char *motionAlias, const 
    /* ID */
    id = findModelAlias(modelAlias);
    if (id < 0) {
-      sendLogString(m_moduleId, MLOG_WARNING, "addMotion: %s is not found.", modelAlias);
+      sendLogString(m_moduleId, MLOG_WARNING, "addMotion: %s is not found, unable to start motion %s", modelAlias, motionAlias);
       return false;
    }
 
@@ -658,10 +659,23 @@ bool MMDAgent::addMotion(const char *modelAlias, const char *motionAlias, const 
    if (MMDAgent_strlen(motionAlias) > 0) {
       /* check the same alias */
       name = MMDAgent_strdup(motionAlias);
-      if (m_model[id].getMotionManager()->getRunning(name) != NULL) {
-         sendLogString(m_moduleId, MLOG_WARNING, "addMotion: motion alias \"%s\" is already used.", name);
+      motionPlayer = m_model[id].getMotionManager()->getRunning(name);
+      if (motionPlayer != NULL) {
+         sendLogString(m_moduleId, MLOG_WARNING, "addMotion: motion alias \"%s\" already exist, swap it.", name);
          free(name);
-         return false;
+         VMD *old = motionPlayer->vmd;
+         /* when smoothing has been disabled, skip next physics simulation for warping at beginning of changed motion */
+         if (motionPlayer->enableSmooth == false)
+            m_model[id].skipNextSimulation();
+         /* change motion */
+         if (m_model[id].swapMotion(vmd, motionAlias) == false) {
+            sendLogString(m_moduleId, MLOG_WARNING, "addMotion: %s: failed to change existing motion.", motionAlias);
+            m_motion->unload(vmd);
+            return false;
+         }
+         m_motion->unload(old);
+         sendMessage(m_moduleId, MMDAGENT_EVENT_MOTIONADD, "%s|%s", modelAlias, name);
+         return true;
       }
    } else {
       /* if motion alias is not specified, unused digit is used */
@@ -733,7 +747,7 @@ bool MMDAgent::changeMotion(const char *modelAlias, const char *motionAlias, con
 
    /* change motion */
    if (m_model[id].swapMotion(vmd, motionAlias) == false) {
-      sendLogString(m_moduleId, MLOG_WARNING, "changeMotion: %s is not found.", motionAlias);
+      sendLogString(m_moduleId, MLOG_WARNING, "changeMotion: %s: failed to change motion", motionAlias);
       m_motion->unload(vmd);
       return false;
    }
