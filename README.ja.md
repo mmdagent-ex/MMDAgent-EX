@@ -2,6 +2,7 @@
 
 [![en](https://img.shields.io/badge/lang-en-red.svg)](README.md)
 [![ja](https://img.shields.io/badge/lang-ja-blue.svg)](README.ja.md)
+[![DOI](https://zenodo.org/badge/691418774.svg)](https://zenodo.org/doi/10.5281/zenodo.10427368)
 
 ---
 > 注意：このレポジトリでは大きいモデルファイルをホストするために Git LFS (Large File Storage) を使っています。**clone前にGit LFSをインストールするか、 [GitHub Desktop](https://desktop.github.com/) などの LFS に対応した Git ツールを使って下さい**。詳しい手順は[公式サイト](https://mmdagent-ex.dev/ja/) をご覧ください。
