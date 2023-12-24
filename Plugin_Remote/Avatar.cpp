@@ -108,6 +108,8 @@ void Avatar::initialize()
    for (int i = 0; i < NUMACTIONUNITS; i++)
       m_auControl[i].clear();
 
+   m_noLipControl = NULL;
+   m_noLipControlNum = 0;
 }
 
 // Avatar::clear: clear instance
@@ -126,6 +128,9 @@ void Avatar::clear()
    if (m_mq)
       delete m_mq;
 
+   if (m_noLipControl)
+      delete [] m_noLipControl;
+
    initialize();
 }
 
@@ -134,6 +139,8 @@ void Avatar::resetFaceTarget()
 {
    for (int i = 0; i < LIP_NUM; i++)
       m_lipControl[i].resetTarget();
+   for (int i = 0; i < m_noLipControlNum; i++)
+      m_noLipControl[i].resetTarget();
    for (int i = 0; i < NUMACTIONUNITS; i++)
       m_auControl[i].resetTarget();
    m_arkit.resetTargets();
@@ -222,6 +229,26 @@ bool Avatar::assignModel(const char *alias)
          PMDFaceInterface *f = m_shapemap->getAUMorph(buf);
          if (f)
             m_auControl[i].set(f, 0.0f);
+      }
+   }
+
+   if (m_noLipControl) {
+      delete[] m_noLipControl;
+      m_noLipControl = NULL;
+   }
+   m_noLipControlNum = 0;
+   if (m_shapemap->getIgnoreLipMorphTree()) {
+      PMDFaceInterface *f;
+      void *save;
+      for (f = (PMDFaceInterface *)m_shapemap->getIgnoreLipMorphTree()->firstData(&save); f; f = (PMDFaceInterface *)m_shapemap->getIgnoreLipMorphTree()->nextData(&save)) {
+         m_noLipControlNum++;
+      }
+      m_noLipControl = new MorphControl[m_noLipControlNum];
+      int n = 0;
+      for (f = (PMDFaceInterface *)m_shapemap->getIgnoreLipMorphTree()->firstData(&save); f; f = (PMDFaceInterface *)m_shapemap->getIgnoreLipMorphTree()->nextData(&save)) {
+         m_noLipControl[n].set(f, 0.0f);
+         m_noLipControl[n].setTarget(0.0f);
+         n++;
       }
    }
 
@@ -470,14 +497,20 @@ void Avatar::update(float deltaFrame)
 
    if (m_faceTrackingFrameLeft == 0.0f && m_noControlFromAudioLipSync == false) {
       // face tracking parameter does not arrive for a moment, just do for lip sync
+      for (int i = 0; i < m_noLipControlNum; i++)
+         m_noLipControl[i].resetWeight();
       m_lipControl[LIP_A].resetWeight();
       m_lipControl[LIP_I].resetWeight();
       m_lipControl[LIP_U].resetWeight();
       m_lipControl[LIP_O].resetWeight();
+      for (int i = 0; i < m_noLipControlNum; i++)
+         m_noLipControl[i].addWeight(rate);
       m_lipControl[LIP_A].addWeight(rate);
       m_lipControl[LIP_I].addWeight(rate);
       m_lipControl[LIP_U].addWeight(rate);
       m_lipControl[LIP_O].addWeight(rate);
+      for (int i = 0; i < m_noLipControlNum; i++)
+         m_noLipControl[i].apply();
       m_lipControl[LIP_A].apply();
       m_lipControl[LIP_I].apply();
       m_lipControl[LIP_U].apply();
@@ -487,6 +520,8 @@ void Avatar::update(float deltaFrame)
    if (m_faceTrackingFrameLeft > 0.0f) {
       // control morphs
       // 1. clear weights on the target morph
+      for (int i = 0; i < m_noLipControlNum; i++)
+         m_noLipControl[i].resetWeight();
       for (int i = 0; i < LIP_NUM; i++)
          m_lipControl[i].resetWeight();
       for (int i = 0; i < NUMACTIONUNITS; i++)
@@ -494,6 +529,8 @@ void Avatar::update(float deltaFrame)
       m_arkit.resetWeights();
       m_exMorph.resetWeights();
       // 2. sum current weights to be applied to the target morph
+      for (int i = 0; i < m_noLipControlNum; i++)
+         m_noLipControl[i].addWeight(rate);
       for (int i = 0; i < LIP_NUM; i++)
          m_lipControl[i].addWeight(rate);
       for (int i = 0; i < NUMACTIONUNITS; i++)
@@ -501,6 +538,8 @@ void Avatar::update(float deltaFrame)
       m_arkit.addWeights(rate);
       m_exMorph.addWeights(rate);
       // 3. apply the summed weights to the target morph
+      for (int i = 0; i < m_noLipControlNum; i++)
+         m_noLipControl[i].apply();
       for (int i = 0; i < LIP_NUM; i++)
          m_lipControl[i].apply();
       for (int i = 0; i < NUMACTIONUNITS; i++)

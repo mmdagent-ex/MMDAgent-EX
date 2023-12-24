@@ -28,6 +28,7 @@ private:
 
    float m_eyeRotationCoef;
    PTree *m_lipMorph;
+   PTree *m_ignoreLipMorph;
    PTree *m_trackBone;
    PTree *m_auMorph;
    PTree *m_arKitMorph;
@@ -88,5 +89,11 @@ public:
 
    /* getLipIgnoreList: get lip ignore list */
    const char *getLipIgnoreList();
+
+   /* getIgnoreLipMorph: get ignore lip morph */
+   PMDFaceInterface *getIgnoreLipMorph(const char *ignoreLipEntryName);
+
+   /* getIgnoreLipMorphTree get ignore lip morph tree */
+   PTree *getIgnoreLipMorphTree();
 
 };
