@@ -102,6 +102,8 @@ private:
 
    ShapeMap *m_shapemap;
    MorphControl m_lipControl[LIP_NUM];
+   MorphControl *m_noLipControl;
+   int m_noLipControlNum;
    MorphControl m_auControl[NUMACTIONUNITS];
    MorphControlSet m_arkit;
    MorphControlSet m_exMorph;

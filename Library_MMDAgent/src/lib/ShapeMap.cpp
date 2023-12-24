@@ -23,6 +23,7 @@ void ShapeMap::initialize()
 {
    m_eyeRotationCoef = 1.0f;
    m_lipMorph = NULL;
+   m_ignoreLipMorph = NULL;
    m_trackBone = NULL;
    m_auMorph = NULL;
    m_arKitMorph = NULL;
@@ -48,6 +49,10 @@ void ShapeMap::clear()
    if (m_lipMorph) {
       freeMorphInstance(m_lipMorph);
       delete m_lipMorph;
+   }
+   if (m_ignoreLipMorph) {
+      freeMorphInstance(m_ignoreLipMorph);
+      delete m_ignoreLipMorph;
    }
    if (m_trackBone)
       delete m_trackBone;
@@ -113,6 +118,7 @@ bool ShapeMap::load(const char *fileName, PMDModel *pmd, const char *dirName)
       if (zf->openAndLoad(fileName)) {
          clear();
          m_lipMorph = new PTree;
+         m_ignoreLipMorph = new PTree;
          m_trackBone = new PTree;
          m_auMorph = new PTree;
          m_arKitMorph = new PTree;
@@ -143,6 +149,19 @@ bool ShapeMap::load(const char *fileName, PMDModel *pmd, const char *dirName)
                if (m_lipIgnoreList)
                   free(m_lipIgnoreList);
                m_lipIgnoreList = MMDAgent_strdup(p2);
+               char *buff = MMDAgent_strdup(p2);
+               char *p, *psave;
+               for (p = MMDAgent_strtok(buff, ",\r\n", &psave); p; p = MMDAgent_strtok(NULL, ",\r\n", &psave)) {
+                  PMDFaceInterface *f = getIgnoreLipMorph(p);
+                  if (f == NULL) {
+                     f = new PMDFaceInterface(pmd, p, 1.0f, false);
+                     if (f->isValid())
+                        m_ignoreLipMorph->add(p, MMDAgent_strlen(p), (void *)f);
+                     else
+                        delete f;
+                  }
+               }
+               free(buff);
             } else if (MMDAgent_strheadmatch(p1, "TRACK_")) {
                // tracking
                PMDBone *btmp = getTrackBone(p1);
@@ -404,4 +423,24 @@ void ShapeMap::doMorphTune()
 const char *ShapeMap::getLipIgnoreList()
 {
    return m_lipIgnoreList;
+}
+
+/* ShapeMap::getIgnoreLipMorph: get ignore lip morph */
+PMDFaceInterface *ShapeMap::getIgnoreLipMorph(const char *ignoreLipEntryName)
+{
+   char **data;
+
+   if (ignoreLipEntryName == NULL)
+      return NULL;
+   if (m_ignoreLipMorph == NULL)
+      return NULL;
+   if (m_ignoreLipMorph->search(ignoreLipEntryName, MMDAgent_strlen(ignoreLipEntryName), (void **)&data) == false)
+      return NULL;
+   return (PMDFaceInterface *)data;
+}
+
+/* ShapeMap::getIgnoreLipMorphTree get ignore lip morph tree */
+PTree *ShapeMap::getIgnoreLipMorphTree()
+{
+   return m_ignoreLipMorph;
 }
