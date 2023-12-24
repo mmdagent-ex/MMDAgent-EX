@@ -152,7 +152,6 @@ bool ServerClient::readyAsServer(int portnum)
    sin.sin_family = AF_INET;
    sin.sin_port = htons((unsigned short)portnum);
    if (bind(m_server_sd, (struct sockaddr *)&sin, sizeof(sin)) < 0) {
-      int errcode = WSAGetLastError();
       reset();
       return false;
    }
