@@ -3,11 +3,12 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](README.md)
 [![ja](https://img.shields.io/badge/lang-ja-blue.svg)](README.ja.md)
 [![DOI](https://zenodo.org/badge/691418774.svg)](https://zenodo.org/doi/10.5281/zenodo.10427368)
-
 ---
-> 注意：このレポジトリでは大きいモデルファイルをホストするために Git LFS (Large File Storage) を使っています。**clone前にGit LFSをインストールするか、 [GitHub Desktop](https://desktop.github.com/) などの LFS に対応した Git ツールを使って下さい**。詳しい手順は[公式サイト](https://mmdagent-ex.dev/ja/) をご覧ください。
+**A short demo (tap image to open video)**
 
-## これはなに？
+[![Demo movie](http://img.youtube.com/vi/iu2gU2uHAcc/0.jpg)](https://www.youtube.com/watch?v=iu2gU2uHAcc)
+---
+## MMDAgent-EX とは
 
 MMDAgent-EX は音声対話システム・アバターコミュニケーションのオープンソース研究開発プラットフォームです。CGキャラクターの表示・制御と音声・言語処理を組み合わせ、任意の音声対話システムを構築できる単体のシステムです。様々なモジュールの追加により、カメラやネットワークを組み合わせた多様なマルチモーダル対話システムを構築することが可能です。また、動作コマンドや音声データを外部からネットワーク経由で送り込むことでリップシンク付き音声再生やモーション再生・制御ができ、さまざまな既存の対話システムのフロントエンドとして動作させることもできます。
 
@@ -18,6 +19,8 @@ MMDAgent-EX は MMD (MikuMikuDance) 互換の独自のOpenGLベースの描画�
 ## ドキュメント
 
 全てのドキュメントは [公式サイト](https://mmdagent-ex.dev/ja/) にあります。
+
+> 注意：このレポジトリでは大きいモデルファイルをホストするために Git LFS (Large File Storage) を使っています。**clone前にGit LFSをインストールするか、 [GitHub Desktop](https://desktop.github.com/) などの LFS に対応した Git ツールを使って下さい**。詳しい手順は[公式サイト](https://mmdagent-ex.dev/ja/) をご覧ください。
 
 ## ライセンス
 
