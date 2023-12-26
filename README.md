@@ -3,10 +3,11 @@
 [![en](https://img.shields.io/badge/lang-en-red.svg)](README.md)
 [![ja](https://img.shields.io/badge/lang-ja-blue.svg)](README.ja.md)
 [![DOI](https://zenodo.org/badge/691418774.svg)](https://zenodo.org/doi/10.5281/zenodo.10427368)
-
 ---
+**A short demo (tap image to open video)**
 
-> Notice: this repository uses Git LFS (Large File Storage) to serve large model files.  **Make sure to install Git LFS before cloning this repository**.  See [the site](https://mmdagent-ex.dev/) for details.
+[![Demo movie](http://img.youtube.com/vi/iu2gU2uHAcc/0.jpg)](https://www.youtube.com/watch?v=iu2gU2uHAcc)
+---
 
 ## What is this?
 
@@ -19,6 +20,8 @@ MMDAgent-EX has its own OpenGL-based rendering engine compatible with MMD (MikuM
 ## Documents
 
 All documents are available at the [official site](https://mmdagent-ex.dev/).
+
+> Notice: this repository uses Git LFS (Large File Storage) to serve large model files.  **Make sure to install Git LFS before cloning this repository**.  See [the site](https://mmdagent-ex.dev/) for details.
 
 ## License
 
