@@ -22,7 +22,7 @@
 
 
 /* html elements */
-static const std::string html_header =
+static const std::string html_text_head =
 "<html><head>"
 "<meta charset = \"UTF-8\"><meta http-equiv=\"Cache-Control\" content=\"no-store\">"
 "<title>MMDAgent-EX internal message post page</title>"
@@ -31,7 +31,11 @@ static const std::string html_header =
 "</head><body>"
 "<h2>Message:</h2>"
 "<form action=\"/post\" method=\"post\">"
-"<textarea name=\"com\" style=\"width: 1024px; max-width: 100%;\" rows=\"3\"></textarea>"
+"<textarea name=\"com\" style=\"width: 1024px; max-width: 100%;\" rows=\"3\">"
+;
+
+static const std::string html_text_tail =
+"</textarea>"
 "<p></p><button>Send</button>"
 "</form>"
 "</div>"
@@ -57,6 +61,7 @@ void HttpServer::initialize()
       m_history[i] = NULL;
    m_historyLen = 0;
    m_historyCurrent = 0;
+   m_last = NULL;
    m_server = NULL;
    m_mmdagent = NULL;
    m_thread = -1;
@@ -77,6 +82,8 @@ void HttpServer::clear()
       if (m_history[i])
          free(m_history[i]);
    }
+   if (m_last)
+      free(m_last);
 
    initialize();
 }
@@ -106,6 +113,12 @@ void HttpServer::exec(const char *message)
    q = MMDAgent_strtok(NULL, "\r\n", &psave);
    m_mmdagent->sendMessage(0, p, q);
 
+   if (m_last != NULL && MMDAgent_strequal(m_last, message) == true)
+      return;
+   if (m_last)
+      free(m_last);
+   m_last = MMDAgent_strdup(message);
+
    /* add to history */
    if (m_historyLen < MMDAGENT_HTTPSERVER_MAX_HISTORY_NUM) {
       m_history[m_historyLen] = MMDAgent_strdup(message);
@@ -121,9 +134,9 @@ void HttpServer::exec(const char *message)
 }
 
 /* HttpServer::getHtmlString: get new html page string */
-char* HttpServer::getHtmlString()
+char* HttpServer::getHtmlString(const char *text)
 {
-   std::string page = html_header;
+   std::string page = html_text_head + text + html_text_tail;
 
    if (m_historyLen < MMDAGENT_HTTPSERVER_MAX_HISTORY_NUM) {
       for (int i = m_historyLen - 1; i >= 0; i--) {
@@ -152,28 +165,30 @@ void HttpServer::run()
 
    // access to "/": return form
    svr->Get("/", [this](const httplib::Request &, httplib::Response &res) {
-      char *s = getHtmlString();
+      char *s = getHtmlString("");
       res.set_content(s, "text/html");
       free(s);
       });
 
    // accecss to "/req": get message as query "com=..."
    svr->Get("/req", [this](const httplib::Request &req, httplib::Response &res) {
+      std::string val = "";
       if (req.has_param("com")) {
-         std::string val = req.get_param_value("com");
+         val = req.get_param_value("com");
          exec(val.c_str());
       }
-      char *s = getHtmlString();
+      char *s = getHtmlString(val.c_str());
       res.set_content(s, "text/html");
       free(s);
       });
 
    svr->Post("/post", [this](const httplib::Request &req, httplib::Response &res) {
+      std::string val = "";
       if (req.has_param("com")) {
-         std::string val = req.get_param_value("com");
+         val = req.get_param_value("com");
          exec(val.c_str());
       }
-      char *s = getHtmlString();
+      char *s = getHtmlString(val.c_str());
       res.set_content(s, "text/html");
       free(s);
       });
