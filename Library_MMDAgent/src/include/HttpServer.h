@@ -25,6 +25,7 @@ private:
    char *m_history[MMDAGENT_HTTPSERVER_MAX_HISTORY_NUM];/* history */
    int m_historyLen;
    int m_historyCurrent;
+   char *m_last;
    void *m_server;            /* server instance */
    MMDAgent *m_mmdagent;      /* mmdagent instance */
    GLFWthread m_thread; // thread ID
@@ -39,7 +40,7 @@ private:
    void exec(const char * message);
 
    /* getHtmlString: get new html page string */
-   char *getHtmlString();
+   char *getHtmlString(const char *text);
 
 public:
 
