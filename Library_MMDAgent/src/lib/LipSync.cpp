@@ -243,6 +243,10 @@ bool LipSync::createMotion(const char *str, unsigned char **rawData, unsigned in
       }
    }
 
+   /* add hold for last phone */
+   if (tail)
+      tail->duration += 6;
+
    /* add final closed lip */
    tmp1 = (LipKeyFrame *) malloc(sizeof(LipKeyFrame));
    tmp1->phone = 0;
