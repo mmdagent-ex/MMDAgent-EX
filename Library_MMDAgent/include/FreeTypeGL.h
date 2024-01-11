@@ -92,8 +92,8 @@
  * policies, either expressed or implied, of Nicolas P. Rougier.
  * ========================================================================= */
 
-#define FREETYPEGL_TEXTUREWIDTH           1024
-#define FREETYPEGL_TEXTUREHEIGHT          1024
+#define FREETYPEGL_TEXTUREWIDTH           2048
+#define FREETYPEGL_TEXTUREHEIGHT          2048
 #define FREETYPEGL_TEXTUREDEPTH           1
 #define FREETYPEGL_FONTDIR                "Noto_Fonts"
 #define FREETYPEGL_FONTFILE               "NotoSansCJKjp-Medium.otf"
