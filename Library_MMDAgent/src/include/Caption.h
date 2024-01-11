@@ -110,6 +110,7 @@ private:
    MMDAgent *m_mmdagent;
    int m_id;
    FTGLTextureAtlas *m_atlas;   /* texture atlas for caption drawing */
+   bool m_hasAtlasError;
    CaptionStyle *m_styles[MMDAGENT_CAPTION_STYLE_MAXNUM];
    int m_numStyles;
    CaptionElement *m_captions[MMDAGENT_CAPTION_MAXNUM];

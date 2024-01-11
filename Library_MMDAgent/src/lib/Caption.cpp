@@ -248,6 +248,7 @@ void Caption::initialize()
    m_mmdagent = NULL;
    m_id = 0;
    m_atlas = NULL;
+   m_hasAtlasError = false;
    for (int i = 0; i < MMDAGENT_CAPTION_STYLE_MAXNUM; i++)
       m_styles[i] = NULL;
    m_numStyles = 0;
@@ -294,19 +295,24 @@ void Caption::setup(MMDAgent *mmdagent, int mid)
 {
    m_mmdagent = mmdagent;
    m_id = mid;
-   m_atlas = new FTGLTextureAtlas();
-   if (m_atlas->setup() == false) {
-      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "failed to initialize font texture atlas");
-      delete m_atlas;
-      m_atlas = NULL;
-   }
 }
 
 /* Caption::setStyle: set style */
 bool Caption::setStyle(const char *name, const char *fontPath, float *col, float *edge1, float *edge2, float *bscol)
 {
-   if (m_atlas == NULL)
+   if (m_hasAtlasError)
       return false;
+
+   if (m_atlas == NULL) {
+      m_atlas = new FTGLTextureAtlas();
+      if (m_atlas->setup() == false) {
+         m_mmdagent->sendLogString(m_id, MLOG_ERROR, "failed to initialize font texture atlas");
+         delete m_atlas;
+         m_atlas = NULL;
+         m_hasAtlasError = true;
+         return false;
+      }
+   }
 
    CaptionStyle *s = (CaptionStyle *)malloc(sizeof(CaptionStyle));
    MMDAgent_snprintf(s->name, 128, "%s", name);

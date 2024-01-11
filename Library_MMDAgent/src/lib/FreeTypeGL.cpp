@@ -190,10 +190,10 @@ bool FTGLTextureAtlas::setRegion(size_t x, size_t y, size_t width, size_t height
 bool FTGLTextureAtlas::getRegion(size_t width, size_t height, size_t *x, size_t *y)
 {
    int tmpY, left, bestHeight = INT_MAX, bestWidth = INT_MAX;
-   Node *node, *bestNode = NULL, *curr, *next, *temp;
+   Node *node, *bestNode = NULL, *curr, *next, *temp, *prev, *bestNodePrev;
    int shrink;
 
-   for (curr = m_nodes; curr != NULL; curr = curr->next) {
+   for (curr = m_nodes, prev = NULL; curr != NULL; prev = curr, curr = curr->next) {
       /* find fitting room for a square region */
       if (curr->x + width + 1 > m_width)
          continue;
@@ -216,6 +216,7 @@ bool FTGLTextureAtlas::getRegion(size_t width, size_t height, size_t *x, size_t 
          bestWidth = curr->z;
          *x = curr->x;
          *y = tmpY;
+         bestNodePrev = prev;
       }
    }
 
@@ -238,13 +239,8 @@ bool FTGLTextureAtlas::getRegion(size_t width, size_t height, size_t *x, size_t 
       node->next = m_nodes;
       m_nodes = node;
    } else {
-      for (curr = m_nodes; curr != NULL && curr->next != NULL; curr = curr->next) {
-         if (curr->next == bestNode) {
-            node->next = curr->next;
-            curr->next = node;
-            break;
-         }
-      }
+      node->next = bestNodePrev->next;
+      bestNodePrev->next = node;
    }
 
    /* shrink till last */
@@ -261,7 +257,9 @@ bool FTGLTextureAtlas::getRegion(size_t width, size_t height, size_t *x, size_t 
    }
 
    /* merge nodes with the same y */
-   for (curr = m_nodes; curr != NULL && curr->next != NULL;) {
+   if (bestNodePrev == NULL)
+      bestNodePrev = m_nodes;
+   for (curr = bestNodePrev; curr != NULL && curr->next != NULL;) {
       if (curr->y == curr->next->y) {
          next = curr->next->next;
          curr->z += curr->next->z;
@@ -277,7 +275,31 @@ bool FTGLTextureAtlas::getRegion(size_t width, size_t height, size_t *x, size_t 
 /* FTGLTextureAtlas::updateTexture: update the current texture data for OpenGL */
 void FTGLTextureAtlas::updateTexture()
 {
+   GLint internalformat;
+   GLint format;
+   GLint type;
+
    if (m_data == NULL) return;
+
+   if (m_depth == 4) {
+#ifdef GL_UNSIGNED_INT_8_8_8_8_REV
+      internalformat = GL_RGBA;
+      format = GL_BGRA;
+      type = GL_UNSIGNED_INT_8_8_8_8_REV;
+#else
+      internalformat = GL_RGBA;
+      format = GL_RGBA;
+      type = GL_UNSIGNED_BYTE;
+#endif
+   } else if (m_depth == 3) {
+      internalformat = GL_RGB;
+      format = GL_RGB;
+      type = GL_UNSIGNED_BYTE;
+   } else {
+      internalformat = GL_ALPHA;
+      format = GL_ALPHA;
+      type = GL_UNSIGNED_BYTE;
+   }
 
    glEnable(GL_TEXTURE_2D);
 
@@ -288,30 +310,10 @@ void FTGLTextureAtlas::updateTexture()
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      if (m_depth == 4) {
-#ifdef GL_UNSIGNED_INT_8_8_8_8_REV
-         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, m_data);
-#else
-         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_data);
-#endif
-      } else if (m_depth == 3) {
-         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, m_data);
-      } else {
-         glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, m_width, m_height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, m_data);
-      }
+      glTexImage2D(GL_TEXTURE_2D, 0, internalformat, m_width, m_height, 0, format, type, m_data);
    } else {
       glBindTexture(GL_TEXTURE_2D, m_id);
-      if (m_depth == 4) {
-#ifdef GL_UNSIGNED_INT_8_8_8_8_REV
-         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, m_data);
-#else
-         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GL_RGBA, GL_UNSIGNED_BYTE, m_data);
-#endif
-      } else if (m_depth == 3) {
-         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GL_RGB, GL_UNSIGNED_BYTE, m_data);
-      } else {
-         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GL_ALPHA, GL_UNSIGNED_BYTE, m_data);
-      }
+      glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, format, type, m_data);
    }
 
    glDisable(GL_TEXTURE_2D);
