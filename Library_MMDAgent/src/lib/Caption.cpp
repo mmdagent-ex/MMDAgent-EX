@@ -258,6 +258,7 @@ bool CaptionElement::setup(const char *name, const char *str, CaptionElementConf
       }
    } else {
       setCaption(str);
+      m_frameLeft = m_config.duration;
    }
 
    m_isShowing = true;
