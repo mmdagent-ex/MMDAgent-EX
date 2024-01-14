@@ -19,56 +19,251 @@
 #include "MMDAgent.h"
 
 #define TEXT_MARGIN 0.2f
+#define RESCALE_WIDTH_MARGIN 2.0f
+
+/***********************************************************/
+
+/* TimeCaption::initialize: initialize */
+void TimeCaption::initialize()
+{
+   m_fileName = NULL;
+   m_list = NULL;
+   m_listLen = 0;
+   m_currentFrame = 0.0;
+   m_currentId = -1;
+   m_finished = false;
+}
+
+/* TimeCaption::clear: free */
+void TimeCaption::clear()
+{
+   if (m_fileName)
+      free(m_fileName);
+   if (m_list)
+      free(m_list);
+   initialize();
+}
+
+/* TimeCaption::TimeCaption: constructor */
+TimeCaption::TimeCaption()
+{
+   initialize();
+}
+
+/* TimeCaption::~TimeCaption: destructor */
+TimeCaption::~TimeCaption()
+{
+   clear();
+}
+
+/* TimeCaption::setup: setup */
+bool TimeCaption::setup(const char *fileName)
+{
+   ZFile *zf;
+   char buf[MMDAGENT_MAXBUFLEN];
+   char *buft;
+   char *p1, *p2, *pt, *psave, *ptsave;
+   float min, sec, dmsec;
+   TimeCaptionList *list = NULL;
+   int num = 0;
+
+   if (fileName == NULL)
+      return false;
+   if (MMDAgent_exist(fileName) == false)
+      return false;
+   zf = new ZFile(g_enckey);
+   if (zf->openAndLoad(fileName) == false) {
+      delete zf;
+      return false;
+   }
+   while (zf->gets(buf, MMDAGENT_MAXBUFLEN) != NULL) {
+      if (buf[0] == '\r' || buf[0] == '\n' || buf[0] == '#')
+         continue;
+      p1 = MMDAgent_strtok(buf, "[]\r\n", &psave);
+      if (p1 == NULL)
+         continue;
+      buft = MMDAgent_strdup(p1);
+      p2 = MMDAgent_strtok(NULL, "[]\r\n", &psave);
+      if (p2 == NULL)
+         continue;
+      pt = MMDAgent_strtok(buft, ":.", &ptsave);
+      if (pt == NULL)
+         continue;
+      min = MMDAgent_str2float(pt);
+      pt = MMDAgent_strtok(NULL, ":.", &ptsave);
+      if (pt == NULL)
+         continue;
+      sec = MMDAgent_str2float(pt);
+      pt = MMDAgent_strtok(NULL, ":.", &ptsave);
+      if (pt == NULL)
+         continue;
+      dmsec = MMDAgent_str2float(pt);
+
+      TimeCaptionList *newItem = (TimeCaptionList *)malloc(sizeof(TimeCaptionList));
+      newItem->id = num;
+      newItem->string = MMDAgent_strdup(p2);
+      newItem->frame = (double)(min * 1800.0 + sec * 30.0 + dmsec * 0.3);
+      newItem->next = list;
+      list = newItem;
+      num++;
+   }
+   if (num == 0) {
+      delete zf;
+      return false;
+   }
+
+   /* serialize */
+   TimeCaptionList *itemArray = (TimeCaptionList *)malloc(sizeof(TimeCaptionList) * num);
+   TimeCaptionList *item = list;
+   TimeCaptionList *tmp;
+   for (int i = num - 1; i >= 0; i--) {
+      memcpy(&(itemArray[i]), item, sizeof(TimeCaptionList));
+      tmp = item->next;
+      free(item);
+      item = tmp;
+   }
+
+   m_fileName = MMDAgent_strdup(fileName);
+   m_list = itemArray;
+   m_listLen = num;
+
+   delete zf;
+   return true;
+}
+
+/* TimeCaption::setFrame: set frame */
+int TimeCaption::setFrame(double frame)
+{
+   m_currentFrame = frame;
+
+   if (m_listLen == 0) {
+      m_currentId = -1;
+      m_finished = true;
+      return m_currentId;
+   }
+   if (m_currentFrame < m_list[0].frame) {
+      m_currentId = -1;
+      m_finished = false;
+      return m_currentId;
+   }
+   if (m_currentFrame >= m_list[m_listLen - 1].frame) {
+      m_currentId = m_listLen - 1;
+      m_finished = true;
+      return m_currentId;
+   }
+   for (int i = 0; i < m_listLen - 1; i++) {
+      if (m_list[i].frame <= m_currentFrame && m_currentFrame < m_list[i + 1].frame) {
+         m_currentId = i;
+         break;
+      }
+   }
+   m_finished = false;
+
+   return m_currentId;
+}
+
+/* TimeCaption::proceedFrame: proceed frame */
+int TimeCaption::proceedFrame(double ellapsedFrame)
+{
+   if (m_listLen == 0) {
+      m_currentId = -1;
+      m_finished = true;
+      return m_currentId;
+   }
+
+   m_currentFrame += ellapsedFrame;
+
+   if (m_currentFrame < m_list[0].frame) {
+      m_currentId = -1;
+      m_finished = false;
+      return m_currentId;
+   }
+
+   if (m_currentId < m_listLen - 1)
+      if (m_currentFrame >= m_list[m_currentId + 1].frame)
+         m_currentId++;
+
+   if (m_currentId >= m_listLen - 1) {
+      /* reached end */
+      m_finished = true;
+      return m_currentId;
+   }
+
+   return(m_currentId);
+}
+
+/* TimeCaption::getCaption: get caption */
+const char *TimeCaption::getCaption(int id)
+{
+   if (id < 0 || id >= m_listLen)
+      return NULL;
+   return m_list[id].string;
+}
+
+/* TimeCaption::isFinished: return true when finished */
+bool TimeCaption::isFinished()
+{
+   return m_finished;
+}
+
+/* TimeCaption::getFileName: get file name */
+const char *TimeCaption::getFileName()
+{
+   return m_fileName;
+}
+
+
 /***********************************************************/
 
 /* CaptionElement::CaptionElement: constructor */
-CaptionElement::CaptionElement(const char *name, const char *str, CaptionElementConfig config, CaptionStyle *style)
+CaptionElement::CaptionElement()
 {
-   /* reset values */
    m_name = NULL;
-   m_string = NULL;
+   m_timeCaption = NULL;
    m_style = NULL;
-   memset(&m_elem, 0, sizeof(FTGLTextDrawElements));
+   m_drawWidth = 0.0f;
+   m_drawHeight = 0.0f;
    memset(&m_elem, 0, sizeof(FTGLTextDrawElements));
    memset(&m_elemOut, 0, sizeof(FTGLTextDrawElements));
    memset(&m_elemOut2, 0, sizeof(FTGLTextDrawElements));
    m_frameLeft = 0.0;
    m_isShowing = false;
    m_endChecked = false;
+}
 
+/* CaptionElement::setup: setup */
+bool CaptionElement::setup(const char *name, const char *str, CaptionElementConfig config, CaptionStyle *style)
+{
    if (name == NULL || str == NULL || style == NULL)
-      return;
+      return false;
 
-   m_name = MMDAgent_strdup(name);
-   m_string = MMDAgent_strdup(str);
    memcpy(&m_config, &config, sizeof(CaptionElementConfig));
 
-   assignStyle(style);
+   m_name = MMDAgent_strdup(name);
 
-   /* calculate position */
-   m_drawWidth = m_elem.width + TEXT_MARGIN * config.size * 2.0f;
-   m_drawHeight = m_elem.height + TEXT_MARGIN * config.size * 2.0f;
+   m_style = style;
 
-   /* calculate vertices for drawing */
-   float x1 = -TEXT_MARGIN * config.size;
-   float x2 = m_elem.width + TEXT_MARGIN * config.size;
-   float y1 = m_elem.upheight - m_elem.height - TEXT_MARGIN * config.size;
-   float y2 = m_elem.upheight + TEXT_MARGIN * config.size;
-   m_vertices[0] = x1;
-   m_vertices[1] = y1;
-   m_vertices[2] = 0;
-   m_vertices[3] = x2;
-   m_vertices[4] = y1;
-   m_vertices[5] = 0;
-   m_vertices[6] = x2;
-   m_vertices[7] = y2;
-   m_vertices[8] = 0;
-   m_vertices[9] = x1;
-   m_vertices[10] = y2;
-   m_vertices[11] = 0;
+   if (MMDAgent_exist(str)) {
+      m_timeCaption = new TimeCaption();
+      if (m_timeCaption->setup(str) == false)
+         return false;
+      int tcid = m_timeCaption->setFrame(0.0);
+      if (m_timeCaption->isFinished()) {
+         delete m_timeCaption;
+         m_timeCaption = NULL;
+      } else {
+         const char *firstCaption = m_timeCaption->getCaption(tcid);
+         setCaption(firstCaption);
+         m_timeCaptionId = tcid;
+      }
+   } else {
+      setCaption(str);
+   }
 
-   m_frameLeft = config.duration;
    m_isShowing = true;
+   m_timeCaptionId = -1;
+
+   return true;
 }
 
 /* CaptionElement::clearElements: clear elements */
@@ -88,38 +283,55 @@ void CaptionElement::clearElements()
    memset(&m_elemOut2, 0, sizeof(FTGLTextDrawElements));
 }
 
-
 /* CaptionElement::~CaptionElement: constructor */
 CaptionElement::~CaptionElement()
 {
-   if (m_string)
-      free(m_string);
+   if (m_timeCaption)
+      delete m_timeCaption;
    if (m_name)
       free(m_name);
    clearElements();
    m_isShowing = false;
 }
 
-/* CaptionElement::assignStyle: assign style */
-void CaptionElement::assignStyle(CaptionStyle *style)
+/* CaptionElement::setCaption: set caption */
+void CaptionElement::setCaption(const char *string)
+{
+   if (string)
+      MMDAgent_snprintf(m_captionString, MMDAGENT_MAXBUFLEN, "%s", string);
+   else
+      m_captionString[0] = '\0';
+   updateRenderingElement();
+}
+
+/* CaptionElement::updateRenderingElement: update rendering element */
+void CaptionElement::updateRenderingElement()
 {
    FTGLTextureFont *font;
 
-   m_style = style;
-
    clearElements();
+
+   if (MMDAgent_strlen(m_captionString) == 0)
+      return;
+
+   if (m_style == NULL)
+      return;
 
    font = m_style->font;
 
    /* assign text drawing elements */
-   if (font->getTextDrawElementsWithScale(m_string, &m_elem, 0, 0.0, 0.0, 0.1f, m_config.size) == false)
+   if (font->getTextDrawElementsWithScale(m_captionString, &m_elem, 0, 0.0, 0.0, 0.1f, m_config.size) == false) {
+      clearElements();
       return;
+   }
    font->setZ(&m_elem, 0.1f);
    if (m_style->edgethickness1 > 0.0f) {
       font->enableOutlineMode();
       font->setOutlineThickness(m_style->edgethickness1);
-      if (font->getTextDrawElementsWithScale(m_string, &m_elemOut, 0, 0.0, 0.0, 0.1f, m_config.size) == false)
+      if (font->getTextDrawElementsWithScale(m_captionString, &m_elemOut, 0, 0.0, 0.0, 0.1f, m_config.size) == false) {
+         clearElements();
          return;
+      }
       font->setZ(&m_elemOut, 0.05f);
       font->setOutlineThickness(1.0f);
       font->disableOutlineMode();
@@ -128,29 +340,61 @@ void CaptionElement::assignStyle(CaptionStyle *style)
       font->enableOutlineMode();
       font->setOutlineThickness(m_style->edgethickness2);
       font->setOutlineUnit(1);
-      if (font->getTextDrawElementsWithScale(m_string, &m_elemOut2, 0, 0.0, 0.0, 0.1f, m_config.size) == false)
+      if (font->getTextDrawElementsWithScale(m_captionString, &m_elemOut2, 0, 0.0, 0.0, 0.1f, m_config.size) == false) {
+         clearElements();
          return;
+      }
       font->setOutlineUnit(0);
       font->setOutlineThickness(1.0f);
       font->disableOutlineMode();
    }
-}
 
-/* CaptionElement::swapStyle: swap style */
-void CaptionElement::swapStyle(CaptionStyle *oldStyle, CaptionStyle *newStyle)
-{
-   if (m_style == oldStyle)
-      assignStyle(newStyle);
+   /* calculate position */
+   m_drawWidth = m_elem.width + TEXT_MARGIN * m_config.size * 2.0f;
+   m_drawHeight = m_elem.height + TEXT_MARGIN * m_config.size * 2.0f;
+
+   /* calculate vertices for drawing */
+   float x1 = -TEXT_MARGIN * m_config.size;
+   float x2 = m_elem.width + TEXT_MARGIN * m_config.size;
+   float y1 = m_elem.upheight - m_elem.height - TEXT_MARGIN * m_config.size;
+   float y2 = m_elem.upheight + TEXT_MARGIN * m_config.size;
+   m_vertices[0] = x1;
+   m_vertices[1] = y1;
+   m_vertices[2] = 0;
+   m_vertices[3] = x2;
+   m_vertices[4] = y1;
+   m_vertices[5] = 0;
+   m_vertices[6] = x2;
+   m_vertices[7] = y2;
+   m_vertices[8] = 0;
+   m_vertices[9] = x1;
+   m_vertices[10] = y2;
+   m_vertices[11] = 0;
 }
 
 /* CaptionElement::update: update */
 void CaptionElement::update(double ellapsedFrame)
 {
-   if (m_frameLeft > 0.0) {
-      m_frameLeft -= ellapsedFrame;
-      if (m_frameLeft <= 0.0) {
+   if (m_timeCaption) {
+      int tcid = m_timeCaption->proceedFrame(ellapsedFrame);
+      if (m_timeCaption->isFinished()) {
+         delete m_timeCaption;
+         m_timeCaption = NULL;
          m_frameLeft = 0.0;
          m_isShowing = false;
+      } else {
+         if (m_timeCaptionId != tcid) {
+            setCaption(m_timeCaption->getCaption(tcid));
+            m_timeCaptionId = tcid;
+         }
+      }
+   } else {
+      if (m_frameLeft > 0.0) {
+         m_frameLeft -= ellapsedFrame;
+         if (m_frameLeft <= 0.0) {
+            m_frameLeft = 0.0;
+            m_isShowing = false;
+         }
       }
    }
 }
@@ -161,8 +405,16 @@ void CaptionElement::render2D(float width, float height)
    static GLindices indices[] = { 0, 1, 2, 0, 2, 3 };
    float x, y;
 
-   if (m_frameLeft <= 0.0f)
+   if (m_timeCaption == NULL && m_frameLeft <= 0.0f)
       return;
+
+   if (width < m_drawWidth) {
+      /* re-scale */
+      float orig_size = m_config.size;
+      m_config.size = m_config.size * (width - RESCALE_WIDTH_MARGIN) / m_drawWidth;
+      updateRenderingElement();
+      m_config.size = orig_size;
+   }
 
    /* calculate position */
    switch (m_config.position) {
@@ -356,10 +608,6 @@ bool Caption::setStyle(const char *name, const char *fontPath, float *col, float
 
    if (sid != -1) {
       /* style already exist, swap it */
-      for (int i = 0; i < m_numCaptions; i++) {
-         if (m_captions[i])
-            m_captions[i]->swapStyle(m_styles[sid], s);
-      }
       if (m_styles[sid]->allocatedFont)
          delete m_styles[sid]->allocatedFont;
       free(m_styles[sid]);
@@ -421,7 +669,6 @@ bool Caption::start(const char *name, const char *string, const char *styleName,
             break;
          }
          if (m_captions[i]->isShowing() == false) {
-            delete m_captions[cid];
             cid = i;
             break;
          }
@@ -433,12 +680,19 @@ bool Caption::start(const char *name, const char *string, const char *styleName,
          }
          cid = m_numCaptions++;
       }
-   } else {
-      /* found, replace it */
-      if (m_captions[cid])
-         delete m_captions[cid];
    }
-   CaptionElement *ce = new CaptionElement(name, string, config, m_styles[sid]);
+
+   /* assign new caption */
+   CaptionElement *ce = new CaptionElement();
+   if (ce->setup(name, string, config, m_styles[sid]) == false) {
+      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "Error: failed to set up caption \"%s\" with style \"%s\"", name, styleName);
+      delete ce;
+      return false;
+   }
+
+   if (m_captions[cid]) {
+      delete m_captions[cid];
+   }
    m_captions[cid] = ce;
 
    return true;
@@ -470,15 +724,15 @@ bool Caption::stop(const char *name)
 /* Caption::update: update */
 void Caption::update(double ellapsedFrame)
 {
-   /* update font glyph */
-   for (int i = 0; i < m_numStyles; i++)
-      if (m_styles[i]->allocatedFont)
-         m_styles[i]->allocatedFont->updateGlyphInfo();
-
    /* duration progress */
    for (int i = 0; i < m_numCaptions; i++)
       if (m_captions[i])
          m_captions[i]->update(ellapsedFrame);
+
+   /* update font glyph */
+   for (int i = 0; i < m_numStyles; i++)
+      if (m_styles[i]->allocatedFont)
+         m_styles[i]->allocatedFont->updateGlyphInfo();
 
    /* check if it ends */
    for (int i = 0; i < m_numCaptions; i++) {
