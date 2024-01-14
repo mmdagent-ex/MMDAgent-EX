@@ -19,6 +19,7 @@
 /* maximum number of caption styles */
 #define MMDAGENT_CAPTION_STYLE_MAXNUM 10
 
+/* enum for caption positions */
 enum {
    CAPTION_POSITION_CENTER,
    CAPTION_POSITION_SLIDELEFT,
@@ -26,6 +27,7 @@ enum {
    CAPTION_POSITION_NUM
 };
 
+/* caption style structure */
 struct CaptionStyle {
    char name[128];
    float color[4];           /* foreground color */
@@ -38,11 +40,66 @@ struct CaptionStyle {
    FTGLTextureFont *allocatedFont;
 };
 
+/* configuration of an caption */
 struct CaptionElementConfig {
    short position;           /* caption style: center, slideLeft, slideRight */
    float size;               /* text size */
    float height;             /* location height ratio */
    double duration;          /* duration in frames */
+};
+
+/* time-varying caption */
+class TimeCaption
+{
+private:
+
+   struct TimeCaptionList
+   {
+      int id;
+      char *string;         /* caption string */
+      double frame;         /* time in frame to be shown */
+      struct TimeCaptionList *next;  /* pointer to next caption item */
+   };
+
+   char *m_fileName;          /* source file */
+   TimeCaptionList *m_list;   /* caption list */
+   int m_listLen;             /* length of the list */
+
+   double m_currentFrame;     /* current frame */
+   int m_currentId;           /* current id */
+   bool m_finished;           /* true when finished */
+
+   /* initialize: initialize */
+   void initialize();
+
+   /* clear: free */
+   void clear();
+
+public:
+
+   /* TimeCaption: constructor */
+   TimeCaption();
+
+   /* ~TimeCaption: destructor */
+   ~TimeCaption();
+
+   /* setup: setup */
+   bool setup(const char *fileName);
+
+   /* setFrame: set frame */
+   int setFrame(double frame);
+
+   /* proceedFrame: proceed frame */
+   int proceedFrame(double ellapsedFrame);
+
+   /* getCaption: get caption */
+   const char *getCaption(int id);
+
+   /* isFinished: return true when finished */
+   bool isFinished();
+
+   /* getFileName: get file name */
+   const char *getFileName();
 };
 
 /* CaptionElement: text caption element class */
@@ -52,9 +109,10 @@ private:
 
    char *m_name;                    /* name */
    CaptionElementConfig m_config;   /* configuration */
-   char *m_string;                  /* displaying string */
+   TimeCaption *m_timeCaption;      /* displaying file */
    CaptionStyle *m_style;           /* style to be used */
 
+   char m_captionString[MMDAGENT_MAXBUFLEN]; /* current caption string */
    float m_drawWidth;               /* total drawing width */
    float m_drawHeight;              /* total drawing height */
    FTGLTextDrawElements m_elem;     /* text drawing element */
@@ -64,17 +122,27 @@ private:
    double m_frameLeft;              /* duration timer */
    bool m_isShowing;                /* true when showing */
    bool m_endChecked;               /* flag for end detection */
+   int m_timeCaptionId;             /* current time caption id */
 
    /* clearElements: clear elements */
    void clearElements();
 
+   /* setCaption: set caption */
+   void setCaption(const char *string);
+
+   /* updateRenderingElement: update rendering element */
+   void updateRenderingElement();
+
 public:
 
    /* CaptionElement: constructor */
-   CaptionElement(const char *name, const char *str, CaptionElementConfig config, CaptionStyle *style);
+   CaptionElement();
 
    /* ~CaptionElement: constructor */
    ~CaptionElement();
+
+   /* setup: setup */
+   bool setup(const char *name, const char *str, CaptionElementConfig config, CaptionStyle *style);
 
    /* update: update */
    void update(double ellapsedFrame);
@@ -93,13 +161,6 @@ public:
 
    /* setChecked: set checked flag */
    void setChecked(bool flag);
-
-   /* assignStyle: assign style */
-   void assignStyle(CaptionStyle *style);
-
-   /* swapStyle: swap style */
-   void swapStyle(CaptionStyle *oldStyle, CaptionStyle *newStyle);
-
 };
 
 /* Caption: text caption class */
