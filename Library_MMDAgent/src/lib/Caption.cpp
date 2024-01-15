@@ -26,7 +26,6 @@
 /* TimeCaption::initialize: initialize */
 void TimeCaption::initialize()
 {
-   m_fileName = NULL;
    m_list = NULL;
    m_listLen = 0;
    m_currentFrame = 0.0;
@@ -37,10 +36,11 @@ void TimeCaption::initialize()
 /* TimeCaption::clear: free */
 void TimeCaption::clear()
 {
-   if (m_fileName)
-      free(m_fileName);
-   if (m_list)
+   if (m_list) {
+      for (int i = 0; i < m_listLen; i++)
+         clearElements(&(m_list[i]));
       free(m_list);
+   }
    initialize();
 }
 
@@ -56,8 +56,28 @@ TimeCaption::~TimeCaption()
    clear();
 }
 
-/* TimeCaption::setup: setup */
-bool TimeCaption::setup(const char *fileName)
+/* TimeCaption::clearElements: clear elements */
+void TimeCaption::clearElements(TimeCaptionList *item)
+{
+   if (item == NULL)
+      return;
+
+   if (item->elem.vertices) free(item->elem.vertices);
+   if (item->elem.texcoords) free(item->elem.texcoords);
+   if (item->elem.indices) free(item->elem.indices);
+   if (item->elemOut.vertices) free(item->elemOut.vertices);
+   if (item->elemOut.texcoords) free(item->elemOut.texcoords);
+   if (item->elemOut.indices) free(item->elemOut.indices);
+   if (item->elemOut2.vertices) free(item->elemOut2.vertices);
+   if (item->elemOut2.texcoords) free(item->elemOut2.texcoords);
+   if (item->elemOut2.indices) free(item->elemOut2.indices);
+   memset(&item->elem, 0, sizeof(FTGLTextDrawElements));
+   memset(&item->elemOut, 0, sizeof(FTGLTextDrawElements));
+   memset(&item->elemOut2, 0, sizeof(FTGLTextDrawElements));
+}
+
+/* TimeCaption::load: load */
+bool TimeCaption::load(const char *fileName)
 {
    ZFile *zf;
    char buf[MMDAGENT_MAXBUFLEN];
@@ -103,6 +123,12 @@ bool TimeCaption::setup(const char *fileName)
       newItem->id = num;
       newItem->string = MMDAgent_strdup(p2);
       newItem->frame = (double)(min * 1800.0 + sec * 30.0 + dmsec * 0.3);
+      memset(&newItem->elem, 0, sizeof(FTGLTextDrawElements));
+      memset(&newItem->elemOut, 0, sizeof(FTGLTextDrawElements));
+      memset(&newItem->elemOut2, 0, sizeof(FTGLTextDrawElements));
+      newItem->drawWidth = 0.0f;
+      newItem->drawHeight = 0.0f;
+
       newItem->next = list;
       list = newItem;
       num++;
@@ -113,6 +139,7 @@ bool TimeCaption::setup(const char *fileName)
    }
 
    /* serialize */
+   clear();
    TimeCaptionList *itemArray = (TimeCaptionList *)malloc(sizeof(TimeCaptionList) * num);
    TimeCaptionList *item = list;
    TimeCaptionList *tmp;
@@ -123,12 +150,189 @@ bool TimeCaption::setup(const char *fileName)
       item = tmp;
    }
 
-   m_fileName = MMDAgent_strdup(fileName);
    m_list = itemArray;
    m_listLen = num;
 
    delete zf;
    return true;
+}
+
+/* TimeCaption::set: set */
+bool TimeCaption::set(const char *string, double durationFrame)
+{
+   clear();
+
+   m_listLen = 2;
+   m_list = (TimeCaptionList *)malloc(sizeof(TimeCaptionList) * m_listLen);
+   m_list[0].id = 0;
+   m_list[0].string = MMDAgent_strdup(string);
+   m_list[0].frame = 0.0;
+   memset(&m_list[0].elem, 0, sizeof(FTGLTextDrawElements));
+   memset(&m_list[0].elemOut, 0, sizeof(FTGLTextDrawElements));
+   memset(&m_list[0].elemOut2, 0, sizeof(FTGLTextDrawElements));
+   m_list[0].drawWidth = 0.0f;
+   m_list[0].drawHeight = 0.0f;
+   m_list[1].id = 1;
+   m_list[1].string = NULL;
+   m_list[1].frame = durationFrame;
+   memset(&m_list[1].elem, 0, sizeof(FTGLTextDrawElements));
+   memset(&m_list[1].elemOut, 0, sizeof(FTGLTextDrawElements));
+   memset(&m_list[1].elemOut2, 0, sizeof(FTGLTextDrawElements));
+   m_list[1].drawWidth = 0.0f;
+   m_list[1].drawHeight = 0.0f;
+
+   return true;
+}
+
+/* TimeCaption::updateRenderingItem: update rendering Item */
+void TimeCaption::updateRenderingItem(TimeCaptionList *item, CaptionElementConfig config, CaptionStyle *style)
+{
+   FTGLTextureFont *font;
+
+   if (style == NULL)
+      return;
+
+   font = style->font;
+
+   clearElements(item);
+   if (MMDAgent_strlen(item->string) == 0)
+      return;
+
+   /* assign text drawing elements */
+   if (font->getTextDrawElementsWithScale(item->string, &item->elem, 0, 0.0, 0.0, 0.1f, config.size) == false) {
+      clearElements(item);
+      return;
+   }
+   font->setZ(&item->elem, 0.1f);
+   if (style->edgethickness1 > 0.0f) {
+      font->enableOutlineMode();
+      font->setOutlineThickness(style->edgethickness1);
+      if (font->getTextDrawElementsWithScale(item->string, &item->elemOut, 0, 0.0, 0.0, 0.1f, config.size) == false) {
+         clearElements(item);
+         return;
+      }
+      font->setZ(&item->elemOut, 0.05f);
+      font->setOutlineThickness(1.0f);
+      font->disableOutlineMode();
+   }
+   if (style->edgethickness2 > 0.0f) {
+      font->enableOutlineMode();
+      font->setOutlineThickness(style->edgethickness2);
+      font->setOutlineUnit(1);
+      if (font->getTextDrawElementsWithScale(item->string, &item->elemOut2, 0, 0.0, 0.0, 0.1f, config.size) == false) {
+         clearElements(item);
+         return;
+      }
+      font->setOutlineUnit(0);
+      font->setOutlineThickness(1.0f);
+      font->disableOutlineMode();
+   }
+
+   /* calculate position */
+   item->drawWidth = item->elem.width + TEXT_MARGIN * config.size * 2.0f;
+   item->drawHeight = item->elem.height + TEXT_MARGIN * config.size * 2.0f;
+
+   /* calculate vertices for drawing */
+   float x1 = -TEXT_MARGIN * config.size;
+   float x2 = item->elem.width + TEXT_MARGIN * config.size;
+   float y1 = item->elem.upheight - item->elem.height - TEXT_MARGIN * config.size;
+   float y2 = item->elem.upheight + TEXT_MARGIN * config.size;
+   item->vertices[0] = x1;
+   item->vertices[1] = y1;
+   item->vertices[2] = 0;
+   item->vertices[3] = x2;
+   item->vertices[4] = y1;
+   item->vertices[5] = 0;
+   item->vertices[6] = x2;
+   item->vertices[7] = y2;
+   item->vertices[8] = 0;
+   item->vertices[9] = x1;
+   item->vertices[10] = y2;
+   item->vertices[11] = 0;
+}
+
+
+/* TimeCaption::updateRendering: update rendering */
+void TimeCaption::updateRendering(CaptionElementConfig config, CaptionStyle *style)
+{
+   if (style == NULL)
+      return;
+
+   for (int i = 0; i < m_listLen; i++) {
+      updateRenderingItem(&(m_list[i]), config, style);
+   }
+}
+
+/* TimeCaption::render: render */
+void TimeCaption::render(int id, CaptionElementConfig config, CaptionStyle *style, float width, float height)
+{
+   TimeCaptionList *item;
+   static GLindices indices[] = { 0, 1, 2, 0, 2, 3 };
+   float x, y;
+
+   if (id < 0 || id >= m_listLen)
+      return;
+
+   item = &(m_list[id]);
+
+   if (width < item->drawWidth) {
+      /* re-scale */
+      float orig_size = config.size;
+      config.size = config.size * (width - RESCALE_WIDTH_MARGIN) / item->drawWidth;
+      updateRenderingItem(item, config, style);
+      config.size = orig_size;
+   }
+
+   /* calculate position */
+   switch (config.position) {
+   case CAPTION_POSITION_CENTER:
+      x = (width - item->drawWidth) * 0.5f;
+      break;
+   case CAPTION_POSITION_SLIDELEFT:
+      x = 0.0f;
+      break;
+   case CAPTION_POSITION_SLIDERIGHT:
+      x = width - item->drawWidth;
+      break;
+   }
+   y = height * config.height;
+
+   glPushMatrix();
+   glTranslatef(x, y, 0.0f);
+   /* background */
+   if (style->bgcolor[3] > 0.0f) {
+      glVertexPointer(3, GL_FLOAT, 0, item->vertices);
+      glBindTexture(GL_TEXTURE_2D, 0);
+      glColor4fv(style->bgcolor);
+      glDrawElements(GL_TRIANGLES, 6, GL_INDICES, (const GLvoid *)indices);
+   }
+   /* begin text */
+   glEnable(GL_TEXTURE_2D);
+   glBindTexture(GL_TEXTURE_2D, style->font->getTextureID());
+   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+   if (style->edgethickness2 > 0.0f) {
+      /* edge 2 */
+      glVertexPointer(3, GL_FLOAT, 0, item->elemOut2.vertices);
+      glTexCoordPointer(2, GL_FLOAT, 0, item->elemOut2.texcoords);
+      glColor4fv(style->edgecolor2);
+      glDrawElements(GL_TRIANGLES, item->elemOut2.numIndices, GL_INDICES, (const GLvoid *)item->elemOut2.indices);
+   }
+   if (style->edgethickness1 > 0.0f) {
+      /* edge 1 */
+      glVertexPointer(3, GL_FLOAT, 0, item->elemOut.vertices);
+      glTexCoordPointer(2, GL_FLOAT, 0, item->elemOut.texcoords);
+      glColor4fv(style->edgecolor1);
+      glDrawElements(GL_TRIANGLES, item->elemOut.numIndices, GL_INDICES, (const GLvoid *)item->elemOut.indices);
+   }
+   /* text */
+   glVertexPointer(3, GL_FLOAT, 0, item->elem.vertices);
+   glTexCoordPointer(2, GL_FLOAT, 0, item->elem.texcoords);
+   glColor4fv(style->color);
+   glDrawElements(GL_TRIANGLES, item->elem.numIndices, GL_INDICES, (const GLvoid *)item->elem.indices);
+   /* end text */
+   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+   glDisable(GL_TEXTURE_2D);
+   glPopMatrix();
 }
 
 /* TimeCaption::setFrame: set frame */
@@ -192,26 +396,11 @@ int TimeCaption::proceedFrame(double ellapsedFrame)
    return(m_currentId);
 }
 
-/* TimeCaption::getCaption: get caption */
-const char *TimeCaption::getCaption(int id)
-{
-   if (id < 0 || id >= m_listLen)
-      return NULL;
-   return m_list[id].string;
-}
-
 /* TimeCaption::isFinished: return true when finished */
 bool TimeCaption::isFinished()
 {
    return m_finished;
 }
-
-/* TimeCaption::getFileName: get file name */
-const char *TimeCaption::getFileName()
-{
-   return m_fileName;
-}
-
 
 /***********************************************************/
 
@@ -219,14 +408,8 @@ const char *TimeCaption::getFileName()
 CaptionElement::CaptionElement()
 {
    m_name = NULL;
-   m_timeCaption = NULL;
+   m_caption = NULL;
    m_style = NULL;
-   m_drawWidth = 0.0f;
-   m_drawHeight = 0.0f;
-   memset(&m_elem, 0, sizeof(FTGLTextDrawElements));
-   memset(&m_elemOut, 0, sizeof(FTGLTextDrawElements));
-   memset(&m_elemOut2, 0, sizeof(FTGLTextDrawElements));
-   m_frameLeft = 0.0;
    m_isShowing = false;
    m_endChecked = false;
 }
@@ -243,160 +426,47 @@ bool CaptionElement::setup(const char *name, const char *str, CaptionElementConf
 
    m_style = style;
 
+   m_caption = new TimeCaption();
    if (MMDAgent_exist(str)) {
-      m_timeCaption = new TimeCaption();
-      if (m_timeCaption->setup(str) == false)
+      if (m_caption->load(str) == false)
          return false;
-      int tcid = m_timeCaption->setFrame(0.0);
-      if (m_timeCaption->isFinished()) {
-         delete m_timeCaption;
-         m_timeCaption = NULL;
-      } else {
-         const char *firstCaption = m_timeCaption->getCaption(tcid);
-         setCaption(firstCaption);
-         m_timeCaptionId = tcid;
-      }
    } else {
-      setCaption(str);
-      m_frameLeft = m_config.duration;
+      if (m_caption->set(str, m_config.duration) == false)
+         return false;      
+   }
+   m_caption->updateRendering(m_config, m_style);
+   m_timeCaptionId = m_caption->setFrame(0.0);
+   if (m_caption->isFinished()) {
+      delete m_caption;
+      m_caption = NULL;
    }
 
    m_isShowing = true;
-   m_timeCaptionId = -1;
 
    return true;
-}
-
-/* CaptionElement::clearElements: clear elements */
-void CaptionElement::clearElements()
-{
-   if (m_elem.vertices) free(m_elem.vertices);
-   if (m_elem.texcoords) free(m_elem.texcoords);
-   if (m_elem.indices) free(m_elem.indices);
-   if (m_elemOut.vertices) free(m_elemOut.vertices);
-   if (m_elemOut.texcoords) free(m_elemOut.texcoords);
-   if (m_elemOut.indices) free(m_elemOut.indices);
-   if (m_elemOut2.vertices) free(m_elemOut2.vertices);
-   if (m_elemOut2.texcoords) free(m_elemOut2.texcoords);
-   if (m_elemOut2.indices) free(m_elemOut2.indices);
-   memset(&m_elem, 0, sizeof(FTGLTextDrawElements));
-   memset(&m_elemOut, 0, sizeof(FTGLTextDrawElements));
-   memset(&m_elemOut2, 0, sizeof(FTGLTextDrawElements));
 }
 
 /* CaptionElement::~CaptionElement: constructor */
 CaptionElement::~CaptionElement()
 {
-   if (m_timeCaption)
-      delete m_timeCaption;
+   if (m_caption)
+      delete m_caption;
    if (m_name)
       free(m_name);
-   clearElements();
    m_isShowing = false;
-}
-
-/* CaptionElement::setCaption: set caption */
-void CaptionElement::setCaption(const char *string)
-{
-   if (string)
-      MMDAgent_snprintf(m_captionString, MMDAGENT_MAXBUFLEN, "%s", string);
-   else
-      m_captionString[0] = '\0';
-   updateRenderingElement();
-}
-
-/* CaptionElement::updateRenderingElement: update rendering element */
-void CaptionElement::updateRenderingElement()
-{
-   FTGLTextureFont *font;
-
-   clearElements();
-
-   if (MMDAgent_strlen(m_captionString) == 0)
-      return;
-
-   if (m_style == NULL)
-      return;
-
-   font = m_style->font;
-
-   /* assign text drawing elements */
-   if (font->getTextDrawElementsWithScale(m_captionString, &m_elem, 0, 0.0, 0.0, 0.1f, m_config.size) == false) {
-      clearElements();
-      return;
-   }
-   font->setZ(&m_elem, 0.1f);
-   if (m_style->edgethickness1 > 0.0f) {
-      font->enableOutlineMode();
-      font->setOutlineThickness(m_style->edgethickness1);
-      if (font->getTextDrawElementsWithScale(m_captionString, &m_elemOut, 0, 0.0, 0.0, 0.1f, m_config.size) == false) {
-         clearElements();
-         return;
-      }
-      font->setZ(&m_elemOut, 0.05f);
-      font->setOutlineThickness(1.0f);
-      font->disableOutlineMode();
-   }
-   if (m_style->edgethickness2 > 0.0f) {
-      font->enableOutlineMode();
-      font->setOutlineThickness(m_style->edgethickness2);
-      font->setOutlineUnit(1);
-      if (font->getTextDrawElementsWithScale(m_captionString, &m_elemOut2, 0, 0.0, 0.0, 0.1f, m_config.size) == false) {
-         clearElements();
-         return;
-      }
-      font->setOutlineUnit(0);
-      font->setOutlineThickness(1.0f);
-      font->disableOutlineMode();
-   }
-
-   /* calculate position */
-   m_drawWidth = m_elem.width + TEXT_MARGIN * m_config.size * 2.0f;
-   m_drawHeight = m_elem.height + TEXT_MARGIN * m_config.size * 2.0f;
-
-   /* calculate vertices for drawing */
-   float x1 = -TEXT_MARGIN * m_config.size;
-   float x2 = m_elem.width + TEXT_MARGIN * m_config.size;
-   float y1 = m_elem.upheight - m_elem.height - TEXT_MARGIN * m_config.size;
-   float y2 = m_elem.upheight + TEXT_MARGIN * m_config.size;
-   m_vertices[0] = x1;
-   m_vertices[1] = y1;
-   m_vertices[2] = 0;
-   m_vertices[3] = x2;
-   m_vertices[4] = y1;
-   m_vertices[5] = 0;
-   m_vertices[6] = x2;
-   m_vertices[7] = y2;
-   m_vertices[8] = 0;
-   m_vertices[9] = x1;
-   m_vertices[10] = y2;
-   m_vertices[11] = 0;
 }
 
 /* CaptionElement::update: update */
 void CaptionElement::update(double ellapsedFrame)
 {
-   if (m_timeCaption) {
-      int tcid = m_timeCaption->proceedFrame(ellapsedFrame);
-      if (m_timeCaption->isFinished()) {
-         delete m_timeCaption;
-         m_timeCaption = NULL;
-         m_frameLeft = 0.0;
-         m_isShowing = false;
-      } else {
-         if (m_timeCaptionId != tcid) {
-            setCaption(m_timeCaption->getCaption(tcid));
-            m_timeCaptionId = tcid;
-         }
-      }
-   } else {
-      if (m_frameLeft > 0.0) {
-         m_frameLeft -= ellapsedFrame;
-         if (m_frameLeft <= 0.0) {
-            m_frameLeft = 0.0;
-            m_isShowing = false;
-         }
-      }
+   if (m_caption == NULL)
+      return;
+
+   m_timeCaptionId = m_caption->proceedFrame(ellapsedFrame);
+   if (m_caption->isFinished()) {
+      delete m_caption;
+      m_caption = NULL;
+      m_isShowing = false;
    }
 }
 
@@ -404,69 +474,11 @@ void CaptionElement::update(double ellapsedFrame)
 void CaptionElement::render2D(float width, float height)
 {
    static GLindices indices[] = { 0, 1, 2, 0, 2, 3 };
-   float x, y;
 
-   if (m_timeCaption == NULL && m_frameLeft <= 0.0f)
+   if (m_caption == NULL)
       return;
 
-   if (width < m_drawWidth) {
-      /* re-scale */
-      float orig_size = m_config.size;
-      m_config.size = m_config.size * (width - RESCALE_WIDTH_MARGIN) / m_drawWidth;
-      updateRenderingElement();
-      m_config.size = orig_size;
-   }
-
-   /* calculate position */
-   switch (m_config.position) {
-   case CAPTION_POSITION_CENTER:
-      x = (width - m_drawWidth) * 0.5f;
-      break;
-   case CAPTION_POSITION_SLIDELEFT:
-      x = 0.0f;
-      break;
-   case CAPTION_POSITION_SLIDERIGHT:
-      x = width - m_drawWidth;
-      break;
-   }
-   y = height * m_config.height;
-
-   glPushMatrix();
-   glTranslatef(x, y, 0.0f);
-   /* background */
-   if (m_style->bgcolor[3] > 0.0f) {
-      glVertexPointer(3, GL_FLOAT, 0, m_vertices);
-      glBindTexture(GL_TEXTURE_2D, 0);
-      glColor4fv(m_style->bgcolor);
-      glDrawElements(GL_TRIANGLES, 6, GL_INDICES, (const GLvoid *)indices);
-   }
-   /* begin text */
-   glEnable(GL_TEXTURE_2D);
-   glBindTexture(GL_TEXTURE_2D, m_style->font->getTextureID());
-   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-   if (m_style->edgethickness2 > 0.0f) {
-      /* edge 2 */
-      glVertexPointer(3, GL_FLOAT, 0, m_elemOut2.vertices);
-      glTexCoordPointer(2, GL_FLOAT, 0, m_elemOut2.texcoords);
-      glColor4fv(m_style->edgecolor2);
-      glDrawElements(GL_TRIANGLES, m_elemOut2.numIndices, GL_INDICES, (const GLvoid *)m_elemOut2.indices);
-   }
-   if (m_style->edgethickness1 > 0.0f) {
-      /* edge 1 */
-      glVertexPointer(3, GL_FLOAT, 0, m_elemOut.vertices);
-      glTexCoordPointer(2, GL_FLOAT, 0, m_elemOut.texcoords);
-      glColor4fv(m_style->edgecolor1);
-      glDrawElements(GL_TRIANGLES, m_elemOut.numIndices, GL_INDICES, (const GLvoid *)m_elemOut.indices);
-   }
-   /* text */
-   glVertexPointer(3, GL_FLOAT, 0, m_elem.vertices);
-   glTexCoordPointer(2, GL_FLOAT, 0, m_elem.texcoords);
-   glColor4fv(m_style->color);
-   glDrawElements(GL_TRIANGLES, m_elem.numIndices, GL_INDICES, (const GLvoid *)m_elem.indices);
-   /* end text */
-   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-   glDisable(GL_TEXTURE_2D);
-   glPopMatrix();
+   m_caption->render(m_timeCaptionId, m_config, m_style, width, height);
 }
 
 /* CaptionElement::isShowing: return true when showing */
@@ -508,7 +520,6 @@ void Caption::initialize()
    for (int i = 0; i < MMDAGENT_CAPTION_MAXNUM; i++)
       m_captions[i] = NULL;
    m_numCaptions = 0;
-
 }
 
 /* Caption::clear: free */
