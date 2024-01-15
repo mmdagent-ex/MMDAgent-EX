@@ -58,10 +58,15 @@ private:
       int id;
       char *string;         /* caption string */
       double frame;         /* time in frame to be shown */
+      FTGLTextDrawElements elem;     /* text drawing element */
+      FTGLTextDrawElements elemOut;  /* text drawing element for edge 1 */
+      FTGLTextDrawElements elemOut2; /* text drawing element for edge 2 */
+      GLfloat vertices[12];          /* vertices */
+      float drawWidth;               /* total drawing width */
+      float drawHeight;              /* total drawing height */
       struct TimeCaptionList *next;  /* pointer to next caption item */
    };
 
-   char *m_fileName;          /* source file */
    TimeCaptionList *m_list;   /* caption list */
    int m_listLen;             /* length of the list */
 
@@ -75,6 +80,12 @@ private:
    /* clear: free */
    void clear();
 
+   /* clearElements: clear elements */
+   void clearElements(TimeCaptionList *item);
+
+   /* updateRenderingItem: update rendering Item */
+   void updateRenderingItem(TimeCaptionList *item, CaptionElementConfig config, CaptionStyle *style);
+
 public:
 
    /* TimeCaption: constructor */
@@ -83,8 +94,17 @@ public:
    /* ~TimeCaption: destructor */
    ~TimeCaption();
 
-   /* setup: setup */
-   bool setup(const char *fileName);
+   /* load: load */
+   bool load(const char *fileName);
+
+   /* set: set */
+   bool set(const char *string, double durationFrame);
+
+   /* updateRendering: update rendering */
+   void updateRendering(CaptionElementConfig config, CaptionStyle *style);
+
+   /* render: render */
+   void render(int id, CaptionElementConfig config, CaptionStyle *style, float width, float height);
 
    /* setFrame: set frame */
    int setFrame(double frame);
@@ -92,14 +112,8 @@ public:
    /* proceedFrame: proceed frame */
    int proceedFrame(double ellapsedFrame);
 
-   /* getCaption: get caption */
-   const char *getCaption(int id);
-
    /* isFinished: return true when finished */
    bool isFinished();
-
-   /* getFileName: get file name */
-   const char *getFileName();
 };
 
 /* CaptionElement: text caption element class */
@@ -109,29 +123,12 @@ private:
 
    char *m_name;                    /* name */
    CaptionElementConfig m_config;   /* configuration */
-   TimeCaption *m_timeCaption;      /* displaying file */
+   TimeCaption *m_caption;          /* list of captions to be displayed */
    CaptionStyle *m_style;           /* style to be used */
 
-   char m_captionString[MMDAGENT_MAXBUFLEN]; /* current caption string */
-   float m_drawWidth;               /* total drawing width */
-   float m_drawHeight;              /* total drawing height */
-   FTGLTextDrawElements m_elem;     /* text drawing element */
-   FTGLTextDrawElements m_elemOut;  /* text drawing element for edge 1 */
-   FTGLTextDrawElements m_elemOut2; /* text drawing element for edge 2 */
-   GLfloat m_vertices[12];          /* vertices */
-   double m_frameLeft;              /* duration timer */
    bool m_isShowing;                /* true when showing */
    bool m_endChecked;               /* flag for end detection */
    int m_timeCaptionId;             /* current time caption id */
-
-   /* clearElements: clear elements */
-   void clearElements();
-
-   /* setCaption: set caption */
-   void setCaption(const char *string);
-
-   /* updateRenderingElement: update rendering element */
-   void updateRenderingElement();
 
 public:
 
