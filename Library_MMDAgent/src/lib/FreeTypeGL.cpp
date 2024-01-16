@@ -190,7 +190,7 @@ bool FTGLTextureAtlas::setRegion(size_t x, size_t y, size_t width, size_t height
 bool FTGLTextureAtlas::getRegion(size_t width, size_t height, size_t *x, size_t *y)
 {
    int tmpY, left, bestHeight = INT_MAX, bestWidth = INT_MAX;
-   Node *node, *bestNode = NULL, *curr, *next, *temp, *prev, *bestNodePrev;
+   Node *node, *bestNode = NULL, *curr, *next, *temp, *prev, *bestNodePrev = NULL;
    int shrink;
 
    for (curr = m_nodes, prev = NULL; curr != NULL; prev = curr, curr = curr->next) {
@@ -368,8 +368,8 @@ void FTGLTextureFont::initialize()
 
    m_glyphListUpdated = false;
    m_outlineMode = false;
-   m_outlineThickness = 1.0f;
    m_outlineUnit = 0;
+   m_outlineUnitNum = 0;
 
    m_langID[0] = 'e';
    m_langID[1] = 'n';
@@ -508,7 +508,7 @@ bool FTGLTextureFont::loadGlyph(unsigned long charcode)
 
    if (m_outlineMode) {
       outlineType = OUTLINE_OUTER;
-      outlineThickness = m_outlineThickness;
+      outlineThickness = m_outlineThickness[m_outlineUnit];
    } else {
       outlineType = OUTLINE_NONE;
       outlineThickness = 0.0f;
@@ -814,23 +814,24 @@ bool FTGLTextureFont::setup(FTGLTextureAtlas *atlas, const char *filename)
    return true;
 }
 
-/* FTGLTextureFont::setOutlineThickness: set outline thickness */
-void FTGLTextureFont::setOutlineThickness(float thickness)
-{
-   m_outlineThickness = thickness;
-}
-
-/* FTGLTextureFont::setOutlineUnit: set outline unit number */
-void FTGLTextureFont::setOutlineUnit(int n)
-{
-   if (n < 0 || n > FREETYLEGL_MAXOUTLINEUNITNUM)
-      return;
-   m_outlineUnit = n;
-}
-
 /* FTGLTextureFont::enableOutlineMode: enable outline mode */
-void FTGLTextureFont::enableOutlineMode()
+void FTGLTextureFont::enableOutlineMode(float thickness)
 {
+   int i;
+
+   for (i = 0; i < m_outlineUnitNum; i++) {
+      if (m_outlineThickness[i] == thickness)
+         break;
+   }
+   if (i >= m_outlineUnitNum) {
+      if (m_outlineUnitNum >= FREETYLEGL_MAXOUTLINEUNITNUM)
+         return;
+      m_outlineThickness[m_outlineUnitNum] = thickness;
+      m_outlineUnit = m_outlineUnitNum;
+      m_outlineUnitNum++;
+   } else {
+      m_outlineUnit = i;
+   }
    m_outlineMode = true;
 }
 

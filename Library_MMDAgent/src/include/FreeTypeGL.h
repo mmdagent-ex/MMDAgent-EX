@@ -101,7 +101,7 @@
 #define FREETYPEGL_FONTPIXELSIZE          36
 #define FREETYPEGL_DEFAULTFONTSIZEINCOORD 0.85f /* default font scaling factor */
 #define FREETYPEGL_MAXTEXTLEN             16383
-#define FREETYLEGL_MAXOUTLINEUNITNUM      10
+#define FREETYLEGL_MAXOUTLINEUNITNUM      30
 
 /* FTGLTextureAtlas: character texture manager */
 class FTGLTextureAtlas
@@ -237,8 +237,9 @@ private:
 
    bool m_glyphListUpdated; /* working flag if glyph list has been added */
    bool m_outlineMode;      /* true when outline mode is enabled */
-   float m_outlineThickness;/* outline thickness */
+   float m_outlineThickness[FREETYLEGL_MAXOUTLINEUNITNUM];/* outline thickness */
    int m_outlineUnit;
+   int m_outlineUnitNum;
 
    char m_langID[3];           /* language ID to display */
 
@@ -268,14 +269,8 @@ public:
    /* setup: setup */
    bool setup(FTGLTextureAtlas *atlas, const char *filename);
 
-   /* setOutlineThickness: set outline thickness */
-   void setOutlineThickness(float thickness);
-
-   /* setOutlineUnit: set outline unit number */
-   void setOutlineUnit(int n);
-
    /* enableOutlineMode: enable outline mode */
-   void enableOutlineMode();
+   void enableOutlineMode(float thickness);
 
    /* disableOutlineMode: disable outline mode */
    void disableOutlineMode();

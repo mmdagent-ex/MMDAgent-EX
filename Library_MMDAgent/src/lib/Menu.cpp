@@ -657,7 +657,7 @@ void Menu::updateStem(int id)
       return;
    }
    m_font->setZ(&(m_stem[id].elem[0]), 0.05f);
-   m_font->enableOutlineMode();
+   m_font->enableOutlineMode(1.0f);
    if (m_font->getTextDrawElementsWithScale(m_stem[id].name, &(m_stem[id].elemOut[0]), 0, MENU_PADDING_X, MENU_PADDING_Y, 0.0f, MENU_LABELSCALEFORTITLE) == false) {
       m_stem[id].elemOut[0].textLen = 0; /* reset */
       m_stem[id].elemOut[0].numIndices = 0;
@@ -674,7 +674,7 @@ void Menu::updateStem(int id)
             m_stem[id].itemName[i] = NULL;
          } else {
             m_font->setZ(&(m_stem[id].elem[i + 1]), 0.05f);
-            m_font->enableOutlineMode();
+            m_font->enableOutlineMode(1.0f);
             if (m_font->getTextDrawElementsFixed(m_stem[id].itemName[i], &(m_stem[id].elemOut[i + 1]), m_stem[id].elemOut[i + 1].textLen, MENU_PADDING_X, MENU_PADDING_Y, 0.0f, MENU_WIDTH - MENU_PADDING_X, MENU_LABELSCALE) == false) {
                m_stem[id].elemOut[i + 1].textLen = 0; /* reset */
                m_stem[id].elemOut[i + 1].numIndices = 0;
@@ -691,7 +691,7 @@ void Menu::updateStem(int id)
          } else {
             xpad = (MENU_WIDTH - MENU_PADDING_X * 2) - m_stem[id].subelem[i + 1].width;
             m_font->addOffset(&(m_stem[id].subelem[i + 1]), xpad, 0.0f, 0.15f);
-            m_font->enableOutlineMode();
+            m_font->enableOutlineMode(1.0f);
             if (m_font->getTextDrawElementsFixed(m_stem[id].subtext[i], &(m_stem[id].subelemOut[i + 1]), m_stem[id].subelemOut[i + 1].textLen, MENU_PADDING_X, MENU_PADDING_Y * 0.3f, 0.0f, MENU_WIDTH - MENU_PADDING_X, MENU_LABELSCALEFORSUB) == false) {
                m_stem[id].subelemOut[i + 1].textLen = 0; /* reset */
                m_stem[id].subelemOut[i + 1].numIndices = 0;

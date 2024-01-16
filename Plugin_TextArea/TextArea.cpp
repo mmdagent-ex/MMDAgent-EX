@@ -398,7 +398,7 @@ void TextArea::setText(const char *text)
       m_font->getTextDrawElements(m_text[m_bid], &(m_elem[m_bid]), m_elem[m_bid].textLen, 0.0f, 0.0f, m_linespace);
       if (m_outline) {
          m_font->setZ(&(m_elem[m_bid]), 0.05f);
-         m_font->enableOutlineMode();
+         m_font->enableOutlineMode(1.0f);
          m_font->getTextDrawElements(m_text[m_bid], &(m_elemOut[m_bid]), m_elemOut[m_bid].textLen, 0.0f, 0.0f, m_linespace);
          m_font->disableOutlineMode();
       }

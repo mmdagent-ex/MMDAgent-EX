@@ -1130,7 +1130,7 @@ public:
             m_elem.numIndices = 0;
          }
          m_mmdagent->getTextureFont()->setZ(&m_elem, 0.05f);
-         m_mmdagent->getTextureFont()->enableOutlineMode();
+         m_mmdagent->getTextureFont()->enableOutlineMode(1.0f);
          if (m_mmdagent->getTextureFont()->getTextDrawElements(m_statusString, &m_elemOutline, m_elemOutline.textLen, 0.0f, 0.0f, 0.0f) == false) {
             m_elemOutline.textLen = 0;
             m_elemOutline.numIndices = 0;

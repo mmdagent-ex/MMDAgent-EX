@@ -17,7 +17,7 @@
 /* maximum number of captions at a time */
 #define MMDAGENT_CAPTION_MAXNUM 30
 /* maximum number of caption styles */
-#define MMDAGENT_CAPTION_STYLE_MAXNUM 10
+#define MMDAGENT_CAPTION_STYLE_MAXNUM 30
 
 /* enum for caption positions */
 enum {
@@ -25,6 +25,13 @@ enum {
    CAPTION_POSITION_SLIDELEFT,
    CAPTION_POSITION_SLIDERIGHT,
    CAPTION_POSITION_NUM
+};
+
+/* caption font structure */
+struct CaptionFont {
+   char *fontFileName;             /* font file name */
+   FTGLTextureFont *allocatedFont; /* allocated font */
+   FTGLTextureAtlas *atlas;        /* texture atlas for the font */
 };
 
 /* caption style structure */
@@ -37,7 +44,6 @@ struct CaptionStyle {
    float edgethickness2;     /* thickness of edge 2 */
    float bgcolor[4];         /* background color */
    FTGLTextureFont *font;
-   FTGLTextureFont *allocatedFont;
 };
 
 /* configuration of an caption */
@@ -167,8 +173,8 @@ private:
 
    MMDAgent *m_mmdagent;
    int m_id;
-   FTGLTextureAtlas *m_atlas;   /* texture atlas for caption drawing */
-   bool m_hasAtlasError;
+   CaptionFont *m_fonts[MMDAGENT_CAPTION_STYLE_MAXNUM];
+   int m_numFonts;
    CaptionStyle *m_styles[MMDAGENT_CAPTION_STYLE_MAXNUM];
    int m_numStyles;
    CaptionElement *m_captions[MMDAGENT_CAPTION_MAXNUM];

@@ -188,6 +188,7 @@ bool TimeCaption::set(const char *string, double durationFrame)
 void TimeCaption::updateRenderingItem(TimeCaptionList *item, CaptionElementConfig config, CaptionStyle *style)
 {
    FTGLTextureFont *font;
+   bool ret;
 
    if (style == NULL)
       return;
@@ -199,33 +200,30 @@ void TimeCaption::updateRenderingItem(TimeCaptionList *item, CaptionElementConfi
       return;
 
    /* assign text drawing elements */
-   if (font->getTextDrawElementsWithScale(item->string, &item->elem, 0, 0.0, 0.0, 0.1f, config.size) == false) {
+   ret = font->getTextDrawElementsWithScale(item->string, &item->elem, 0, 0.0, 0.0, 0.1f, config.size);
+   if (ret == false) {
       clearElements(item);
       return;
    }
    font->setZ(&item->elem, 0.1f);
    if (style->edgethickness1 > 0.0f) {
-      font->enableOutlineMode();
-      font->setOutlineThickness(style->edgethickness1);
-      if (font->getTextDrawElementsWithScale(item->string, &item->elemOut, 0, 0.0, 0.0, 0.1f, config.size) == false) {
+      font->enableOutlineMode(style->edgethickness1);
+      ret = font->getTextDrawElementsWithScale(item->string, &item->elemOut, 0, 0.0, 0.0, 0.1f, config.size);
+      font->disableOutlineMode();
+      if (ret == false) {
          clearElements(item);
          return;
       }
       font->setZ(&item->elemOut, 0.05f);
-      font->setOutlineThickness(1.0f);
-      font->disableOutlineMode();
    }
    if (style->edgethickness2 > 0.0f) {
-      font->enableOutlineMode();
-      font->setOutlineThickness(style->edgethickness2);
-      font->setOutlineUnit(1);
-      if (font->getTextDrawElementsWithScale(item->string, &item->elemOut2, 0, 0.0, 0.0, 0.1f, config.size) == false) {
+      font->enableOutlineMode(style->edgethickness2);
+      ret = font->getTextDrawElementsWithScale(item->string, &item->elemOut2, 0, 0.0, 0.0, 0.1f, config.size);
+      font->disableOutlineMode();
+      if (ret == false) {
          clearElements(item);
          return;
       }
-      font->setOutlineUnit(0);
-      font->setOutlineThickness(1.0f);
-      font->disableOutlineMode();
    }
 
    /* calculate position */
@@ -512,8 +510,9 @@ void Caption::initialize()
 {
    m_mmdagent = NULL;
    m_id = 0;
-   m_atlas = NULL;
-   m_hasAtlasError = false;
+   for (int i = 0; i < MMDAGENT_CAPTION_STYLE_MAXNUM; i++)
+      m_fonts[i] = NULL;
+   m_numFonts = 0;
    for (int i = 0; i < MMDAGENT_CAPTION_STYLE_MAXNUM; i++)
       m_styles[i] = NULL;
    m_numStyles = 0;
@@ -530,14 +529,20 @@ void Caption::clear()
          delete m_captions[i];
    }
    for (int i = 0; i < m_numStyles; i++) {
-      if (m_styles[i]) {
-         if (m_styles[i]->allocatedFont)
-            delete m_styles[i]->allocatedFont;
+      if (m_styles[i])
          free(m_styles[i]);
+   }
+   for (int i = 0; i < m_numFonts; i++) {
+      if (m_fonts[i]) {
+         if (m_fonts[i]->fontFileName)
+            free(m_fonts[i]->fontFileName);
+         if (m_fonts[i]->allocatedFont)
+            delete m_fonts[i]->allocatedFont;
+         if (m_fonts[i]->atlas)
+            delete m_fonts[i]->atlas;
+         free(m_fonts[i]);
       }
    }
-   if (m_atlas)
-      delete m_atlas;
 
    initialize();
 }
@@ -564,20 +569,9 @@ void Caption::setup(MMDAgent *mmdagent, int mid)
 /* Caption::setStyle: set style */
 bool Caption::setStyle(const char *name, const char *fontPath, float *col, float *edge1, float *edge2, float *bscol)
 {
-   if (m_hasAtlasError)
-      return false;
+   CaptionFont *f;
 
-   if (m_atlas == NULL) {
-      m_atlas = new FTGLTextureAtlas();
-      if (m_atlas->setup() == false) {
-         m_mmdagent->sendLogString(m_id, MLOG_ERROR, "failed to initialize font texture atlas");
-         delete m_atlas;
-         m_atlas = NULL;
-         m_hasAtlasError = true;
-         return false;
-      }
-   }
-
+   /* assign new style */
    CaptionStyle *s = (CaptionStyle *)malloc(sizeof(CaptionStyle));
    MMDAgent_snprintf(s->name, 128, "%s", name);
    memcpy(s->color, col, sizeof(float) * 4);
@@ -596,17 +590,51 @@ bool Caption::setStyle(const char *name, const char *fontPath, float *col, float
    /* set font */
    if (fontPath == NULL) {
       /* use default font */
-      s->allocatedFont = NULL;
       s->font = m_mmdagent->getTextureFont();
    } else {
+      int i = 0;
       /* load font from fontPath and set it to s->font, using shared atlas */
-      s->allocatedFont = new FTGLTextureFont();
-      s->font = s->allocatedFont;
-      if (s->allocatedFont->setup(m_atlas, fontPath) == false) {
-         m_mmdagent->sendLogString(m_id, MLOG_WARNING, "failed to load font: %s, fall back to default", fontPath);
-         delete s->allocatedFont;
-         s->allocatedFont = NULL;
-         s->font = m_mmdagent->getTextureFont();
+      for (i = 0; i < m_numFonts; i++) {
+         if (MMDAgent_strequal(m_fonts[i]->fontFileName, fontPath)) {
+            /* already loaded */
+            s->font = m_fonts[i]->allocatedFont;
+            break;
+         }
+      }
+      if (i >= m_numFonts) {
+         /* allocate new font */
+         if (m_numFonts >= MMDAGENT_CAPTION_STYLE_MAXNUM) {
+            /* num exceeded limit */
+            m_mmdagent->sendLogString(m_id, MLOG_ERROR, "number of caption fonts exceeds limit (%d)", MMDAGENT_CAPTION_STYLE_MAXNUM);
+            free(s);
+            return false;
+         }
+         /* allocate atlas */
+         f = (CaptionFont *)malloc(sizeof(CaptionFont));
+         f->fontFileName = NULL;
+         f->allocatedFont = NULL;
+         f->atlas = new FTGLTextureAtlas();
+         if (f->atlas->setup() == false) {
+            m_mmdagent->sendLogString(m_id, MLOG_ERROR, "failed to initialize font texture atlas for font %s, fall back to default", fontPath);
+            delete f->atlas;
+            free(f);
+            s->font = m_mmdagent->getTextureFont();
+         } else {
+            /* allocate font */
+            f->allocatedFont = new FTGLTextureFont();
+            if (f->allocatedFont->setup(f->atlas, fontPath) == false) {
+               m_mmdagent->sendLogString(m_id, MLOG_WARNING, "failed to load font: %s, fall back to default", fontPath);
+               delete f->allocatedFont;
+               delete f->atlas;
+               free(f);
+               s->font = m_mmdagent->getTextureFont();
+            } else {
+               f->fontFileName = MMDAgent_strdup(fontPath);
+               s->font = f->allocatedFont;
+               m_fonts[m_numFonts] = f;
+               m_numFonts++;
+            }
+         }
       }
    }
 
@@ -620,14 +648,12 @@ bool Caption::setStyle(const char *name, const char *fontPath, float *col, float
 
    if (sid != -1) {
       /* style already exist, swap it */
-      if (m_styles[sid]->allocatedFont)
-         delete m_styles[sid]->allocatedFont;
       free(m_styles[sid]);
    } else {
       /* assign new */
       if (m_numStyles >= MMDAGENT_CAPTION_STYLE_MAXNUM) {
-         delete s;
          m_mmdagent->sendLogString(m_id, MLOG_ERROR, "Error: number of caption style exceeds limit: %d", MMDAGENT_CAPTION_STYLE_MAXNUM);
+         free(s);
          return false;
       }
       sid = m_numStyles++;
@@ -742,9 +768,9 @@ void Caption::update(double ellapsedFrame)
          m_captions[i]->update(ellapsedFrame);
 
    /* update font glyph */
-   for (int i = 0; i < m_numStyles; i++)
-      if (m_styles[i]->allocatedFont)
-         m_styles[i]->allocatedFont->updateGlyphInfo();
+   for (int i = 0; i < m_numFonts; i++)
+      if (m_fonts[i]->allocatedFont)
+         m_fonts[i]->allocatedFont->updateGlyphInfo();
 
    /* check if it ends */
    for (int i = 0; i < m_numCaptions; i++) {
