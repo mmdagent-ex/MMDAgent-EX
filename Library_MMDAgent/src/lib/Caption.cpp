@@ -21,6 +21,9 @@
 #define TEXT_MARGIN 0.2f
 #define RESCALE_WIDTH_MARGIN 2.0f
 
+// name of pre-defined default style
+#define CAPTION_DEFAULT_STYLE_NAME "_default"
+
 /***********************************************************/
 
 /* TimeCaption::initialize: initialize */
@@ -564,6 +567,20 @@ void Caption::setup(MMDAgent *mmdagent, int mid)
 {
    m_mmdagent = mmdagent;
    m_id = mid;
+
+   /* assign pre-defined default style */
+   /*
+   * fontpath  = default
+   * text rgba = (1, 0.5, 0, 1)
+   * edge 1    = (1, 1, 1, 1), 4
+   * edge 2    = (0, 0, 0, 0.6), 6
+   * bgcolor   = (0,0,0,0)
+   */
+   float text_color[4] = { 1, 0.5f, 0, 1 };
+   float edge1[5] = { 1, 1, 1, 1, 4 };
+   float edge2[5] = { 0, 0, 0, 0.6f, 6 };
+   float bg_color[4] = { 0, 0, 0, 0 };
+   setStyle(CAPTION_DEFAULT_STYLE_NAME, NULL, text_color, edge1, edge2, bg_color);
 }
 
 /* Caption::setStyle: set style */
