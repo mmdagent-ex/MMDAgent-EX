@@ -184,7 +184,7 @@ void InfoText::updateRendering()
       m_titley = m_screenHeight - OUTMARGIN - YMARGIN - TITLEHEIGHT + (TITLEHEIGHT - tmpElem.height) * 0.5f + tmpElem.height - tmpElem.upheight;
       font->getTextDrawElementsWithScale(m_titleLabel, &m_labelElem, m_labelElem.textLen, m_titlex, m_titley, 0.0f, 1.0f);
       font->setZ(&m_labelElem, 0.05f);
-      font->enableOutlineMode();
+      font->enableOutlineMode(1.0f);
       font->getTextDrawElementsWithScale(m_titleLabel, &m_labelElemOut, m_labelElemOut.textLen, m_titlex, m_titley, 0.0f, 1.0f);
       font->disableOutlineMode();
    }
@@ -199,7 +199,7 @@ void InfoText::updateRendering()
          bty = YMARGIN + OUTMARGIN + ypad + (TITLEHEIGHT - tmpElem.height) * 0.5f + tmpElem.height - tmpElem.upheight;
          font->getTextDrawElementsWithScale(m_buttonLabels[i], &m_labelElem, m_labelElem.textLen, btx, bty, 0.0f, 1.0f);
          font->setZ(&m_labelElem, 0.05f);
-         font->enableOutlineMode();
+         font->enableOutlineMode(1.0f);
          font->getTextDrawElementsWithScale(m_buttonLabels[i], &m_labelElemOut, m_labelElemOut.textLen, btx, bty, 0.0f, 1.0f);
          font->disableOutlineMode();
       }
@@ -213,7 +213,7 @@ void InfoText::updateRendering()
       m_textElem.numIndices = 0;
    } else {
       font->setZ(&m_textElem, 0.05f);
-      font->enableOutlineMode();
+      font->enableOutlineMode(1.0f);
       font->getTextDrawElementsWithScale(m_text, &m_textElemOut, m_textElemOut.textLen, TEXTPADDINGX, 0.0f, LINESPACE, 1.0f);
       font->disableOutlineMode();
    }
