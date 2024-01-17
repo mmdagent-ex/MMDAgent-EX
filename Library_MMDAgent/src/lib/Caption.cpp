@@ -40,8 +40,11 @@ void TimeCaption::initialize()
 void TimeCaption::clear()
 {
    if (m_list) {
-      for (int i = 0; i < m_listLen; i++)
+      for (int i = 0; i < m_listLen; i++) {
          clearElements(&(m_list[i]));
+         if (m_list[i].string)
+            free(m_list[i].string);
+      }
       free(m_list);
    }
    initialize();
@@ -85,7 +88,8 @@ bool TimeCaption::load(const char *fileName)
    ZFile *zf;
    char buf[MMDAGENT_MAXBUFLEN];
    char *buft;
-   char *p1, *p2, *pt, *psave, *ptsave;
+   bool valid_line;
+   char *p1, *p2, *psave;
    float min, sec, dmsec;
    TimeCaptionList *list = NULL;
    int num = 0;
@@ -102,29 +106,44 @@ bool TimeCaption::load(const char *fileName)
    while (zf->gets(buf, MMDAGENT_MAXBUFLEN) != NULL) {
       if (buf[0] == '\r' || buf[0] == '\n' || buf[0] == '#')
          continue;
+      valid_line = false;
       p1 = MMDAgent_strtok(buf, "[]\r\n", &psave);
       if (p1 == NULL)
          continue;
       buft = MMDAgent_strdup(p1);
       p2 = MMDAgent_strtok(NULL, "[]\r\n", &psave);
-      if (p2 == NULL)
+      {
+         char *pl, *pr;
+         pl = buft;
+         pr = pl;
+         while(isdigit((int)*pr)) pr++;
+         if (*pr == ':') {
+            *pr = '\0';
+            min = MMDAgent_str2float(pl);
+            pl = pr + 1;
+            pr = pl;
+            while (isdigit((int)*pr)) pr++;
+            if (*pr == '.') {
+               *pr = '\0';
+               sec = MMDAgent_str2float(pl);
+               pl = pr + 1;
+               pr = pl;
+               while (isdigit((int)*pr)) pr++;
+               if (*pr == '\0') {
+                  dmsec = MMDAgent_str2float(pl);
+                  valid_line = true;
+               }
+            }
+         }
+
+      }
+      free(buft);
+      if (valid_line == false)
          continue;
-      pt = MMDAgent_strtok(buft, ":.", &ptsave);
-      if (pt == NULL)
-         continue;
-      min = MMDAgent_str2float(pt);
-      pt = MMDAgent_strtok(NULL, ":.", &ptsave);
-      if (pt == NULL)
-         continue;
-      sec = MMDAgent_str2float(pt);
-      pt = MMDAgent_strtok(NULL, ":.", &ptsave);
-      if (pt == NULL)
-         continue;
-      dmsec = MMDAgent_str2float(pt);
 
       TimeCaptionList *newItem = (TimeCaptionList *)malloc(sizeof(TimeCaptionList));
       newItem->id = num;
-      newItem->string = MMDAgent_strdup(p2);
+      newItem->string = p2 ? MMDAgent_strdup(p2) : NULL;
       newItem->frame = (double)(min * 1800.0 + sec * 30.0 + dmsec * 0.3);
       memset(&newItem->elem, 0, sizeof(FTGLTextDrawElements));
       memset(&newItem->elemOut, 0, sizeof(FTGLTextDrawElements));
@@ -168,7 +187,7 @@ bool TimeCaption::set(const char *string, double durationFrame)
    m_listLen = 2;
    m_list = (TimeCaptionList *)malloc(sizeof(TimeCaptionList) * m_listLen);
    m_list[0].id = 0;
-   m_list[0].string = MMDAgent_strdup(string);
+   m_list[0].string = string ? MMDAgent_strdup(string) : NULL;
    m_list[0].frame = 0.0;
    memset(&m_list[0].elem, 0, sizeof(FTGLTextDrawElements));
    memset(&m_list[0].elemOut, 0, sizeof(FTGLTextDrawElements));
@@ -275,6 +294,9 @@ void TimeCaption::render(int id, CaptionElementConfig config, CaptionStyle *styl
       return;
 
    item = &(m_list[id]);
+
+   if (MMDAgent_strlen(item->string) == 0)
+      return;
 
    if (width < item->drawWidth) {
       /* re-scale */
@@ -622,7 +644,7 @@ bool Caption::setStyle(const char *name, const char *fontPath, float *col, float
          /* allocate new font */
          if (m_numFonts >= MMDAGENT_CAPTION_STYLE_MAXNUM) {
             /* num exceeded limit */
-            m_mmdagent->sendLogString(m_id, MLOG_ERROR, "number of caption fonts exceeds limit (%d)", MMDAGENT_CAPTION_STYLE_MAXNUM);
+            m_mmdagent->sendLogString(m_id, MLOG_ERROR, "caption style \"%s\": number of caption fonts exceeds limit (%d), font \"%s\" not loaded", name, MMDAGENT_CAPTION_STYLE_MAXNUM, fontPath);
             free(s);
             return false;
          }
@@ -632,7 +654,7 @@ bool Caption::setStyle(const char *name, const char *fontPath, float *col, float
          f->allocatedFont = NULL;
          f->atlas = new FTGLTextureAtlas();
          if (f->atlas->setup() == false) {
-            m_mmdagent->sendLogString(m_id, MLOG_ERROR, "failed to initialize font texture atlas for font %s, fall back to default", fontPath);
+            m_mmdagent->sendLogString(m_id, MLOG_ERROR, "caption style \"%s\": failed to initialize texture atlas for font \"%s\", fall back to default", name, fontPath);
             delete f->atlas;
             free(f);
             s->font = m_mmdagent->getTextureFont();
@@ -640,7 +662,7 @@ bool Caption::setStyle(const char *name, const char *fontPath, float *col, float
             /* allocate font */
             f->allocatedFont = new FTGLTextureFont();
             if (f->allocatedFont->setup(f->atlas, fontPath) == false) {
-               m_mmdagent->sendLogString(m_id, MLOG_WARNING, "failed to load font: %s, fall back to default", fontPath);
+               m_mmdagent->sendLogString(m_id, MLOG_ERROR, "caption style \"%s\": failed to load font \"%s\", fall back to default", name, fontPath);
                delete f->allocatedFont;
                delete f->atlas;
                free(f);
@@ -669,7 +691,7 @@ bool Caption::setStyle(const char *name, const char *fontPath, float *col, float
    } else {
       /* assign new */
       if (m_numStyles >= MMDAGENT_CAPTION_STYLE_MAXNUM) {
-         m_mmdagent->sendLogString(m_id, MLOG_ERROR, "Error: number of caption style exceeds limit: %d", MMDAGENT_CAPTION_STYLE_MAXNUM);
+         m_mmdagent->sendLogString(m_id, MLOG_ERROR, "caption style \"%s\": number of caption style exceeds limit: %d", name, MMDAGENT_CAPTION_STYLE_MAXNUM);
          free(s);
          return false;
       }
@@ -700,7 +722,7 @@ bool Caption::start(const char *name, const char *string, const char *styleName,
    }
    if (sid == -1) {
       /* style not found */
-      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "style not found: %s", styleName);
+      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "caption \"%s\": style not found: %s", name, styleName);
       return false;
    }
 
@@ -730,7 +752,7 @@ bool Caption::start(const char *name, const char *string, const char *styleName,
       }
       if (cid == -1) {
          if (m_numCaptions >= MMDAGENT_CAPTION_MAXNUM) {
-            m_mmdagent->sendLogString(m_id, MLOG_ERROR, "Error: number of caption exceeds limit: %d", MMDAGENT_CAPTION_MAXNUM);
+            m_mmdagent->sendLogString(m_id, MLOG_ERROR, "caption \"%s\": number of caption exceeds limit: %d", name, MMDAGENT_CAPTION_MAXNUM);
             return false;
          }
          cid = m_numCaptions++;
@@ -740,7 +762,7 @@ bool Caption::start(const char *name, const char *string, const char *styleName,
    /* assign new caption */
    CaptionElement *ce = new CaptionElement();
    if (ce->setup(name, string, config, m_styles[sid]) == false) {
-      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "Error: failed to set up caption \"%s\" with style \"%s\"", name, styleName);
+      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "caption \"%s\": failed to set up caption for \"%s\"", name, string);
       delete ce;
       return false;
    }
