@@ -6014,11 +6014,12 @@ void MMDAgent::procReceivedMessage(const char *type, const char *value)
       }
       m_keyHandler.processRemoteKeyUp(value);
    } else if (MMDAgent_strequal(type, MMDAGENT_COMMAND_CAPTION_SETSTYLE)) {
+      /* CAPTION_SETSTYLE|style_alias|font|color */
       /* CAPTION_SETSTYLE|style_alias|font|color|edge1|edge2|basecolor */
       float col[4], edge1[5], edge2[5], bscol[4];
       sendLogString(m_moduleId, MLOG_MESSAGE_CAPTURED, "%s|%s", type, value);
-      if (num != 6) {
-         sendLogString(m_moduleId, MLOG_ERROR, "%s: number of arguments should be 6.", type);
+      if (num != 3 && num != 6) {
+         sendLogString(m_moduleId, MLOG_ERROR, "%s: number of arguments should be 3 or 6.", type);
          return;
       }
       char *fontPath = MMDAgent_strequal(argv[1], "default") ? NULL : argv[1];
@@ -6026,21 +6027,28 @@ void MMDAgent::procReceivedMessage(const char *type, const char *value)
          sendLogString(m_moduleId, MLOG_ERROR, "%s: \"%s\" is not in a format \"r,g,b,a\"", type, argv[2]);
          return;
       }
-      if (MMDAgent_str2fvec(argv[3], edge1, 5) == false) {
-         sendLogString(m_moduleId, MLOG_ERROR, "%s: \"%s\" is not in a format \"r,g,b,a,thickness\"", type, argv[3]);
-         return;
-      }
-      if (MMDAgent_str2fvec(argv[4], edge2, 5) == false) {
-         sendLogString(m_moduleId, MLOG_ERROR, "%s: \"%s\" is not in a format \"r,g,b,a,thickness\"", type, argv[4]);
-         return;
-      }
-      if (MMDAgent_str2fvec(argv[5], bscol, 4) == false) {
-         sendLogString(m_moduleId, MLOG_ERROR, "%s: \"%s\" is not in a format \"r,g,b,a\"", type, argv[5]);
-         return;
-      }
-      if (m_caption->setStyle(argv[0], fontPath, col, edge1, edge2, bscol) == false) {
-         sendLogString(m_moduleId, MLOG_ERROR, "%s: failed to set style: %s", type, value);
-         return;
+      if (num == 3) {
+         if (m_caption->setStyle(argv[0], fontPath, col, NULL, NULL, NULL) == false) {
+            sendLogString(m_moduleId, MLOG_ERROR, "%s: failed to set style: %s", type, value);
+            return;
+         }
+      } else {
+         if (MMDAgent_str2fvec(argv[3], edge1, 5) == false) {
+            sendLogString(m_moduleId, MLOG_ERROR, "%s: \"%s\" is not in a format \"r,g,b,a,thickness\"", type, argv[3]);
+            return;
+         }
+         if (MMDAgent_str2fvec(argv[4], edge2, 5) == false) {
+            sendLogString(m_moduleId, MLOG_ERROR, "%s: \"%s\" is not in a format \"r,g,b,a,thickness\"", type, argv[4]);
+            return;
+         }
+         if (MMDAgent_str2fvec(argv[5], bscol, 4) == false) {
+            sendLogString(m_moduleId, MLOG_ERROR, "%s: \"%s\" is not in a format \"r,g,b,a\"", type, argv[5]);
+            return;
+         }
+         if (m_caption->setStyle(argv[0], fontPath, col, edge1, edge2, bscol) == false) {
+            sendLogString(m_moduleId, MLOG_ERROR, "%s: failed to set style: %s", type, value);
+            return;
+         }
       }
       sendMessage(m_moduleId, MMDAGENT_EVENT_CAPTION_SETSTYLE, "%s", argv[0]);
    } else if (MMDAgent_strequal(type, MMDAGENT_COMMAND_CAPTION_START)) {
