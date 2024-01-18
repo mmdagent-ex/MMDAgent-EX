@@ -23,6 +23,22 @@
 
 // name of pre-defined default style
 #define CAPTION_DEFAULT_STYLE_NAME "_default"
+// default style color
+#define CAPTION_DEFAULT_STYLE_COLOR         1.0f, 0.5f, 0.0f, 1.0f
+// default style edge 1 thickness
+#define CAPTION_DEFAULT_EDGE1_THICKNESS     4.0f
+// default style edge 2 thickness
+#define CAPTION_DEFAULT_EDGE2_THICKNESS     8.0f
+
+// edge 2 color generation: Hue shift
+#define CAPTION_EDGE2_COLOR_HUE_SHIFT       10.0f
+// edge 2 color generation: Luminance addition
+#define CAPTION_EDGE2_COLOR_LUMINANCE_ADD   0.2f
+// edge 2 color generation: Luminance floor
+#define CAPTION_EDGE2_COLOR_LUMINANCE_FLOOR 0.4f
+// edge 2 color generation: static alpha
+#define CAPTION_EDGE2_COLOR_ALPHA           0.8f
+
 
 /***********************************************************/
 
@@ -598,11 +614,88 @@ void Caption::setup(MMDAgent *mmdagent, int mid)
    * edge 2    = (0, 0, 0, 0.6), 6
    * bgcolor   = (0,0,0,0)
    */
-   float text_color[4] = { 1, 0.5f, 0, 1 };
-   float edge1[5] = { 1, 1, 1, 1, 4 };
-   float edge2[5] = { 0, 0, 0, 0.6f, 6 };
-   float bg_color[4] = { 0, 0, 0, 0 };
-   setStyle(CAPTION_DEFAULT_STYLE_NAME, NULL, text_color, edge1, edge2, bg_color);
+   float text_color[4] = { CAPTION_DEFAULT_STYLE_COLOR };
+   setStyle(CAPTION_DEFAULT_STYLE_NAME, NULL, text_color, NULL, NULL, NULL);
+}
+
+#define min_f(a, b, c)  (fminf(a, fminf(b, c)))
+#define max_f(a, b, c)  (fmaxf(a, fmaxf(b, c)))
+
+/* sub function to convert RGB to HSL */
+static void rgb2hsl(float *src, float *dst)
+{
+   float r = src[0];
+   float g = src[1];
+   float b = src[2];
+
+   float h, s, l; // h:0-360.0, s:0.0-1.0, l:0.0-1.0
+
+   float max = max_f(r, g, b);
+   float min = min_f(r, g, b);
+
+   l = (max + min) * 0.5f;
+
+   if (max == 0.0f) {
+      s = 0;
+      h = 0;
+   } else if (max - min == 0.0f) {
+      s = 0;
+      h = 0;
+   } else {
+      if (l < 0.5f)
+         s = (max - min) / (max + min);
+      else
+         s = (max - min) / (2.0f - max - min);
+
+      if (min == b) {
+         h = 60 * ((g - r) / (max - min)) + 60;
+      } else if (min == r) {
+         h = 60 * ((b - g) / (max - min)) + 180;
+      } else {
+         h = 60 * ((r - b) / (max - min)) + 300;
+      }
+   }
+
+   while (h < 0) h += 360.0f;
+   while (h >= 360.0f) h -= 360.0f;
+
+   dst[0] = h;
+   dst[1] = s;
+   dst[2] = l;
+}
+
+/* sub function to convert HSL to RGB */
+void hsl2rgb(float *src, float *dst)
+{
+   float h = src[0]; // 0-360
+   float s = src[1]; // 0.0-1.0
+   float l = src[2]; // 0.0-1.0
+
+   float r, g, b; // 0.0-1.0
+
+   if (s < 0.0001f) {
+      r = g = b = 0.0f;
+   } else {
+      float x;
+      if (l < 0.5f)
+         x = l * (1.0f + s);
+      else
+         x = l + s - l * s;
+      float n = 2.0f * l - x;
+      int hi = (int)(h / 60.0f) % 6;
+      switch (hi) {
+      case 0: r = x, g = n + (x - n) * h / 60.0f, b = n; break;
+      case 1: r = n + (x - n) * (120.0f - h) / 60.0f, g = x, b = n; break;
+      case 2: r = n, g = x, b = n + (x - n) * (h - 120.0f) / 60.0f; break;
+      case 3: r = n, g = n + (x - n) * (240.0f - h) / 60.0f, b = x; break;
+      case 4: r = n + (x - n) * (h - 240.0f) / 60.0f, g = n, b = x; break;
+      case 5: r = x, g = n, b = n + (x - n) * (360.0f - h) / 60.0f; break;
+      }
+   }
+
+   dst[0] = r;
+   dst[1] = g;
+   dst[2] = b;
 }
 
 /* Caption::setStyle: set style */
@@ -614,13 +707,46 @@ bool Caption::setStyle(const char *name, const char *fontPath, float *col, float
    CaptionStyle *s = (CaptionStyle *)malloc(sizeof(CaptionStyle));
    MMDAgent_snprintf(s->name, 128, "%s", name);
    memcpy(s->color, col, sizeof(float) * 4);
-   memcpy(s->edgecolor1, edge1, sizeof(float) * 4);
-   s->edgethickness1 = edge1[4];
-   memcpy(s->edgecolor2, edge2, sizeof(float) * 4);
-   s->edgethickness2 = edge2[4];
-   memcpy(s->bgcolor, bscol, sizeof(float) * 4);
+   if (edge1 != NULL) {
+      /* edge values are given, set it */
+      memcpy(s->edgecolor1, edge1, sizeof(float) * 4);
+      s->edgethickness1 = edge1[4];
+      memcpy(s->edgecolor2, edge2, sizeof(float) * 4);
+      s->edgethickness2 = edge2[4];
+      memcpy(s->bgcolor, bscol, sizeof(float) * 4);
+   } else {
+      /* generate edge parameters */
+      for (int i = 0; i < 4; i++) {
+         /* edge 1 color is fixed to white */
+         s->edgecolor1[i] = 1.0f;
+         /* no background color */
+         s->bgcolor[i] = 0.0f;
+      }
+      /* generate edge 2 color from text color */
+      float hsl[3];
+      float rgb[3];
+      /* convert text color to HSL */
+      rgb2hsl(col, hsl);
+      /* increase luminance */
+      hsl[2] += CAPTION_EDGE2_COLOR_LUMINANCE_ADD;
+      if (hsl[2] > 1.0f) hsl[2] = 1.0f;
+      if (hsl[2] < CAPTION_EDGE2_COLOR_LUMINANCE_FLOOR) hsl[2] = CAPTION_EDGE2_COLOR_LUMINANCE_FLOOR;
+      /* shift Hue */
+      hsl[0] += CAPTION_EDGE2_COLOR_HUE_SHIFT;
+      if (hsl[0] > 360.0f) hsl[0] -= 360.0f;
+      /* convert back to RGB */
+      hsl2rgb(hsl, rgb);
+      for (int i = 0; i < 3; i++) {
+         s->edgecolor2[i] = rgb[i];
+      }
+      /* set default alpha */
+      s->edgecolor2[3] = CAPTION_EDGE2_COLOR_ALPHA;
+      /* set default thicknesses */
+      s->edgethickness1 = CAPTION_DEFAULT_EDGE1_THICKNESS;
+      s->edgethickness2 = CAPTION_DEFAULT_EDGE2_THICKNESS;
+   }
 
-   /* sed edge thickness to 0.0 if alpha channel is 0.0 (means no drawing) */
+   /* set edge thickness to 0.0 if alpha channel is 0.0 (means no drawing) */
    if (s->edgecolor1[3] <= 0.0f)
       s->edgethickness1 = 0.0f;
    if (s->edgecolor2[3] <= 0.0f)
