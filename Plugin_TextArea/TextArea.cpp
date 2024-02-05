@@ -334,6 +334,7 @@ void TextArea::setText(const char *text)
       /* image */
       m_imageTexture[m_bid] = new PMDTexture;
       if (m_imageTexture[m_bid]->loadImage(p) == true) {
+         m_imageTexture[m_bid]->setAnimationSpeedRate(1.0);
          m_mmdagent->sendLogString(m_id, MLOG_STATUS, "image \"%s\", %d x %d", p, m_imageTexture[m_bid]->getWidth(), m_imageTexture[m_bid]->getHeight());
          is_image = true;
       } else {

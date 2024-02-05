@@ -109,6 +109,8 @@ bool TileTexture::load(const char *file)
    if (ret == false)
       return false;
 
+   m_texture.setAnimationSpeedRate(1.0);
+
    m_isLoaded = true;
 
    return true;
