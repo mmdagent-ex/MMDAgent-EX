@@ -3,6 +3,7 @@ on: [push]
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         os:
           - windows-2022
@@ -59,7 +60,7 @@ jobs:
     - name: Build app for release on macos-13
       if: matrix.os == 'macos-13'
       run: |
-        cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release
+        cmake -S. -Bbuild -DCMAKE_OSX_ARCHITECTURES="arm64" -DCMAKE_BUILD_TYPE=Release
         cmake --build build
 
     - name: Upload artifact
