@@ -2,16 +2,8 @@ name: MSBuild
 on: [push]
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - windows-2022
-          - ubuntu-22.04
-          - macos-13
-
-    runs-on: ${{ matrix.os }}
-
+    name: MSBuild
+    runs-on: windows-2022
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -19,57 +11,16 @@ jobs:
         lfs: 'true'
 
     - name: Add MSBUILD to PATH on Windows
-      if: matrix.os == 'windows-2022'
       uses: microsoft/setup-msbuild@v2
 
-    - name: Install dependencies on Ubuntu-22.04
-      if: matrix.os == 'ubuntu-22.04'
-      run: |
-        sudo apt update
-        sudo apt install `cat requirements-linux.txt`
-
-    - name: Install dependencies on macos-13
-      if: matrix.os == 'macos-13'
-      run: |
-        brew update
-        brew install cmake
-        brew install poco
-        brew install glew
-        brew install libjpeg
-        brew install re2
-        brew install portaudio
-        brew install minizip
-        brew install libsndfile
-        brew install libsamplerate
-        brew install sox
-        brew install rabbitmq-c
-        brew install libomp
-        brew install librdkafka
-        brew link --force libomp
-
     - name: Build app for release on Windows
-      if: matrix.os == 'windows-2022'
       run: msbuild /p:Configuration=Release MMDAgent_vs2022.sln
-
-    - name: Build app for release on Ubuntu-22.04
-      if: matrix.os == 'ubuntu-22.04'
-      run: |
-        cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release
-        cmake --build build
-
-    - name: Build app for release on macos-13
-      if: matrix.os == 'macos-13'
-      run: |
-        cmake -S. -Bbuild -DCMAKE_OSX_ARCHITECTURES="arm64" -DCMAKE_BUILD_TYPE=Release
-        cmake --build build
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: build-result-${{ matrix.os }}
+        name: build-result-win32
         path: |
           Release/MMDAgent-EX.exe
-          Release/MMDAgent-EX
           Release/Plugins/*.dll
-          Release/Plugins/*.so
 
