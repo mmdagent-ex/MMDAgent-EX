@@ -2,25 +2,47 @@ name: MSBuild
 on: [push]
 jobs:
   build:
-    name: MSBuild
-    runs-on: windows-2022
+    strategy:
+      matrix:
+        os:
+          - windows-2022
+          - ubuntu-22.04
+          - macos-13
+
+    runs-on: ${{ matrix.os }}
+
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         lfs: 'true'
 
-    - name: Add msbuild to PATH
+    - name: Add MSBUILD to PATH on Windows
+      if: matrix.os == 'windows-2022'
       uses: microsoft/setup-msbuild@v2
 
-    - name: Build app for release
+    - name: Install dependencies on Ubuntu-22.04
+      if: matrix.os == 'ubuntu-22.04'
+      run: |
+        sudo apt install `cat requirements-linux.txt`
+
+    - name: Build app for release on Windows
+      if: matrix.os == 'windows-2022'
       run: msbuild /p:Configuration=Release MMDAgent_vs2022.sln
+
+    - name: Build app for release on Ubuntu-22.04
+      if: matrix.os == 'ubuntu-22.04'
+      run: |
+        cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release
+        cmake --build build
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: build-result
+        name: build-result-${{ matrix.os }}
         path: |
           Release/MMDAgent-EX.exe
-          Release/Plugins/
-        
+          Release/MMDAgent-EX
+          Release/Plugins/*.dll
+          Release/Plugins/*.so
+
