@@ -1,0 +1,26 @@
+name: MSBuild
+on: [push]
+jobs:
+  build:
+    name: MSBuild
+    runs-on: windows-2022
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        lfs: 'true'
+
+    - name: Add MSBUILD to PATH on Windows
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Build app for release on Windows
+      run: msbuild /p:Configuration=Release MMDAgent_vs2022.sln
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-result-win32
+        path: |
+          Release/MMDAgent-EX.exe
+          Release/Plugins/*.dll
+
