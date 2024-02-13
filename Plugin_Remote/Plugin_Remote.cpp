@@ -1359,10 +1359,11 @@ EXPORT void extProcMessage(MMDAgent *mmdagent, const char *type, const char *arg
       if (enabled == true) {
          if (MMDAgent_strlen(type) > 0) {
             if (MMDAgent_strlen(args) > 0) {
-               MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s|%s", type, args);
+               MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s|%s\n", type, args);
                plugin.enqueueLogString(buff);
             }  else {
-               plugin.enqueueLogString(type);
+               MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s\n", type);
+               plugin.enqueueLogString(buff);
             }
          }
       }
@@ -1410,10 +1411,14 @@ EXPORT void extRender2D(MMDAgent *mmdagent, float screenWidth, float screenHeigh
 /* extLog: process log string */
 EXPORT void extLog(MMDAgent *mmdagent, int id, unsigned int flag, const char *text, const char *fulltext)
 {
+   char buff[MMDAGENT_MAXBUFLEN];
+
    if (configured == false)
       return;
-   if (send_log == true)
-      plugin.enqueueLogString(fulltext);
+   if (send_log == true) {
+      MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s\n", fulltext);
+      plugin.enqueueLogString(buff);
+   }
 }
 
 /* extAppEnd: end of application */
