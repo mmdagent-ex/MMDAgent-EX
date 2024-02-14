@@ -1293,6 +1293,14 @@ EXPORT void extProcMessage(MMDAgent *mmdagent, const char *type, const char *arg
          }
          free(buff);
       }
+   } else if (MMDAgent_strequal(type, PLUGIN_COMMAND_SPEAK_STOP)) {
+      mmdagent->sendLogString(mid, MLOG_MESSAGE_CAPTURED, "%s|%s", type, args);
+      if (args) {
+         if (speak.stopSpeakingThread(args) == false) {
+            /* not running, issue stop event message */
+            mmdagent->sendMessage(mid, PLUGIN_EVENT_SPEAK_STOP, "%s", args);
+         }
+      }
    }
 
    if (configured == false)

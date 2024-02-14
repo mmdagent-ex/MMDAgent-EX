@@ -851,6 +851,16 @@ void Julius_Thread::segmentAudio()
       m_audio->m_want_segment = true;
 }
 
+// Julius_Thread::clearAudio: clear the current audio
+void Julius_Thread::clearAudio()
+{
+   if (m_audio) {
+      m_audio->m_receive_buffer_last_point = 0;
+      m_audio->m_receive_buffer_store_point = 0;
+      m_audio->m_play_buffer_current = 0;
+   }
+}
+
 /* Julius_Thread::enableRecording: enable recording */
 void Julius_Thread::enableRecording(const char *dirname)
 {

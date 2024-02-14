@@ -42,6 +42,7 @@ void Speak::initialize()
    m_threadForSpeak = NULL;
    m_avatarForSpeakSpeaking = false;
    m_speakingThreadrunning = false;
+   m_wantSpeakStop = false;
 }
 
 /* Speak::clear: clear */
@@ -161,6 +162,11 @@ void Speak::loadWaveAndSpeak()
       return;
    }
 
+   if (m_wantSpeakStop == true) {
+      m_speakingThreadrunning = false;
+      return;
+   }
+
    // load audio file
    char *filepath = MMDFiles_pathdup_from_application_to_system_locale(m_givenFileName);
    input_sndfile = sf_open(filepath, SFM_READ, &input_info);
@@ -236,6 +242,11 @@ void Speak::loadWaveAndSpeak()
    sf_close(input_sndfile);
    src_delete(src_state);
 
+   if (m_wantSpeakStop == true) {
+      m_speakingThreadrunning = false;
+      return;
+   }
+
    float audio_sec = (float)output_frames / OUTPUT_SAMPLE_RATE;
 
    m_mmdagent->sendLogString(m_id, MLOG_STATUS, "speaking audio length: %.2f sec.", audio_sec);
@@ -250,7 +261,18 @@ void Speak::loadWaveAndSpeak()
    m_mmdagent->sendMessage(m_id, PLUGIN_EVENT_SPEAK_START, "%s", m_givenModelName);
 
    // wait the audio to be processed by sleeping this thread to the audio length
-   MMDAgent_sleep(audio_sec + 0.1f);
+   float wait_audio_sec = audio_sec + 0.1f;
+   float current_audio_sec = 0.0f;
+   while (current_audio_sec < wait_audio_sec) {
+      if (m_wantSpeakStop == true) {
+         if (m_avatarForSpeak)
+            m_avatarForSpeak->clearSoundData();
+         break;
+      }
+      MMDAgent_sleep(0.05f);
+      current_audio_sec += 0.05f;
+   }
+
    m_mmdagent->sendMessage(m_id, PLUGIN_EVENT_SPEAK_STOP, "%s", m_givenModelName);
 
    m_avatarForSpeakSpeaking = false;
@@ -291,11 +313,37 @@ void Speak::startSpeakingThread(const char *modelName, const char *filename)
       m_threadForSpeak = NULL;
       delete th;
    }
+
+   m_wantSpeakStop = false;
    th = new Thread;
    th->setup();
    th->addThread(glfwCreateThread(speakThread, this));
    m_threadForSpeak = th;
 }
+
+/* Speak::stopSpeakingThread: stop speaking thread */
+bool Speak::stopSpeakingThread(const char *modelName)
+{
+   if (m_mmdagent->findModelAlias(modelName) < 0) {
+      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "model alias \"%s\" not found", modelName);
+      return false;
+   }
+   
+   if (m_givenModelName == NULL || MMDAgent_strequal(m_givenModelName, modelName) == false) {
+      m_mmdagent->sendLogString(m_id, MLOG_WARNING, "model alias \"%s\" not speaking", modelName);
+      return false;
+   }
+
+   if (m_speakingThreadrunning == false) {
+      m_mmdagent->sendLogString(m_id, MLOG_WARNING, "model alias \"%s\" not speaking", modelName);
+      return false;
+   }
+
+   m_wantSpeakStop = true;
+
+   return true;
+}
+
 
 // Speak::getMaxVol: get max volume of avatar's speaking since last call
 int Speak::getMaxVol()

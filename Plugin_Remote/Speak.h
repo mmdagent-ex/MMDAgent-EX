@@ -17,6 +17,8 @@
 /* commands */
 // SPEAK_START|(model alias)|filename.wav
 #define PLUGIN_COMMAND_SPEAK_START "SPEAK_START"
+// SPEAK_STOP|(model alias)
+#define PLUGIN_COMMAND_SPEAK_STOP "SPEAK_STOP"
 // SPEAK_EVENT_START|(model alias)
 #define PLUGIN_EVENT_SPEAK_START "SPEAK_EVENT_START"
 // SPEAK_EVENT_STOP|(model alias)
@@ -38,6 +40,7 @@ private:
    Thread *m_threadForSpeak;         /* thread instance */
    bool m_speakingThreadrunning;     /* thread running flag */
    bool m_avatarForSpeakSpeaking;    /* flag, true while speaking */
+   bool m_wantSpeakStop;             /* flag, true when want to stop speaking thread */
 
    /* speakAudio: speak audio */
    bool speakAudio(const char *modelName, const char *audio, unsigned int len);
@@ -73,6 +76,9 @@ public:
 
    /* startSpeakingThread: start speaking thread */
    void startSpeakingThread(const char *modelName, const char *filename);
+
+   /* stopSpeakingThread: stop speaking thread */
+   bool stopSpeakingThread(const char *modelName);
 
    // getMaxVol: get max volume of avatar's speaking since last call
    int getMaxVol();

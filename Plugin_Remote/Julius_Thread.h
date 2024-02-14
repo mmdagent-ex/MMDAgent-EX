@@ -221,6 +221,9 @@ public :
    // segmentAudio: segment the current audio
    void segmentAudio();
 
+   // clearAudio: clear the current audio
+   void clearAudio();
+
    /* enableRecording: enable recording */
    void enableRecording(const char *dirname);
 
