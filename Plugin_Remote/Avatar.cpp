@@ -754,11 +754,7 @@ void Avatar::setCurrentMouthShape(double ellapsedFrame)
       m_lipControl[LIP_I].setTarget(m_mouseTargetRate[1] * r);
       m_lipControl[LIP_U].setTarget(m_mouseTargetRate[2] * r);
       m_lipControl[LIP_O].setTarget(m_mouseTargetRate[3] * r);
-      if (
-         m_mouseTargetRate[0] * r < 0.1f &&
-         m_mouseTargetRate[1] * r < 0.1f &&
-         m_mouseTargetRate[2] * r < 0.1f &&
-         m_mouseTargetRate[3] * r < 0.1f) {
+      if (m_mouseAgingFrameLeft == 0.0f) {
          m_noControlFromAudioLipSync = true;
       }
       else {
@@ -775,11 +771,7 @@ void Avatar::setCurrentMouthShape(double ellapsedFrame)
       m_lipControl[LIP_I].setTarget(m_mouseTargetRate[1]);
       m_lipControl[LIP_U].setTarget(m_mouseTargetRate[2]);
       m_lipControl[LIP_O].setTarget(m_mouseTargetRate[3]);
-      if (
-         m_mouseTargetRate[0] < 0.1f &&
-         m_mouseTargetRate[1] < 0.1f &&
-         m_mouseTargetRate[2] < 0.1f &&
-         m_mouseTargetRate[3] < 0.1f) {
+      if (m_mouseAgingFrameLeft == 0.0f) {
          m_noControlFromAudioLipSync = true;
       }
       else {
