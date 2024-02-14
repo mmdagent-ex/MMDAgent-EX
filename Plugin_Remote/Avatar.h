@@ -191,6 +191,9 @@ public:
    // segmentSoundData: segment the current sound data
    void segmentSoundData();
 
+   // clearSoundData: clear the current sound data
+   void clearSoundData();
+
    // waitAudioThreadStart: wait audio thread start
    void waitAudioThreadStart();
 

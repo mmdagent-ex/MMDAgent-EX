@@ -828,6 +828,12 @@ void Avatar::segmentSoundData()
    m_julius_thread->segmentAudio();
 }
 
+// Avatar::clearSoundData: clear the current sound data
+void Avatar::clearSoundData()
+{
+   m_julius_thread->clearAudio();
+}
+
 // Avatar::waitAudioThreadStart: wait audio thread start
 void Avatar::waitAudioThreadStart()
 {
