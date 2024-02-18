@@ -87,6 +87,7 @@ public:
    ADIn *m_adin;                               /* pointer to audio input structure in Julius */
    int m_maxvol;                               /* maximum volume at latest segment */
    bool m_localAdin;
+   bool m_requestPlayFlush;
 
    // constructor
    AudioProcess(bool local);
