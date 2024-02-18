@@ -75,8 +75,16 @@ static int audioPlayCallback(const void *inputBuffer, void *outputBuffer,
 
 #if 1
    if (d->m_play_buffer_current < framesPerBuffer) {
-      // fill with 0
+      /* short of audio data */
+      /* next audio will come later, just fill output with 0 */
       memset(out, 0, framesPerBuffer * sizeof(SP16));
+      if (d->m_requestPlayFlush) {
+         /* this is the last trail, discard it */
+         glfwLockMutex(d->m_play_mutex);
+         d->m_play_buffer_current = 0;
+         glfwUnlockMutex(d->m_play_mutex);
+         d->m_requestPlayFlush = false;
+      }
       return 0;
    }
 #else
@@ -111,6 +119,7 @@ AudioProcess::AudioProcess(bool local)
    m_want_segment = false;
    m_maxvol = 0;
    m_localAdin = local;
+   m_requestPlayFlush = false;
 }
 
 // destructor
@@ -165,6 +174,7 @@ boolean AudioProcess::callback_begin(char *arg)
          adin_mic_begin(arg, NULL);
       m_audio_open = true;
    }
+   m_requestPlayFlush = false;
    return TRUE;
 }
 
@@ -212,8 +222,10 @@ int AudioProcess::callback_read(SP16 *buf, int sampnum)
    unsigned long buflen;
    int num;
 
-   if (m_audio_open == false)
+   if (m_audio_open == false) {
+      m_requestPlayFlush = true;
       return -2;
+   }
 
    if (m_localAdin) {
       int len = adin_mic_read(buf, sampnum, NULL);
@@ -232,6 +244,7 @@ int AudioProcess::callback_read(SP16 *buf, int sampnum)
       /* if segmentation is required, trigger segmentation here */
       if (m_want_segment) {
          m_want_segment = false;
+         m_requestPlayFlush = true;
          return -3;
       }
       Pa_Sleep(15);
@@ -248,8 +261,10 @@ int AudioProcess::callback_read(SP16 *buf, int sampnum)
 
    /* also store the new part to audio playing buffer */
    glfwLockMutex(m_play_mutex);
-   if (m_audio_open == false)
+   if (m_audio_open == false) {
+      m_requestPlayFlush = true;
       return -2;
+   }
    num = m_receive_buffer_store_point - m_receive_buffer_last_point;
    unsigned long len;
    if (m_play_buffer_current + num >= m_play_buffer_len) {
