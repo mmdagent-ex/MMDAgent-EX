@@ -54,6 +54,8 @@ RabbitMQMotionConfig::RabbitMQMotionConfig(std::string jsonstr)
       m_param->setString("motion_expression_alias", s.c_str());
       s = object->getValue<std::string>("motion_action_alias");
       m_param->setString("motion_action_alias", s.c_str());
+      s = object->getValue<std::string>("audio_mode");
+      m_param->setString("audio_mode", s.c_str());
 
       m_expression2motion = new KeyValue();
       m_expression2motion->setup();
@@ -401,8 +403,11 @@ void RabbitMQ::parse_received_data(char *buf, int len)
          if (buf) {
             for (int i = 0; i < len; i++)
                buf[i] = decodedData[i];
+            const char *audioMode = m_motion_config->getParam("audio_mode");
             m_sync->processSoundData(buf, len);
-            m_sync->segmentSoundData();
+            if (audioMode && MMDAgent_strequal(audioMode, "file")) {
+               m_sync->segmentSoundData();
+            }
             m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: audio len = %d", m_name, len);
             free(buf);
          }
