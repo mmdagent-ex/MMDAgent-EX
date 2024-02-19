@@ -40,8 +40,8 @@ add_library(HTSENGINEAPI STATIC ${SOURCES})
 
 # private include dirs to build this project
 target_include_directories(HTSENGINEAPI PRIVATE
-    ${PORTAUDIO_INCLUDE_DIR}
     src/include
+    ${PORTAUDIO_INCLUDE_DIR}
 )
 
 # compiler definitions (-D) for private build

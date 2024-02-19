@@ -18,5 +18,5 @@
 # "Debug" can be "Release"
 cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release
 # do build
-cmake --build build
+cmake --build build -j 4
 
