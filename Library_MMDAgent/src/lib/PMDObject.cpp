@@ -221,12 +221,9 @@ bool PMDObject::load(const char *fileName, const char *alias, btVector3 *offsetP
          m_offsetPos = (*offsetPos);
       if (offsetRot)
          m_offsetRot = (*offsetRot);
-      m_pmd->getRootBone()->setOffset(&m_offsetPos);
-      m_pmd->getRootBone()->update();
-   } else {
-      /* set offset by root bone */
-      m_pmd->getRootBone()->getOffset(&m_offsetPos);
-   }
+   } /* else, remain last offset */
+   m_pmd->getRootBone()->setOffset(&m_offsetPos);
+   m_pmd->getRootBone()->update();
 
    /* copy absolute position flag */
    for (i = 0; i < 3; i++)
