@@ -283,7 +283,8 @@ void RabbitMQ::run()
    }
 
    /* main loop */
-   while (m_active == true && m_thread && m_thread->isRunning()) {
+   bool running = true;
+   while (m_active == true && m_thread && m_thread->isRunning() && running) {
       amqp_rpc_reply_t res;
       amqp_envelope_t envelope;
 
@@ -291,10 +292,73 @@ void RabbitMQ::run()
          /* wait for message to arrive in the queue and process it */
          amqp_maybe_release_buffers(conn);
          res = amqp_consume_message(conn, &envelope, NULL, 0);
-         if (AMQP_RESPONSE_NORMAL != res.reply_type)
-            break;
-         parse_received_data((char *)envelope.message.body.bytes, (int)envelope.message.body.len);
-         amqp_destroy_envelope(&envelope);
+         if (AMQP_RESPONSE_NORMAL == res.reply_type) {
+            /* normal message */
+            parse_received_data((char *)envelope.message.body.bytes, (int)envelope.message.body.len);
+            amqp_destroy_envelope(&envelope);
+         } else {
+            /* failure */
+            if (AMQP_RESPONSE_LIBRARY_EXCEPTION == res.reply_type && AMQP_STATUS_UNEXPECTED_STATE == res.library_error) {
+               /* a frame other than AMQP_BASIC_DELIVER_METHOD was received */
+               amqp_frame_t frame;
+               if (AMQP_STATUS_OK != amqp_simple_wait_frame(conn, &frame)) {
+                  /* failed to read this frame */
+                  running = false;
+                  continue;
+               }
+               if (AMQP_FRAME_METHOD == frame.frame_type) {
+                  switch (frame.payload.method.id) {
+                  case AMQP_BASIC_ACK_METHOD:
+                     /* if we've turned publisher confirms on, and we've published a
+                      * message here is a message being confirmed.
+                      */
+                     break;
+                  case AMQP_BASIC_RETURN_METHOD:
+                     /* if a published message couldn't be routed and the mandatory
+                      * flag was set this is what would be returned. The message then
+                      * needs to be read.
+                      */
+                     {
+                        amqp_message_t message;
+                        res = amqp_read_message(conn, frame.channel, &message, 0);
+                        if (AMQP_RESPONSE_NORMAL != res.reply_type) {
+                           running = false;
+                           continue;
+                        }
+                        parse_received_data((char *)message.body.bytes, (int)message.body.len);
+                        amqp_destroy_message(&message);
+                     }
+                     break;
+                  case AMQP_CHANNEL_CLOSE_METHOD:
+                     /* a channel.close method happens when a channel exception occurs,
+                      * this can happen by publishing to an exchange that doesn't exist
+                      * for example.
+                      *
+                      * In this case you would need to open another channel redeclare
+                      * any queues that were declared auto-delete, and restart any
+                      * consumers that were attached to the previous channel.
+                      */
+                     running = false;
+                     continue;
+
+                  case AMQP_CONNECTION_CLOSE_METHOD:
+                     /* a connection.close method happens when a connection exception
+                      * occurs, this can happen by trying to use a channel that isn't
+                      * open for example.
+                      *
+                      * In this case the whole connection must be restarted.
+                      */
+                     running = false;
+                     continue;
+
+                  default:
+                     m_mmdagent->sendLogString(m_id, MLOG_ERROR, "%s: an unexpected method was received %u\n", frame.payload.method.id);
+                     running = false;
+                     continue;
+                  }
+               }
+            }
+         }
       }
       if (m_mode == RABBITMQ_PRODUCER_MODE) {
          /* send stored message to server */
