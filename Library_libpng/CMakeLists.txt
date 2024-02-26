@@ -41,12 +41,20 @@ set(SOURCES
     src/pngwutil.c
 )
 if(APPLE)
+  if(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" OR CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
     list(APPEND SOURCES
         src/arm/arm_init.c
         src/arm/filter_neon.S
         src/arm/filter_neon_intrinsics.c
         src/arm/palette_neon_intrinsics.c
     )
+  endif()
+  if(CMAKE_SYSTEM_PROCESSOR MATCHES "^i?86" OR CMAKE_SYSTEM_PROCESSOR MATCHES "^x86_64*")
+    list(APPEND SOURCES
+        src/intel/intel_init.c
+        src/intel/filter_sse2_intrinsics.c
+    )
+  endif()
 endif()
 
 # add this project as static library
@@ -59,10 +67,14 @@ target_include_directories(LIBPNG PRIVATE
 )
 
 # compiler definitions (-D) for private build
-#target_compile_definitions(LIBPNG PRIVATE
-#    XXXX=1
-#    XXXX
-#)
+if(APPLE)
+  if(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" OR CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
+    target_compile_definitions(LIBPNG PRIVATE PNG_ARM_NEON_OPT=2)
+  endif()
+  if(CMAKE_SYSTEM_PROCESSOR MATCHES "^i?86" OR CMAKE_SYSTEM_PROCESSOR MATCHES "^x86_64*")
+    target_compile_definitions(LIBPNG PRIVATE PNG_INTEL_SSE_OPT=1)
+  endif()
+endif()
 
 # compiler options for private build
 #target_compile_options(LIBPNG PRIVATE
