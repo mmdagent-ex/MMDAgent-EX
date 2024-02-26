@@ -47,7 +47,7 @@ target_compile_definitions(Plugin_Network PRIVATE
 # compiler options for build
 if(APPLE)
     target_compile_options(Plugin_Network PRIVATE
-        -std=c++11
+        -std=c++14
         -Wno-deprecated-declarations
     )
 else()
