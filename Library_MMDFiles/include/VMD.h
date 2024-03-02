@@ -155,6 +155,9 @@ private:
    /* getFaceMotion: find face motion by name */
    FaceMotion * getFaceMotion(const char *name);
 
+   /* solveInterpolationX: solve interpolation for x */
+   float solveInterpolationX(float x, float x1, float x2);
+
    /* setBoneInterpolationTable: set up bone motion interpolation parameter */
    void setBoneInterpolationTable(BoneKeyFrame *bf, const char *ip);
 

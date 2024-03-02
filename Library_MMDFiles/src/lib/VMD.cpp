@@ -173,16 +173,62 @@ FaceMotion* VMD::getFaceMotion(const char *name)
    return NULL;
 }
 
+/* VMD::solveInterpolationX: solve interpolation for x */
+float VMD::solveInterpolationX(float x, float x1, float x2)
+{
+   float t = x;
+   float v, tt;
+   int i;
+
+   /* try a few iteration of Newton's method */
+   for (i = 0; i < 8; i++) {
+      v = ipfunc(t, x1, x2) - x;
+      if (fabsf(v) < 0.0001f)
+         return t;
+      tt = ipfuncd(t, x1, x2);
+      if (tt < 1e-6)
+         break;
+      t -= v / tt;
+   }
+   /* fall back to bisection method */
+   float t0 = 0.0;
+   float t1 = 1.0;
+   float t2 = x;
+
+   if (t2 < t0)
+      return t0;
+   if (t2 > t1)
+      return t1;
+
+   while (t0 < t1) {
+      x2 = ipfunc(t2, x1, x2);
+      if (fabsf(x2 - x) < 0.0001f)
+         return t2;
+      if (x > x2) {
+         t0 = t2;
+      } else {
+         t1 = t2;
+      }
+      t2 = (t1 - t0) * 0.5f + t0;
+   }
+
+   /* in case of failure, return the nearest */
+   return t2;
+}
+
 /* VMD::setBoneInterpolationTable: set up bone motion interpolation parameter */
 void VMD::setBoneInterpolationTable(BoneKeyFrame *bf, const char *ip)
 {
-   short i, d;
+   short i, base, d;
    float x1, x2, y1, y2;
-   float inval, t, v, tt;
+   float inval, t;
 
    /* check if they are just a linear function */
-   for (i = 0; i < 4; i++)
-      bf->linear[i] = (ip[0 + i] == ip[4 + i] && ip[8 + i] == ip[12 + i]) ? true : false;
+   for (i = 0; i < 4; i++) {
+      /* take diagonal */
+      base = i * 16;
+      bf->linear[i] = (ip[0 + base] == ip[4 + base] && ip[8 + base] == ip[12 + base]) ? true : false;
+   }
 
    /* make X (0.0 - 1.0) -> Y (0.0 - 1.0) mapping table */
    for (i = 0; i < 4; i++) {
@@ -192,21 +238,15 @@ void VMD::setBoneInterpolationTable(BoneKeyFrame *bf, const char *ip)
          continue;
       }
       bf->interpolationTable[i] = (float *) malloc(sizeof(float) * (VMD_INTERPOLATIONTABLESIZE + 1));
-      x1 = ip[   i] / 127.0f;
-      y1 = ip[ 4 + i] / 127.0f;
-      x2 = ip[ 8 + i] / 127.0f;
-      y2 = ip[12 + i] / 127.0f;
+      base = i * 16;
+      x1 = ip[     base] / 127.0f;
+      y1 = ip[ 4 + base] / 127.0f;
+      x2 = ip[ 8 + base] / 127.0f;
+      y2 = ip[12 + base] / 127.0f;
       for (d = 0; d < VMD_INTERPOLATIONTABLESIZE; d++) {
          inval = (float) d / (float) VMD_INTERPOLATIONTABLESIZE;
          /* get Y value for given inval */
-         t = inval;
-         while (1) {
-            v = ipfunc(t, x1, x2) - inval;
-            if (fabsf(v) < 0.0001f) break;
-            tt = ipfuncd(t, x1, x2);
-            if (tt == 0.0f) break;
-            t -= v / tt;
-         }
+         t = solveInterpolationX(inval, x1, x2);
          bf->interpolationTable[i][d] = ipfunc(t, y1, y2);
       }
       bf->interpolationTable[i][VMD_INTERPOLATIONTABLESIZE] = 1.0f;
@@ -218,7 +258,7 @@ void VMD::setCameraInterpolationTable(CameraKeyFrame *cf, const char *ip)
 {
    short i, d;
    float x1, x2, y1, y2;
-   float inval, t, v, tt;
+   float inval, t;
 
    /* check if they are just a linear function */
    for (i = 0; i < 6; i++)
@@ -239,14 +279,7 @@ void VMD::setCameraInterpolationTable(CameraKeyFrame *cf, const char *ip)
       for (d = 0; d < VMD_INTERPOLATIONTABLESIZE; d++) {
          inval = (float) d / (float) VMD_INTERPOLATIONTABLESIZE;
          /* get Y value for given inval */
-         t = inval;
-         while (1) {
-            v = ipfunc(t, x1, x2) - inval;
-            if (fabsf(v) < 0.0001f) break;
-            tt = ipfuncd(t, x1, x2);
-            if (tt == 0.0f) break;
-            t -= v / tt;
-         }
+         t = solveInterpolationX(inval, x1, x2);
          cf->interpolationTable[i][d] = ipfunc(t, y1, y2);
       }
       cf->interpolationTable[i][VMD_INTERPOLATIONTABLESIZE] = 1.0f;
