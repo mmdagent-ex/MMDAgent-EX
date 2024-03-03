@@ -1484,22 +1484,21 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
                   continue;
                }
                if (PMX257format)
-                  morphname = p;
+                  morphname = MMDFiles_strdup(p);
                else
                   morphname = MMDFiles_strdup_from_sjis_to_utf8(p);
             } else if (k == 3) {
                rate = (float)atof(p);
                if (morphname != NULL) {
                   m_groupMorphList[id].add(morphname, rate);
-                  if (PMX257format == false)
-                     free(morphname);
+                  free(morphname);
                   morphname = NULL;
                }
             }
             k++;
             *q = save;
          }
-         if (morphname && PMX257format == false) {
+         if (morphname) {
             free(morphname);
             morphname = NULL;
          }
