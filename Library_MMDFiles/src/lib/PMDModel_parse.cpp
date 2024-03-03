@@ -913,7 +913,7 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
             *q = '\0';
             if (k == 1) {
                if (PMX257format)
-                  s = p;
+                  s = MMDFiles_strdup(p);
                else
                   s = MMDFiles_strdup_from_sjis_to_utf8(p);
             } else if (PMX2Recent == false && k >= 20 && k <= 23) {
@@ -957,7 +957,7 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
          /* set EXT parameters to the material */
          m_material[numMaterial].setName(s);
          m_material[numMaterial].setExtParam(edge, edgeWidth, &(col[0]), alpha, face, shadow, shadowMap, tex, sphere, sphereMode, dir, &m_textureLoader);
-         if (s && PMX257format == false)
+         if (s)
             free(s);
          if (tex)
             free(tex);
@@ -1084,6 +1084,7 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
          btVector3 pos;
          btQuaternion rot;
          char *s;
+         bool local_index_skipped = false;
 
          if (m_boneMorphList == NULL) {
             m_boneMorphList = new PMDBoneMorph[numBoneMorphAllocated];
@@ -1131,6 +1132,12 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
                if (PMX257format == false)
                   free(s);
             } else if (k == 2) {
+               if (PMX257format && local_index_skipped == false) {
+                  /* PMX257format has extra local offset index at k = 2, skip it */
+                  local_index_skipped = true;
+                  *q = save;
+                  continue;
+               }
                if (PMX257format) {
                   bone = getBone(p);
                } else {
@@ -1171,6 +1178,7 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
          float f[3];
          btVector3 pos;
          char *s;
+         bool local_index_skipped = false;
 
          if (m_vertexMorphList == NULL) {
             m_vertexMorphList = new PMDVertexMorph[numVertexMorphAllocated];
@@ -1217,35 +1225,23 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
                }
                if (PMX257format == false)
                   free(s);
-            } else {
-               if (PMX257format) {
-                  if (k == 3) {
-                     idx = atoi(p);
-                  } else if (k >= 4 && k <= 6) {
-                     f[k - 4] = (float)atof(p);
-                     if (k == 6) {
+            } else if (k == 2) {
+               if (PMX257format && local_index_skipped == false) {
+                  /* PMX257format has extra local offset index at k = 2, skip it */
+                  local_index_skipped = true;
+                  *q = save;
+                  continue;
+               }
+               idx = atoi(p);
+            } else if (k >= 3 && k <= 5) {
+               f[k - 3] = (float)atof(p);
+               if (k == 5) {
 #ifdef MMDFILES_CONVERTCOORDINATESYSTEM
-                        pos.setValue(f[0], f[1], -f[2]);
+                  pos.setValue(f[0], f[1], -f[2]);
 #else
-                        pos.setValue(f[0], f[1], f[2]);
+                  pos.setValue(f[0], f[1], f[2]);
 #endif /* MMDFILES_CONVERTCOORDINATESYSTEM */
-                        m_vertexMorphList[id].add(idx, &pos);
-                     }
-                  }
-               } else {
-                  if (k == 2) {
-                     idx = atoi(p);
-                  } else if (k >= 3 && k <= 5) {
-                     f[k - 3] = (float)atof(p);
-                     if (k == 5) {
-#ifdef MMDFILES_CONVERTCOORDINATESYSTEM
-                        pos.setValue(f[0], f[1], -f[2]);
-#else
-                        pos.setValue(f[0], f[1], f[2]);
-#endif /* MMDFILES_CONVERTCOORDINATESYSTEM */
-                        m_vertexMorphList[id].add(idx, &pos);
-                     }
-                  }
+                  m_vertexMorphList[id].add(idx, &pos);
                }
             }
             k++;
@@ -1259,6 +1255,7 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
          float f[2];
          TexCoord tex;
          char *s;
+         bool local_index_skipped = false;
 
          if (m_uvMorphList == NULL) {
             m_uvMorphList = new PMDUVMorph[numUVMorphAllocated];
@@ -1306,6 +1303,12 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
                if (PMX257format == false)
                   free(s);
             } else if (k == 2) {
+               if (PMX257format && local_index_skipped == false) {
+                  /* PMX257format has extra local offset index at k = 2, skip it */
+                  local_index_skipped = true;
+                  *q = save;
+                  continue;
+               }
                idx = atoi(p);
             } else if (k >= 3 && k <= 4) {
                f[k - 3] = (float)atof(p);
@@ -1324,6 +1327,7 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
          unsigned long id;
          char *s;
          PMDMaterialMorphElem m;
+         bool local_index_skipped = false;
 
          if (m_materialMorphList == NULL) {
             m_materialMorphList = new PMDMaterialMorph[numMaterialMorphAllocated];
@@ -1372,12 +1376,20 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
                if (PMX257format == false)
                   free(s);
             } else if (k == 2) {
+               if (PMX257format && local_index_skipped == false) {
+                  /* PMX257format has extra local offset index at k = 2, skip it */
+                  local_index_skipped = true;
+                  *q = save;
+                  continue;
+               }
                if (PMX257format)
                   s = p;
                else
                   s = MMDFiles_strdup_from_sjis_to_utf8(p);
                for (i = 0; i < m_numMaterial; i++) {
-                  if (MMDFiles_strequal(m_material[i].getName(), s)) {
+                  const char *pp;
+                  pp = m_material[i].getName();
+                  if (MMDFiles_strequal(pp, s)) {
                      m.midx = i;
                      break;
                   }
@@ -1394,10 +1406,10 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
                m.shiness = (float)atof(p);
             } else if (k >= 12 && k <= 14) {
                m.ambient[k - 12] = (float)atof(p);
-            } else if (k >= 15 && k <= 18) {
-               m.edgecol[k - 15] = (float)atof(p);
-            } else if (k == 19) {
+            } else if (k == 15) {
                m.edgesize = (float)atof(p);
+            } else if (k >= 16 && k <= 19) {
+               m.edgecol[k - 16] = (float)atof(p);
             } else if (k >= 20 && k <= 23) {
                m.tex[k - 20] = (float)atof(p);
             } else if (k >= 24 && k <= 27) {
@@ -1416,6 +1428,7 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
          char *s;
          char *morphname;
          float rate;
+         bool local_index_skipped = false;
 
          morphname = NULL;
          if (m_groupMorphList == NULL) {
@@ -1464,6 +1477,12 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
                if (PMX257format == false)
                   free(s);
             } else if (k == 2) {
+               if (PMX257format && local_index_skipped == false) {
+                  /* PMX257format has extra local offset index at k = 2, skip it */
+                  local_index_skipped = true;
+                  *q = save;
+                  continue;
+               }
                if (PMX257format)
                   morphname = p;
                else
