@@ -662,7 +662,6 @@ bool MMDAgent::addMotion(const char *modelAlias, const char *motionAlias, const 
       motionPlayer = m_model[id].getMotionManager()->getRunning(name);
       if (motionPlayer != NULL) {
          sendLogString(m_moduleId, MLOG_WARNING, "addMotion: motion alias \"%s\" already exist, swap it.", name);
-         free(name);
          VMD *old = motionPlayer->vmd;
          /* when smoothing has been disabled, skip next physics simulation for warping at beginning of changed motion */
          if (motionPlayer->enableSmooth == false)
@@ -675,6 +674,7 @@ bool MMDAgent::addMotion(const char *modelAlias, const char *motionAlias, const 
          }
          m_motion->unload(old);
          sendMessage(m_moduleId, MMDAGENT_EVENT_MOTIONADD, "%s|%s", modelAlias, name);
+         free(name);
          return true;
       }
    } else {
