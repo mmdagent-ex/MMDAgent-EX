@@ -465,7 +465,7 @@ bool PMDModel::setupModel()
          m_numSurfaceForEdge += m_material[i].getNumSurface();
    m_numSurfaceForShadowMap = 0;
    for (i = 0; i < m_numMaterial; i++)
-      if (m_material[i].getShadowMapFlag())
+      if (m_material[i].getShadowMapRenderFlag())
          m_numSurfaceForShadowMap += m_material[i].getNumSurface();
    m_numSurfaceForShadow = 0;
    if (m_hasExtParam) {
@@ -743,7 +743,7 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
    unsigned long numMaterial;
    float col[4];
    float alpha, edgeWidth;
-   bool face, edge, shadow, shadowMap;
+   bool face, edge, shadow, shadowMapDrop, shadowMapRender;
    char *s, *tex, *sphere;
    unsigned short sphereMode;
    bool PMX2Recent = false;
@@ -888,7 +888,8 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
          alpha = 1.0f;
          face = false;
          shadow = false;
-         shadowMap = false;
+         shadowMapDrop = false;
+         shadowMapRender = false;
          edge = false;
          edgeWidth = 1.0f;
          s = NULL;
@@ -927,7 +928,9 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
             } else if (k == 15) {
                shadow = atoi(p) ? true : false;
             } else if (k == 16) {
-               shadowMap = atoi(p) ? true : false;
+               shadowMapDrop = atoi(p) ? true : false;
+            } else if (k == 17) {
+               shadowMapRender = atoi(p) ? true : false;
             } else if ((PMX2Recent == false && k == 18) || (PMX2Recent == true && k == 20)) {
                edge = atoi(p) ? true : false;
             } else if ((PMX2Recent == false && k == 19) || (PMX2Recent == true && k == 21)) {
@@ -956,7 +959,7 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
             continue;
          /* set EXT parameters to the material */
          m_material[numMaterial].setName(s);
-         m_material[numMaterial].setExtParam(edge, edgeWidth, &(col[0]), alpha, face, shadow, shadowMap, tex, sphere, sphereMode, dir, &m_textureLoader);
+         m_material[numMaterial].setExtParam(edge, edgeWidth, &(col[0]), alpha, face, shadow, shadowMapDrop, shadowMapRender, tex, sphere, sphereMode, dir, &m_textureLoader);
          if (s)
             free(s);
          if (tex)

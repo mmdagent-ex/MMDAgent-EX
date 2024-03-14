@@ -89,7 +89,8 @@ private:
    float m_edgeWidth;      /* edge size */
    bool m_faceFlag;        /* true if both sides should be drawn */
    bool m_shadowFlag;      /* true if should drop shadow */
-   bool m_shadowMapFlag;   /* true if should drop shadow on shadow map */
+   bool m_shadowMapDropFlag;   /* true if should drop shadow on shadow map */
+   bool m_shadowMapRenderFlag; /* true if should render dropped shadow on shadow map */
 #ifdef MY_LUMINOUS
    bool m_luminousFlag;    /* true if should do auto-luminous rendering */
 #endif
@@ -175,8 +176,11 @@ public:
    /* getShadowFlag: get shadow flag */
    bool getShadowFlag();
 
-   /* getShadowMapFlag: get shadow map flag */
-   bool getShadowMapFlag();
+   /* getShadowMapDropFlag: get shadow map drop flag */
+   bool getShadowMapDropFlag();
+
+   /* getShadowMapRenderFlag: get shadow map render flag */
+   bool getShadowMapRenderFlag();
 
    /* getTexture: get texture */
    PMDTexture *getTexture();
@@ -194,7 +198,7 @@ public:
    unsigned int getSurfaceListIndex();
 
    /* setExtParam: set EXT parameters */
-   void setExtParam(bool edge, float edgeSize, float *col, float alpha, bool face, bool shadow, bool shadowMap, char *texFile, char *sphereFile, unsigned short sphereMode, const char *dir, PMDTextureLoader *textureLoader);
+   void setExtParam(bool edge, float edgeSize, float *col, float alpha, bool face, bool shadow, bool shadowMapDrop, bool shadowMapRender, char *texFile, char *sphereFile, unsigned short sphereMode, const char *dir, PMDTextureLoader *textureLoader);
 
    /* getExtEdgeColor: get EXT edge color */
    float *getExtEdgeColor();
