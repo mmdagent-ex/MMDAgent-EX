@@ -80,7 +80,8 @@ void PMDMaterial::initialize()
    m_extEdgeColor = NULL;
    m_faceFlag = false;
    m_shadowFlag = false;
-   m_shadowMapFlag = false;
+   m_shadowMapDropFlag = false;
+   m_shadowMapRenderFlag = false;
 #ifdef MY_LUMINOUS
    m_luminousFlag = false;
 #endif
@@ -157,7 +158,8 @@ bool PMDMaterial::setup(PMDFile_Material *m, PMDTextureLoader *textureLoader, co
    /* shadow drawing flag */
    m_shadowFlag = m_edgeFlag;
    /* shadow map flag */
-   m_shadowMapFlag = (m_alpha >= 0.97999 && m_alpha <= 0.98001) ? m_shadowFlag : false;
+   m_shadowMapDropFlag = (m_alpha >= 0.97999 && m_alpha <= 0.98001) ? m_shadowFlag : false;
+   m_shadowMapRenderFlag = m_shadowMapDropFlag;
 #ifdef MY_LUMINOUS
    /* luminous flag */
    m_luminousFlag = (m_specular[0] == 0.0f && m_specular[1] == 0.0f && m_specular[2] == 0.0f && m_shiness >= 100.0f) ? true : false;
@@ -376,7 +378,7 @@ unsigned int PMDMaterial::getSurfaceListIndex()
 }
 
 /* PMDMaterial::setExtParam: set EXT parameters */
-void PMDMaterial::setExtParam(bool edge, float edgeSize, float *col, float alpha, bool face, bool shadow, bool shadowMap, char *texFile, char *sphereFile, unsigned short sphereMode, const char *dir, PMDTextureLoader *textureLoader)
+void PMDMaterial::setExtParam(bool edge, float edgeSize, float *col, float alpha, bool face, bool shadow, bool shadowMapDrop, bool shadowMapRender, char *texFile, char *sphereFile, unsigned short sphereMode, const char *dir, PMDTextureLoader *textureLoader)
 {
    unsigned long i;
    char buf[MMDFILES_MAXBUFLEN];
@@ -398,7 +400,8 @@ void PMDMaterial::setExtParam(bool edge, float edgeSize, float *col, float alpha
    m_edgeWidth = edgeSize;
    m_faceFlag = (alpha == 0.0f) ? false : face;
    m_shadowFlag = (alpha == 0.0f) ? false : shadow;
-   m_shadowMapFlag = (alpha == 0.0f) ? false : shadowMap;
+   m_shadowMapDropFlag = (alpha == 0.0f) ? false : shadowMapDrop;
+   m_shadowMapRenderFlag = (alpha == 0.0f) ? false : shadowMapRender;
 
    /* texture: assume
    xxx  -> m_texture, isSphereMap=false, isSphereMapAdd=N/A
@@ -467,11 +470,18 @@ bool PMDMaterial::getShadowFlag()
    return m_shadowFlag;
 }
 
-/* PMDMaterial::getShadowMapFlag: get shadow map flag */
-bool PMDMaterial::getShadowMapFlag()
+/* PMDMaterial::getShadowMapDropFlag: get shadow map drop flag */
+bool PMDMaterial::getShadowMapDropFlag()
 {
-   return m_shadowMapFlag;
+   return m_shadowMapDropFlag;
 }
+
+/* PMDMaterial::getShadowMapRenderFlag: get shadow map render flag */
+bool PMDMaterial::getShadowMapRenderFlag()
+{
+   return m_shadowMapRenderFlag;
+}
+
 
 #ifdef MY_LUMINOUS
 /* PMDMaterial::getLuminousFlag: get luminous flag */

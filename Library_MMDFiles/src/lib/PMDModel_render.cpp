@@ -238,7 +238,21 @@ void PMDModel::renderModel(bool renderEdgeFlag)
       if (m_toon) {
          /* set toon texture for texture unit 1 */
          glActiveTexture(GL_TEXTURE1);
-         glBindTexture(GL_TEXTURE_2D, m_toonTextureID[m->getToonID()]);
+         if (m_selfShadowDrawing) {
+            if (m->getShadowMapRenderFlag() == false) {
+               /* this material disables shadow map rendering, no shadow rendering */
+               glBindTexture(GL_TEXTURE_2D, m_toonTextureID[0]);
+            } else {
+               /* this material enables shadow map rendering */
+               if (m->getToonID() == 0)
+                  /* no toonmap, apply toon01.bmp to force shadow map rendering */
+                  glBindTexture(GL_TEXTURE_2D, m_toonTextureID[1]);
+               else
+                  glBindTexture(GL_TEXTURE_2D, m_toonTextureID[m->getToonID()]);
+            }
+         } else {
+            glBindTexture(GL_TEXTURE_2D, m_toonTextureID[m->getToonID()]);
+         }
       }
 
 #ifndef MMDFILES_DONTUSESPHEREMAP
@@ -498,7 +512,7 @@ void PMDModel::renderForShadowMap()
       surfaceFrom = 0;
       surfaceTo = 0;
       for (i = 0; i < m_numMaterial; i++) {
-         if (m_material[i].getShadowMapFlag()) {
+         if (m_material[i].getShadowMapRenderFlag()) {
             glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, (GLintptr)surfaceTo, sizeof(INDICES) * m_material[i].getNumSurface(), &(m_surfaceList[surfaceFrom]));
             surfaceTo += sizeof(INDICES) * m_material[i].getNumSurface();
          }
