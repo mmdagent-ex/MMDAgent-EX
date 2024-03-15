@@ -160,7 +160,7 @@ void PMDModel::renderModel(bool renderEdgeFlag)
       /* on luminous mode, only draw the luminous material */
       if (m_luminousMode == PMDMODEL_LUMINOUS_ON) {
          if (m->getLimunousFlag() == false) continue;
-         c[3] = (m->getShiness() - 100.0f) * 0.03f + 0.4f;
+         c[3] = (m->getShiness() - 100.0f) * 0.09f + 0.1f;
       } else if (m_luminousMode == PMDMODEL_LUMINOUS_OFF) {
          if (m->getLimunousFlag() == true) continue;
          c[3] = 0.0f;

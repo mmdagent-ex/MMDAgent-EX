@@ -859,7 +859,7 @@ void Render::renderBloomTexture(PMDObject *objs, const int *order, int num, Stag
    glBindFramebuffer(GL_FRAMEBUFFER, m_bloomFboID);
 
    /* clear rendering buffer in black */
-   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
    glClearColor(m_backgroundColor[0], m_backgroundColor[1], m_backgroundColor[2], 1.0f);
 
@@ -954,7 +954,7 @@ void Render::renderBloomTexture(PMDObject *objs, const int *order, int num, Stag
    glViewport(0, 0, m_width, m_height);
 
    /* set texture blend function for additive blending: multiply color for black dimming */
-   glBlendFunc(GL_DST_COLOR, GL_ONE);
+   glBlendFunc(GL_ONE, GL_ONE);
 
    /* disable lighting */
    glDisable(GL_LIGHTING);
@@ -989,7 +989,7 @@ void Render::renderBloomTexture(PMDObject *objs, const int *order, int num, Stag
    //   GLfloat biaslist[]  = {0.0f, 1.0f, 2.0f, 4.0f}; // 2
    //   GLfloat alphalist[] = {0.3f, 0.5f, 0.9f, 1.0f};
    GLfloat biaslist[] = { 1.0f, 2.0f, 3.0f, 5.0f }; // 1
-   GLfloat alphalist[] = { 0.5f, 0.7f, 1.0f, 1.1f };
+   GLfloat alphalist[] = { 0.3f, 0.5f, 0.6f, 0.8f };
    for (int i = 0; i < 4; i++) {
       glTexEnvf(GL_TEXTURE_FILTER_CONTROL, GL_TEXTURE_LOD_BIAS, biaslist[i]);
       glColor4f(alphalist[i] * m_bloomIntensity, alphalist[i] * m_bloomIntensity, alphalist[i] * m_bloomIntensity, alphalist[i] * m_bloomIntensity);
