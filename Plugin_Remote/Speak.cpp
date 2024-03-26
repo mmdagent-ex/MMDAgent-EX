@@ -137,9 +137,7 @@ bool Speak::speakAudio(const char *modelName, const char *audio, unsigned int le
    // set file mode
    av->setStreamingSoundDataFlag(false);
    // feed sound samples to processing thread
-   av->processSoundData(audio, len);
-   // set segment status to stop after processing all data
-   av->segmentSoundData();
+   av->processSoundData(audio, len, true);
 
    // set avatar instance to model to start update in other thread
    m_threadForSpeak->lock();
@@ -228,6 +226,8 @@ void Speak::loadWaveAndSpeak()
       m_speakingThreadrunning = false;
       return;
    }
+
+   output_frames = src_data.output_frames_gen;
 
    int16_t *output_int16_buffer = (int16_t *)malloc(output_frames * OUTPUT_CHANNELS * sizeof(int16_t));
    unsigned char *output_uchar_buffer = (unsigned char *)malloc(output_frames * OUTPUT_CHANNELS * sizeof(int16_t));
