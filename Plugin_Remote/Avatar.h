@@ -180,7 +180,7 @@ public:
    void setCurrentMouthShape(double ellapsedFrame);
 
    // processSoundData: process sound data
-   void processSoundData(const char *data, int len);
+   void processSoundData(const char *data, int len, bool requestSegmentAfterPlayed = false);
 
    // getStreamingSoundDataFlag: get streaming sound data flag
    bool getStreamingSoundDataFlag();

@@ -802,13 +802,13 @@ void Avatar::startJulius(const char *conffile, bool wantLocal, bool wantPassthro
 #endif /* LIPSYNC_JULIUS */
 
 // Avatar::processSoundData: process sound data
-void Avatar::processSoundData(const char *data, int len)
+void Avatar::processSoundData(const char *data, int len, bool requestSegmentAfterPlayed) 
 {
    /* would not play&lipsync sent audio when no model is set up */
    if (m_obj == NULL)
       return;
    /* send the internally given audio chunk to Julius adin thread */
-   m_julius_thread->processAudio(data, len);
+   m_julius_thread->processAudio(data, len, requestSegmentAfterPlayed);
 }
 
 // Avatar::getStreamingSoundDataFlag: get streaming sound data flag

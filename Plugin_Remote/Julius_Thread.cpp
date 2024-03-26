@@ -82,14 +82,27 @@ static int audioPlayCallback(const void *inputBuffer, void *outputBuffer,
 #if 1
    if (d->m_play_buffer_current < framesPerBuffer) {
       /* short of audio data */
-      /* next audio will come later, just fill output with 0 */
-      memset(out, 0, framesPerBuffer * sizeof(SP16));
-      if (d->m_requestPlayFlush) {
-         /* this is the last trail, discard it */
+      if (d->m_requestSegmentAfterPlayed && d->m_play_buffer_current != 0) {
+         /* last trail should be played here */
          glfwLockMutex(d->m_play_mutex);
+         memset(out, 0, framesPerBuffer * sizeof(SP16));
+         /* clear buffer */
          d->m_play_buffer_current = 0;
+         /* clear flag since the specified part has been played */
+         d->m_requestSegmentAfterPlayed = false;
+         /* set segment flag to tell main thread to stop processing */
+         d->m_want_segment = true;
          glfwUnlockMutex(d->m_play_mutex);
-         d->m_requestPlayFlush = false;
+      } else {
+         /* next audio will come later, just fill output with 0 */
+         memset(out, 0, framesPerBuffer * sizeof(SP16));
+         if (d->m_requestPlayFlush) {
+            /* this is the last trail, discard it */
+            glfwLockMutex(d->m_play_mutex);
+            d->m_play_buffer_current = 0;
+            glfwUnlockMutex(d->m_play_mutex);
+            d->m_requestPlayFlush = false;
+         }
       }
       return 0;
    }
@@ -126,6 +139,7 @@ AudioProcess::AudioProcess(bool local)
    m_maxvol = 0;
    m_localAdin = local;
    m_requestPlayFlush = false;
+   m_requestSegmentAfterPlayed = false;
 }
 
 // destructor
@@ -823,10 +837,12 @@ double Julius_Thread::getFrameIntervalMSec()
 }
 
 /* Julius_Thread::processAudio: process audio */
-void Julius_Thread::processAudio(const char *data, int len)
+void Julius_Thread::processAudio(const char *data, int len, bool requestSegmentAfterPlayed)
 {
-   if (m_audio && m_running)
+   if (m_audio && m_running) {
       m_audio->appendAudioData(data, len);
+      m_audio->m_requestSegmentAfterPlayed = requestSegmentAfterPlayed;
+   }
 }
 
 // Julius_Thread::getStreamingFlag: get streaming flag
