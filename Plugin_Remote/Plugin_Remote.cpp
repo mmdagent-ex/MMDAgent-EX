@@ -1225,7 +1225,7 @@ static bool status = false;
 static bool configured = false;
 static bool send_log = false;  // true: send log, false: send message
 
-static Speak speak;
+static Speak *speak = NULL;
 
 /* extAppStart: initialize controller */
 EXPORT void extAppStart(MMDAgent *mmdagent)
@@ -1271,7 +1271,8 @@ EXPORT void extAppStart(MMDAgent *mmdagent)
       enabled = false;
    }
 
-   speak.setup(mmdagent, mid);
+   speak = new Speak();
+   speak->setup(mmdagent, mid);
 
 }
 
@@ -1289,14 +1290,14 @@ EXPORT void extProcMessage(MMDAgent *mmdagent, const char *type, const char *arg
          if (modelName) {
             filename = MMDAgent_strtok(NULL, "|\r\n", &save);
             if (filename)
-               speak.startSpeakingThread(modelName, filename);
+               speak->startSpeakingThread(modelName, filename);
          }
          free(buff);
       }
    } else if (MMDAgent_strequal(type, PLUGIN_COMMAND_SPEAK_STOP)) {
       mmdagent->sendLogString(mid, MLOG_MESSAGE_CAPTURED, "%s|%s", type, args);
       if (args) {
-         if (speak.stopSpeakingThread(args) == false) {
+         if (speak->stopSpeakingThread(args) == false) {
             /* not running, issue stop event message */
             mmdagent->sendMessage(mid, PLUGIN_EVENT_SPEAK_STOP, "%s", args);
          }
@@ -1326,10 +1327,10 @@ EXPORT void extProcMessage(MMDAgent *mmdagent, const char *type, const char *arg
       mmdagent->sendLogString(mid, MLOG_MESSAGE_CAPTURED, "%s|%s", type, args);
       if (enabled == true && plugin.is_active()) {
          if (MMDAgent_strequal(args, "DISABLE")) {
-            speak.setAvatarEnableFlag(false);
+            speak->setAvatarEnableFlag(false);
             plugin.avatarSetEnableFlag(false);
          } else if (MMDAgent_strequal(args, "ENABLE")) {
-            speak.setAvatarEnableFlag(true);
+            speak->setAvatarEnableFlag(true);
             plugin.avatarSetEnableFlag(true);
          }
       }
@@ -1381,7 +1382,7 @@ EXPORT void extProcMessage(MMDAgent *mmdagent, const char *type, const char *arg
 /* extUpdate: update */
 EXPORT void extUpdate(MMDAgent *mmdagent, double deltaFrame)
 {
-   speak.update((float)deltaFrame);
+   speak->update((float)deltaFrame);
    if (configured == false)
       return;
    if (enabled == true && plugin.is_active() == true) {
@@ -1403,7 +1404,7 @@ EXPORT void extUpdate(MMDAgent *mmdagent, double deltaFrame)
          mmdagent->sendMessage(mid, type, "%s", args);
       }
    }
-   plugin.avatarUpdate((float)deltaFrame, speak.getMaxVol());
+   plugin.avatarUpdate((float)deltaFrame, speak->getMaxVol());
    plugin.updateStatusString();
 }
 
@@ -1435,6 +1436,8 @@ EXPORT void extAppEnd(MMDAgent *mmdagent)
    if (configured == false)
       return;
    enabled = false;
+   delete speak;
+   speak = NULL;
    plugin.stop();
    plugin.clearAll();
 }
