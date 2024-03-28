@@ -1090,6 +1090,7 @@ void Render::initialize()
    m_distance_set = 100.0f;
    m_fovy_set = 16.0f;
    m_baseBone_set = NULL;
+   m_baseBoneName = NULL;
    m_modelFollow = false;
    m_lastFollowPos = btVector3(btScalar(0.0f), btScalar(0.0f), btScalar(0.0f));
    resetCamera();
@@ -1158,6 +1159,8 @@ void Render::clear()
 {
    if(m_depth)
       free(m_depth);
+   if (m_baseBoneName)
+      free(m_baseBoneName);
    initialize();
 }
 
@@ -1291,21 +1294,28 @@ void Render::setCameraView(const float *trans, const float *angle, float distanc
    m_distance_set = distance;
    m_fovy_set = fovy;
    m_baseBone_set = baseBone;
+   if (m_baseBoneName)
+      free(m_baseBoneName);
+   m_baseBoneName = baseBone ? MMDAgent_strdup(baseBone->getName()) : NULL;
    m_modelFollow = modelFollow;
    m_lastFollowPos = btVector3(btScalar(0.0f), btScalar(0.0f), btScalar(0.0f));
    resetCamera();
 }
 
-/* Render::getCameraBone: get camera bone */
-PMDBone *Render::getCameraBone()
+
+/* Render::getCameraBoneName: get camera bone Name */
+const char *Render::getCameraBoneName()
 {
-   return m_baseBone_set;
+   return m_baseBoneName;
 }
 
 /* Render::updateCameraBone: update camera bone */
 void Render::updateCameraBone(PMDBone *baseBone)
 {
    m_baseBone_set = baseBone;
+   if (m_baseBoneName)
+      free(m_baseBoneName);
+   m_baseBoneName = MMDAgent_strdup(baseBone->getName());
    m_baseBone = m_baseBone_set;
    updateRotationFromAngle();
 }

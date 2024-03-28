@@ -98,6 +98,7 @@ private:
    float m_distance_set;        /* view distance given last */
    float m_fovy_set;            /* view fovy given last */
    PMDBone *m_baseBone_set;     /* camera base bone given last */
+   char *m_baseBoneName;        /* camera base bone name */
 
    btVector3 m_trans;       /* view trans vector */
    btVector3 m_angle;       /* view angles */
@@ -230,8 +231,8 @@ public:
    /* setCameraView: set camera view parameters */
    void setCameraView(const float *trans, const float *angle, float distance, float fovy, PMDBone *baseBone, bool modelFollow);
 
-   /* getCameraBone: get camera bone */
-   PMDBone *getCameraBone();
+   /* getCameraBoneName: get camera bone Name */
+   const char *getCameraBoneName();
 
    /* updateCameraBone: update camera bone */
    void updateCameraBone(PMDBone *baseBone);

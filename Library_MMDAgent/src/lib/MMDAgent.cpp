@@ -524,8 +524,7 @@ bool MMDAgent::changeModel(const char *modelAlias, const char *fileName, PMDMode
    float *l = m_option->getLightDirection();
    btVector3 light = btVector3(btScalar(l[0]), btScalar(l[1]), btScalar(l[2]));
    char buf[MMDAGENT_MAXBUFLEN];
-   PMDBone *bone;
-   char *boneName = NULL;
+   const char *boneName = NULL;
 
    /* ID */
    id = findModelAlias(modelAlias);
@@ -547,10 +546,7 @@ bool MMDAgent::changeModel(const char *modelAlias, const char *fileName, PMDMode
    }
 
    /* when on-model camera is running, store the bone name */
-   bone = m_render->getCameraBone();
-   if (bone) {
-      boneName = MMDAgent_strdup(bone->getName());
-   }
+   boneName = m_render->getCameraBoneName();
 
    /* load model */
    if (MMDAgent_exist(fileName) == false) {
@@ -593,7 +589,7 @@ bool MMDAgent::changeModel(const char *modelAlias, const char *fileName, PMDMode
 
    /* when on-model camera is running, set the bone name, or stop if not exist */
    if (boneName) {
-      bone = m_model[id].getPMDModel()->getBone(boneName);
+      PMDBone *bone = m_model[id].getPMDModel()->getBone(boneName);
       if (bone == NULL)
          bone = m_model[id].getPMDModel()->getCenterBone();
       m_render->updateCameraBone(bone);
