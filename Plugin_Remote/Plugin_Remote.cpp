@@ -354,7 +354,7 @@ private:
             }
          }
       }
-      m_avatar[c]->setup(m_mmdagent, m_id, local_lipsync, local_passthrough);
+      m_avatar[c]->setup(m_mmdagent, m_id, local_lipsync, local_lipsync ? local_passthrough : true);
 
       if (local_lipsync == true) {
          if (m_mmdagent->findModelAlias("0") >= 0) {

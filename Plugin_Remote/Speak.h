@@ -24,6 +24,9 @@
 // SPEAK_EVENT_STOP|(model alias)
 #define PLUGIN_EVENT_SPEAK_STOP "SPEAK_EVENT_STOP"
 
+// configuration key to force 16k play
+#define PLUGIN_REMOTE_CONFIG_SPEAK_16K "Plugin_Remote_Speak_16k"
+
 // audio file speak class
 class Speak
 {
@@ -41,6 +44,7 @@ private:
    bool m_speakingThreadrunning;     /* thread running flag */
    bool m_avatarForSpeakSpeaking;    /* flag, true while speaking */
    bool m_wantSpeakStop;             /* flag, true when want to stop speaking thread */
+   bool m_forcePlaySync;             /* flag, true when use 16k sync play, else use AUDIO_PLAY */
 
    /* speakAudio: speak audio */
    bool speakAudio(const char *modelName, const char *audio, unsigned int len);
