@@ -140,6 +140,7 @@ AudioProcess::AudioProcess(bool local)
    m_localAdin = local;
    m_requestPlayFlush = false;
    m_requestSegmentAfterPlayed = false;
+   m_disablePlay = false;
 }
 
 // destructor
@@ -163,33 +164,39 @@ boolean AudioProcess::callback_begin(char *arg)
    PaError err;
 
    if (m_audio_open == false) {
-      if (m_play_buffer)
-         free(m_play_buffer);
-      m_play_buffer_current = 0;
-      m_play_buffer_len = m_frequency * AUDIO_PLAY_BUFFER_SIZE_IN_SEC;
-      m_play_buffer = (SP16 *)malloc(sizeof(SP16) * m_play_buffer_len);
+      if (m_disablePlay == false) {
+         if (m_play_buffer)
+            free(m_play_buffer);
+         m_play_buffer_current = 0;
+         m_play_buffer_len = m_frequency * AUDIO_PLAY_BUFFER_SIZE_IN_SEC;
+         m_play_buffer = (SP16 *)malloc(sizeof(SP16) * m_play_buffer_len);
+      }
       if (m_receive_buffer)
          free(m_receive_buffer);
       m_receive_buffer_last_point = 0;
       m_receive_buffer_store_point = 0;
       m_receive_buffer_len = m_frequency * AUDIO_PLAY_BUFFER_SIZE_IN_SEC;
       m_receive_buffer = (SP16 *)malloc(sizeof(SP16) * m_receive_buffer_len);
-      err = Pa_Initialize();
-      if (err != paNoError) {
-         return FALSE;
+      if (m_disablePlay == false) {
+         err = Pa_Initialize();
+         if (err != paNoError) {
+            return FALSE;
+         }
+         if (m_play_mutex != NULL)
+            glfwDestroyMutex(m_play_mutex);
+         m_play_mutex = glfwCreateMutex();
       }
-      if (m_play_mutex != NULL)
-         glfwDestroyMutex(m_play_mutex);
-      m_play_mutex = glfwCreateMutex();
       if (m_receive_mutex != NULL)
          glfwDestroyMutex(m_receive_mutex);
       m_receive_mutex = glfwCreateMutex();
-      err = Pa_OpenDefaultStream(&m_play_stream, 0, 1, paInt16, m_frequency, 256, audioPlayCallback, this);
-      if (err != paNoError)
-         return FALSE;
-      err = Pa_StartStream(m_play_stream);
-      if (err != paNoError)
-         return FALSE;
+      if (m_disablePlay == false) {
+         err = Pa_OpenDefaultStream(&m_play_stream, 0, 1, paInt16, m_frequency, 256, audioPlayCallback, this);
+         if (err != paNoError)
+            return FALSE;
+         err = Pa_StartStream(m_play_stream);
+         if (err != paNoError)
+            return FALSE;
+      }
       if (m_localAdin)
          adin_mic_begin(arg, NULL);
       m_audio_open = true;
@@ -203,28 +210,34 @@ boolean AudioProcess::callback_end()
 {
    PaError err;
 
-   if (m_play_mutex != NULL)
-      glfwLockMutex(m_play_mutex);
+   if (m_disablePlay == false) {
+      if (m_play_mutex != NULL)
+         glfwLockMutex(m_play_mutex);
+   }
    if (m_audio_open == true) {
-      /* close audio device */
-      err = Pa_StopStream(m_play_stream);
-      if (err != paNoError) return FALSE;
-      err = Pa_CloseStream(m_play_stream);
-      if (err != paNoError) return FALSE;
+      if (m_disablePlay == false) {
+         /* close audio device */
+         err = Pa_StopStream(m_play_stream);
+         if (err != paNoError) return FALSE;
+         err = Pa_CloseStream(m_play_stream);
+         if (err != paNoError) return FALSE;
 
-      if (m_play_buffer)
-         free(m_play_buffer);
-      m_play_buffer = NULL;
+         if (m_play_buffer)
+            free(m_play_buffer);
+         m_play_buffer = NULL;
+      }
       if (m_receive_buffer)
          free(m_receive_buffer);
       m_receive_buffer = NULL;
 
       m_audio_open = false;
-      if (m_play_mutex != NULL) {
-         glfwUnlockMutex(m_play_mutex);
-         glfwDestroyMutex(m_play_mutex);
+      if (m_disablePlay == false) {
+         if (m_play_mutex != NULL) {
+            glfwUnlockMutex(m_play_mutex);
+            glfwDestroyMutex(m_play_mutex);
+         }
+         m_play_mutex = NULL;
       }
-      m_play_mutex = NULL;
       if (m_receive_mutex != NULL)
          glfwDestroyMutex(m_receive_mutex);
       m_receive_mutex = NULL;
@@ -279,24 +292,26 @@ int AudioProcess::callback_read(SP16 *buf, int sampnum)
       buflen = sampnum;
    memcpy(buf, m_receive_buffer, buflen * sizeof(SP16));
 
-   /* also store the new part to audio playing buffer */
-   glfwLockMutex(m_play_mutex);
-   if (m_audio_open == false) {
-      m_requestPlayFlush = true;
-      return -2;
+   if (m_disablePlay == false) {
+      /* also store the new part to audio playing buffer */
+      glfwLockMutex(m_play_mutex);
+      if (m_audio_open == false) {
+         m_requestPlayFlush = true;
+         return -2;
+      }
+      num = m_receive_buffer_store_point - m_receive_buffer_last_point;
+      unsigned long len;
+      if (m_play_buffer_current + num >= m_play_buffer_len) {
+         len = m_play_buffer_len - m_play_buffer_current;
+      } else {
+         len = num;
+      }
+      if (len > 0) {
+         memcpy(&(m_play_buffer[m_play_buffer_current]), &(m_receive_buffer[m_receive_buffer_last_point]), len * sizeof(SP16));
+         m_play_buffer_current += len;
+      }
+      glfwUnlockMutex(m_play_mutex);
    }
-   num = m_receive_buffer_store_point - m_receive_buffer_last_point;
-   unsigned long len;
-   if (m_play_buffer_current + num >= m_play_buffer_len) {
-      len = m_play_buffer_len - m_play_buffer_current;
-   } else {
-      len = num;
-   }
-   if (len > 0) {
-      memcpy(&(m_play_buffer[m_play_buffer_current]), &(m_receive_buffer[m_receive_buffer_last_point]), len * sizeof(SP16));
-      m_play_buffer_current += len;
-   }
-   glfwUnlockMutex(m_play_mutex);
 
    /* shrink the buffer for the written samples */
    if (m_receive_buffer_store_point > buflen)
@@ -706,9 +721,16 @@ void Julius_Thread::run()
          ret = j_adin_init(m_recog);
       }
    } else {
-      /* remote, out */
-      m_audio = new AudioProcess(false);
-      ret = m_audio->audioInitialize(m_recog);
+      if (m_wantPassthrough) {
+         /* remote, out */
+         m_audio = new AudioProcess(false);
+         ret = m_audio->audioInitialize(m_recog);
+      } else {
+         /* remote, no out */
+         m_audio = new AudioProcess(false);
+         m_audio->m_disablePlay = true;
+         ret = m_audio->audioInitialize(m_recog);
+      }
    }
    if (ret == false) {
       m_mmdagent->sendLogString(m_id, MLOG_ERROR, "failed to initialize audio device");
@@ -873,7 +895,9 @@ void Julius_Thread::clearAudio()
    if (m_audio) {
       m_audio->m_receive_buffer_last_point = 0;
       m_audio->m_receive_buffer_store_point = 0;
-      m_audio->m_play_buffer_current = 0;
+      if (m_audio->m_disablePlay == false) {
+         m_audio->m_play_buffer_current = 0;
+      }
    }
 }
 

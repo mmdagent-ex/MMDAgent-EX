@@ -43,6 +43,7 @@ void Speak::initialize()
    m_avatarForSpeakSpeaking = false;
    m_speakingThreadrunning = false;
    m_wantSpeakStop = false;
+   m_forcePlaySync = false;
 }
 
 /* Speak::clear: clear */
@@ -113,7 +114,13 @@ bool Speak::speakAudio(const char *modelName, const char *audio, unsigned int le
    if (m_avatarForSpeak == NULL) {
       // newly assign avatar instance for lip sync
       av = new Avatar();
-      av->setup(m_mmdagent, m_id, false, false);
+      if (m_forcePlaySync) {
+         // synchronously plays the 16kHz audio sent for lipsync inside this plugin
+         av->setup(m_mmdagent, m_id, false, true);
+      } else {
+         // disable audio play, later play the original audio using Plugin_Audio
+         av->setup(m_mmdagent, m_id, false, false);
+      }
       av->processMessage("__AV_START\n");
       av->waitAudioThreadStart();
    } else {
@@ -251,7 +258,8 @@ void Speak::loadWaveAndSpeak()
 
    m_mmdagent->sendLogString(m_id, MLOG_STATUS, "speaking audio length: %.2f sec.", audio_sec);
 
-   // send audio data to audio playing buffer to start audio playing on another thread
+   // send audio data to start processing lip sync on another thread
+   // if m_forcePlaySync is true, also plays the data inside the thread
    bool ret = speakAudio(m_givenModelName, (char *)output_uchar_buffer, output_frames * OUTPUT_CHANNELS * sizeof(int16_t));
 
    free(output_uchar_buffer);
@@ -260,6 +268,11 @@ void Speak::loadWaveAndSpeak()
 
    m_mmdagent->sendMessage(m_id, PLUGIN_EVENT_SPEAK_START, "%s", m_givenModelName);
 
+   if (m_forcePlaySync == false) {
+      // issue audio play command to play the audio file with Plugin_Audio
+      m_mmdagent->sendMessage(m_id, "SOUND_START", "__speak__%s|%s", m_givenModelName, m_givenFileName);
+   }
+
    // wait the audio to be processed by sleeping this thread to the audio length
    float wait_audio_sec = audio_sec + 0.1f;
    float current_audio_sec = 0.0f;
@@ -267,6 +280,10 @@ void Speak::loadWaveAndSpeak()
       if (m_wantSpeakStop == true) {
          if (m_avatarForSpeak)
             m_avatarForSpeak->clearSoundData();
+         if (m_forcePlaySync == false) {
+            // issue audio stop command to stop the audio file playing with Plugin_Audio
+            m_mmdagent->sendMessage(m_id, "SOUND_STOP", "__speak__%s", m_givenModelName);
+         }
          break;
       }
       MMDAgent_sleep(0.05f);
@@ -306,6 +323,12 @@ void Speak::startSpeakingThread(const char *modelName, const char *filename)
    if (m_givenFileName)
       free(m_givenFileName);
    m_givenFileName = MMDAgent_strdup(filename);
+
+   if (MMDAgent_strequal(m_mmdagent->getKeyValue()->getString(PLUGIN_REMOTE_CONFIG_SPEAK_16K, "false"), "false") == false) {
+      m_forcePlaySync = true;
+   } else {
+      m_forcePlaySync = false;
+   }
 
    // start new thread
    th = m_threadForSpeak;

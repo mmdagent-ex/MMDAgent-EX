@@ -96,6 +96,7 @@ public:
    bool m_localAdin;
    bool m_requestPlayFlush;
    bool m_requestSegmentAfterPlayed;
+   bool m_disablePlay;
 
    // constructor
    AudioProcess(bool local);
