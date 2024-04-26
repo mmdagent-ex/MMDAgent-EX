@@ -382,3 +382,9 @@ bool ScreenWindow::getTitleBarHide()
 {
    return m_HideTitleBar;
 }
+
+/* ScreenWindow::setWindowSize: set window size */
+void ScreenWindow::setWindowSize(int width, int height)
+{
+   glfwSetWindowSize(width, height);
+}
