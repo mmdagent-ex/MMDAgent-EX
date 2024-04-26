@@ -2146,9 +2146,6 @@ bool MMDAgent::setupContent(int argc, char **argv)
       }
    }
 
-   /* keep screen size */
-   m_option->setWindowSize(m_screenSize);
-
    /* determine which content to launch */
    /* if any .mmda file or URL is given in argv, start from it (override mdf) */
    urlPath = NULL;
@@ -2262,6 +2259,11 @@ bool MMDAgent::setupContent(int argc, char **argv)
 /* MMDAgent::setupWorld: load world */
 bool MMDAgent::setupWorld()
 {
+   /* re-set window size if needed */
+   int *sizes = m_option->getWindowSize();
+   if (m_screenSize[0] != sizes[0] || m_screenSize[1] != sizes[1])
+      m_screen->setWindowSize(sizes[0], sizes[1]);
+
    /* initialize BulletPhysics */
    m_bullet = new BulletPhysics();
    m_bullet->setup(m_option->getBulletFps(), m_option->getGravityFactor());

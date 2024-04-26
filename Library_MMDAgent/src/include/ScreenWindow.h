@@ -120,4 +120,7 @@ public:
 
    /* getTitleBarHide: get if title bar is hiding */
    bool getTitleBarHide();
+
+   /* setWindowSize: set window size */
+   void setWindowSize(int width, int height);
 };
