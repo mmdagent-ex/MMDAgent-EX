@@ -168,6 +168,7 @@ void PMDModel::initialize()
    /* initial values for variables that should be kept at model change */
    m_toon = false;
    m_light.setZero();
+   m_lightEdge = true;
    m_globalAlpha = 1.0f;
    m_edgeOffset = 0.03f;
    m_selfShadowDrawing = false;
@@ -837,4 +838,10 @@ void PMDModel::saveAsVmdKeyFrame(unsigned char **boneData, unsigned char **faceD
 float PMDModel::getLoadingProcessRate()
 {
    return m_loadingProgressRate;
+}
+
+/* PMDModel::setLightEdge: set light edge flag */
+void PMDModel::setLightEdge(bool flag)
+{
+   m_lightEdge = flag;
 }

@@ -158,6 +158,7 @@ private:
    unsigned int m_toonTextureID[SYSTEMTEXTURE_NUMFILES];  /* texture ID for toon shading */
    PMDTexture m_localToonTexture[SYSTEMTEXTURE_NUMFILES]; /* toon textures for this model only */
    btVector3 m_light;                                     /* toon light direction */
+   bool m_lightEdge;                                      /* true when edge distortion by light direction is enabled */
 
    /* work area for OpenGL rendering */
    btTransform *m_boneSkinningTrans;           /* transform matrices of bones for skinning */
@@ -448,4 +449,7 @@ public:
 
    /* getLoadingProcessRate: get loading process rate */
    float getLoadingProcessRate();
+
+   /* setLightEdge: set light edge flag */
+   void setLightEdge(bool flag);
 };

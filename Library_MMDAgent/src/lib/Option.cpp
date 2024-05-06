@@ -159,6 +159,8 @@ void Option::initialize()
 
    m_useHttpServer = OPTION_HTTPSERVER_DEF;
    m_httpServerPortNumber = OPTION_HTTPSERVERPORT_DEF;
+
+   m_lightEdge = OPTION_LIGHTEDGE_DEF;
 }
 
 /* Option::Option: constructor */
@@ -348,6 +350,8 @@ bool Option::load(const char *file, ZFileKey *key, char **errstr)
          setUseHttpServer(MMDAgent_str2bool(p1));
       } else if (MMDAgent_strequal(buf, OPTION_HTTPSERVERPORT_STR)) {
          setHttpServerPortNumber(MMDAgent_str2int(p1));
+      } else if (MMDAgent_strequal(buf, OPTION_LIGHTEDGET_STR)) {
+         setLightEdge(MMDAgent_str2bool(p1));
       }
    }
 
@@ -1225,4 +1229,16 @@ void Option::setHttpServerPortNumber(int i)
       m_httpServerPortNumber = OPTION_HTTPSERVERPORT_MIN;
    else
       m_httpServerPortNumber = i;
+}
+
+/* Option::getLightEdge: get light edge flag */
+bool Option::getLightEdge()
+{
+   return m_lightEdge;
+}
+
+/* Option::setLightEdge: set light edge flag */
+void Option::setLightEdge(bool b)
+{
+   m_lightEdge = b;
 }

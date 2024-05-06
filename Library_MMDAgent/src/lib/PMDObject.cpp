@@ -191,7 +191,7 @@ void PMDObject::release()
 }
 
 /* PMDObject::load: load model */
-bool PMDObject::load(const char *fileName, const char *alias, btVector3 *offsetPos, btQuaternion *offsetRot, bool forcedPosition, PMDBone *assignBone, PMDObject *assignObject, BulletPhysics *bullet, SystemTexture *systex, LipSync *sysLipSync, bool useCartoonRendering, float cartoonEdgeWidth, btVector3 *light, float commentFrame, PMDModel *preloadedPMDModel)
+bool PMDObject::load(const char *fileName, const char *alias, btVector3 *offsetPos, btQuaternion *offsetRot, bool forcedPosition, PMDBone *assignBone, PMDObject *assignObject, BulletPhysics *bullet, SystemTexture *systex, LipSync *sysLipSync, bool useCartoonRendering, float cartoonEdgeWidth, bool useLightEdge, btVector3 *light, float commentFrame, PMDModel *preloadedPMDModel)
 {
    int i;
    int len;
@@ -265,6 +265,7 @@ bool PMDObject::load(const char *fileName, const char *alias, btVector3 *offsetP
 
    /* set toon rendering flag */
    m_pmd->setToonFlag(useCartoonRendering);
+   m_pmd->setLightEdge(useLightEdge);
 
    /* set edge width */
    m_pmd->setEdgeThin(cartoonEdgeWidth);
