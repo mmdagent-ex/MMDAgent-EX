@@ -301,6 +301,9 @@
 #define OPTION_HTTPSERVERPORT_MAX 65535
 #define OPTION_HTTPSERVERPORT_MIN 0
 
+#define OPTION_LIGHTEDGET_STR "light_edge"
+#define OPTION_LIGHTEDGE_DEF true
+
 
 /* Option: user options */
 class Option
@@ -404,6 +407,9 @@ private:
    /* http server */
    bool m_useHttpServer;
    int m_httpServerPortNumber;
+
+   /* light edge */
+   bool m_lightEdge;
 
    /* initialize: initialize options */
    void initialize();
@@ -712,4 +718,10 @@ public:
 
    /* setHttpServerPortNumber: set http server port number */
    void setHttpServerPortNumber(int i);
+
+   /* getLightEdge: get light edge flag */
+   bool getLightEdge();
+
+   /* setLightEdge: set light edge flag */
+   void setLightEdge(bool b);
 };

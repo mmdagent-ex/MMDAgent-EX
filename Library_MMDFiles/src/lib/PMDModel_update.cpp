@@ -426,9 +426,13 @@ void PMDModel::updateSkin()
          vertexList[j] = vv;
          normalList[j] = nn;
          if (m_toon) {
+            float r;
             texCoordList[j].u = 0.0f;
             texCoordList[j].v = (1.0f - m_light.dot(nn)) * 0.5f;
-            edgeVertexList[j] = vv + nn * (m_edgeWidthMorphed ? m_edgeWidthMorphed[j] : m_edgeWidth[j]);
+            r = m_edgeWidthMorphed ? m_edgeWidthMorphed[j] : m_edgeWidth[j];
+            if (m_lightEdge)
+               r *= texCoordList[j].v * 1.5f + 0.2f;
+            edgeVertexList[j] = vv + nn * r;
          }
       }
 
@@ -457,9 +461,13 @@ void PMDModel::updateSkin()
          vertexList[j] = vv;
          normalList[j] = nn;
          if (m_toon) {
+            float r;
             texCoordList[j].u = 0.0f;
             texCoordList[j].v = (1.0f - m_light.dot(nn)) * 0.5f;
-            edgeVertexList[j] = vv + nn * (m_edgeWidthMorphed ? m_edgeWidthMorphed[j] : m_edgeWidth[j]);
+            r = m_edgeWidthMorphed ? m_edgeWidthMorphed[j] : m_edgeWidth[j];
+            if (m_lightEdge)
+               r *= texCoordList[j].v * 1.5f + 0.2f;
+            edgeVertexList[j] = vv + nn * r;
          }
       }
 #ifdef MY_EXTRADEFORMATION
