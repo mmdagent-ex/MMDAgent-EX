@@ -1953,6 +1953,15 @@ bool MMDAgent::setupSystem(const char *systemDirName, const char *pluginDirName,
       }
       m_screenSize[0] = m_option->getWindowSize()[0];
       m_screenSize[1] = m_option->getWindowSize()[1];
+      if (m_option->getTransparentWindow() == true) {
+         const float *tcol = m_option->getTransparentColor();
+         if (m_screen->setTransparentWindow(tcol) == false) {
+            sendLogString(m_moduleId, MLOG_ERROR, "failed to make screen transparent");
+            clear();
+            return false;
+         }
+         sendLogString(m_moduleId, MLOG_STATUS, "transparent screen, color=(%.1f,%.1f,%.1f)", tcol[0], tcol[1], tcol[2]);
+      }
    }
 
    /* load toon textures from system directory */

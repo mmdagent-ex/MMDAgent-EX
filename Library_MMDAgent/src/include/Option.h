@@ -304,6 +304,15 @@
 #define OPTION_LIGHTEDGET_STR "light_edge"
 #define OPTION_LIGHTEDGE_DEF true
 
+#define OPTION_TRANSPARENTWINDOW_STR "transparent_window"
+#define OPTION_TRANSPARENTWINDOW_DEF false
+
+#define OPTION_TRANSPARENTCOLOR_STR "transparent_color"
+#define OPTION_TRANSPARENTCOLORR_DEF 0.0f
+#define OPTION_TRANSPARENTCOLORG_DEF 1.0f
+#define OPTION_TRANSPARENTCOLORB_DEF 0.0f
+#define OPTION_TRANSPARENTCOLOR_MAX  1.0f
+#define OPTION_TRANSPARENTCOLOR_MIN  0.0f
 
 /* Option: user options */
 class Option
@@ -410,6 +419,10 @@ private:
 
    /* light edge */
    bool m_lightEdge;
+
+   /* transparent window */
+   bool m_transparentWindow;
+   float m_transparentColor[3];
 
    /* initialize: initialize options */
    void initialize();
@@ -724,4 +737,16 @@ public:
 
    /* setLightEdge: set light edge flag */
    void setLightEdge(bool b);
+
+   /* getTransparentWindow: get transparent window */
+   bool getTransparentWindow();
+
+   /* setTransparentWindow: set transparent window */
+   void setTransparentWindow(bool b);
+
+   /* getTransparentColor: get transparent color */
+   const float* getTransparentColor();
+
+   /* setTransparentColor: set transparent color */
+   void setTransparentColor(const float* f);
 };
