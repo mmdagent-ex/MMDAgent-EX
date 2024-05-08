@@ -62,29 +62,6 @@
 #define WINDOWSIZESAVEPATH "_window"
 #endif
 
-#ifdef WIN32_TRANSPARENT_SCREEN
-
-#include "dwmapi.h"
-#pragma comment (lib, "dwmapi.lib")
-
-static void setTransparentWin32()
-{
-   // Enable blur behind window
-   // For the client window area not in the specified region, alpha channel value of the content will be applied
-   DWM_BLURBEHIND bb = { 0 };
-   bb.fEnable = true;
-   HRGN hRgn = CreateRectRgn(0, 0, 1, 1);
-   bb.dwFlags = DWM_BB_ENABLE | DWM_BB_BLURREGION;
-   bb.hRgnBlur = hRgn;
-   DwmEnableBlurBehindWindow(GetActiveWindow(), &bb);
-
-   // Disable non-client area rendering on the window to disable double rendering
-   DWMNCRENDERINGPOLICY ncrp = DWMNCRP_DISABLED;
-   DwmSetWindowAttribute(GetActiveWindow(), DWMWA_NCRENDERING_POLICY, &ncrp, sizeof(ncrp));
-}
-#endif /* WIN32_TRANSPARENT_SCREEN */
-
-
 /* ScreenWindow::initialize: initialize screen */
 void ScreenWindow::initialize()
 {
@@ -153,12 +130,36 @@ bool ScreenWindow::setup(const int *size, const char *title, int maxMultiSamplin
 
    glfwSwapInterval(m_intervalFrameOfVsync);
 
-#ifdef WIN32_TRANSPARENT_SCREEN
-   setTransparentWin32();
-#endif /* WIN32_TRANSPARENT_SCREEN */
-
    m_enable = true;
    return true;
+}
+
+/* ScreenWindow::setTransparentWindow: set transparent window */
+bool ScreenWindow::setTransparentWindow(const float *transparentColor)
+{
+   HWND hWnd;
+   int c[3];
+
+#ifdef _WIN32
+   hWnd = GetForegroundWindow();
+   if (!hWnd)
+      return false;
+   LONG style = GetWindowLong(hWnd, GWL_EXSTYLE);
+   if (style == 0)
+      return false;
+   if (SetWindowLong(hWnd, GWL_EXSTYLE, style | WS_EX_LAYERED) == 0)
+      return false;
+
+   for (int i = 0; i < 3; i++) {
+      c[i] = int(transparentColor[i] * 256.0);
+      if (c[i] > 255) c[i] = 255;
+   }
+   if (!SetLayeredWindowAttributes(hWnd, RGB(c[0], c[1], c[2]), 0, LWA_COLORKEY))
+      return false;
+   return true;
+#else /* ~_WIN32 */
+   return false;
+#endif /* _WIN32 */
 }
 
 /* ScreenWindow::swapBuffers: swap buffers */

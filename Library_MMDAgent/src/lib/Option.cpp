@@ -161,6 +161,12 @@ void Option::initialize()
    m_httpServerPortNumber = OPTION_HTTPSERVERPORT_DEF;
 
    m_lightEdge = OPTION_LIGHTEDGE_DEF;
+
+   m_transparentWindow = OPTION_TRANSPARENTWINDOW_DEF;
+   m_transparentColor[0] = OPTION_TRANSPARENTCOLORR_DEF;
+   m_transparentColor[1] = OPTION_TRANSPARENTCOLORG_DEF;
+   m_transparentColor[2] = OPTION_TRANSPARENTCOLORB_DEF;
+
 }
 
 /* Option::Option: constructor */
@@ -352,6 +358,11 @@ bool Option::load(const char *file, ZFileKey *key, char **errstr)
          setHttpServerPortNumber(MMDAgent_str2int(p1));
       } else if (MMDAgent_strequal(buf, OPTION_LIGHTEDGET_STR)) {
          setLightEdge(MMDAgent_str2bool(p1));
+      } else if (MMDAgent_strequal(buf, OPTION_TRANSPARENTWINDOW_STR)) {
+         setTransparentWindow(MMDAgent_str2bool(p1));
+      } else if (MMDAgent_strequal(buf, OPTION_TRANSPARENTCOLOR_STR)) {
+         if (MMDAgent_str2fvec(p1, fvec3, 3))
+            setTransparentColor(fvec3);
       }
    }
 
@@ -1241,4 +1252,36 @@ bool Option::getLightEdge()
 void Option::setLightEdge(bool b)
 {
    m_lightEdge = b;
+}
+
+
+/* Option::getTransparentWindow: get transparent window */
+bool Option::getTransparentWindow()
+{
+   return m_transparentWindow;
+}
+
+/* Option::setTransparentWindow: set transparent window */
+void Option::setTransparentWindow(bool b)
+{
+   m_transparentWindow = b;
+}
+
+/* Option::getTransparentColor: get transparent color */
+const float* Option::getTransparentColor()
+{
+   return m_transparentColor;
+}
+
+/* Option::setTransparentColor: set transparent color */
+void Option::setTransparentColor(const float* f)
+{
+   for (int i = 0; i < 3; i++) {
+      if (f[i] > OPTION_TRANSPARENTCOLOR_MAX)
+         m_doppelShadowColor[i] = OPTION_TRANSPARENTCOLOR_MAX;
+      else if (f[i] < OPTION_TRANSPARENTCOLOR_MIN)
+         m_doppelShadowColor[i] = OPTION_TRANSPARENTCOLOR_MIN;
+      else
+         m_doppelShadowColor[i] = f[i];
+   }
 }

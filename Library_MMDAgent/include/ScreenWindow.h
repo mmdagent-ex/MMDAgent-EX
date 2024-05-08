@@ -85,6 +85,9 @@ public:
    /* setup: create window */
    bool setup(const int *size, const char *title, int maxNumSampling);
 
+   /* setTransparentWindow: set transparent window */
+   bool setTransparentWindow(const float* transparentColor);
+
    /* swapBuffers: swap buffers */
    void swapBuffers();
 
