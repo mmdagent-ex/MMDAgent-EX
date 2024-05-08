@@ -39,7 +39,7 @@
 /* POSSIBILITY OF SUCH DAMAGE.                                       */
 /* ----------------------------------------------------------------- */
 
-#define VMD_INTERPOLATIONTABLESIZE 64 /* motion interpolation table size */
+#define VMD_INTERPOLATIONTABLESIZE 256 /* motion interpolation table size */
 
 /* BoneKeyFrame: bone key frame */
 typedef struct _BoneKeyFrame {
