@@ -1278,10 +1278,10 @@ void Option::setTransparentColor(const float* f)
 {
    for (int i = 0; i < 3; i++) {
       if (f[i] > OPTION_TRANSPARENTCOLOR_MAX)
-         m_doppelShadowColor[i] = OPTION_TRANSPARENTCOLOR_MAX;
+         m_transparentColor[i] = OPTION_TRANSPARENTCOLOR_MAX;
       else if (f[i] < OPTION_TRANSPARENTCOLOR_MIN)
-         m_doppelShadowColor[i] = OPTION_TRANSPARENTCOLOR_MIN;
+         m_transparentColor[i] = OPTION_TRANSPARENTCOLOR_MIN;
       else
-         m_doppelShadowColor[i] = f[i];
+         m_transparentColor[i] = f[i];
    }
 }
