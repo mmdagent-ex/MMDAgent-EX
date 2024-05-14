@@ -74,6 +74,10 @@ void ScreenWindow::initialize()
    m_mouseActiveLeftFrame = 0.0;
    m_fullScreen = false;
    m_HideTitleBar = false;
+
+#ifdef MMDAGENT_TRANSPARENT_WINDOW
+   m_transparentWindow = false;
+#endif /* MMDAGENT_TRANSPARENT_WINDOW */
 }
 
 /* ScreenWindow::clear: free screen */
@@ -130,6 +134,11 @@ bool ScreenWindow::setup(const int *size, const char *title, int maxMultiSamplin
 
    glfwSwapInterval(m_intervalFrameOfVsync);
 
+#ifdef MMDAGENT_TRANSPARENT_WINDOW
+   /* set initial transparent state */
+   m_transparentWindow = false;
+#endif /* MMDAGENT_TRANSPARENT_WINDOW */
+
    m_enable = true;
    return true;
 }
@@ -137,29 +146,24 @@ bool ScreenWindow::setup(const int *size, const char *title, int maxMultiSamplin
 /* ScreenWindow::setTransparentWindow: set transparent window */
 bool ScreenWindow::setTransparentWindow(const float *transparentColor)
 {
-   HWND hWnd;
-   int c[3];
-
-#ifdef _WIN32
-   hWnd = GetForegroundWindow();
-   if (!hWnd)
-      return false;
-   LONG style = GetWindowLong(hWnd, GWL_EXSTYLE);
-   if (style == 0)
-      return false;
-   if (SetWindowLong(hWnd, GWL_EXSTYLE, style | WS_EX_LAYERED) == 0)
-      return false;
-
-   for (int i = 0; i < 3; i++) {
-      c[i] = int(transparentColor[i] * 256.0);
-      if (c[i] > 255) c[i] = 255;
+#ifdef MMDAGENT_TRANSPARENT_WINDOW
+   if (transparentColor) {
+      glfwEnableTransparent(transparentColor);
+      m_transparentWindow = true;
+   } else {
+      glfwDisableTransparent();
+      m_transparentWindow = false;
    }
-   if (!SetLayeredWindowAttributes(hWnd, RGB(c[0], c[1], c[2]), 0, LWA_COLORKEY))
-      return false;
    return true;
-#else /* ~_WIN32 */
+#else /* ~MMDAGENT_TRANSPARENT_WINDOW */
    return false;
-#endif /* _WIN32 */
+#endif /* MMDAGENT_TRANSPARENT_WINDOW */
+}
+
+/* ScreenWindow::isTransparentWindow: return true when transparent window */
+bool ScreenWindow::isTransparentWindow()
+{
+   return m_transparentWindow;
 }
 
 /* ScreenWindow::swapBuffers: swap buffers */

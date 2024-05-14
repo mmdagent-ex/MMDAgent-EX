@@ -501,6 +501,8 @@ GLFWAPI void GLFWAPIENTRY glfwSetWindowTitle( const char *title );
 GLFWAPI HDC  GLFWAPIENTRY glfwGetDeviceContext( void );
 GLFWAPI void GLFWAPIENTRY glfwPlatformEnableTrackMouseLeave(void);
 GLFWAPI void GLFWAPIENTRY glfwSetMouseLeaveCallback(GLFWmouseleavefun cbfun);
+GLFWAPI void GLFWAPIENTRY glfwEnableTransparent(const float *col);
+GLFWAPI void GLFWAPIENTRY glfwDisableTransparent();
 #endif /* _WIN32 */
 GLFWAPI void GLFWAPIENTRY glfwMakeCurrentAnotherContext( void );
 GLFWAPI void GLFWAPIENTRY glfwEnableFullScreen( void );

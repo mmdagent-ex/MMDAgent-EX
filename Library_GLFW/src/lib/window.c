@@ -893,6 +893,31 @@ GLFWAPI void GLFWAPIENTRY glfwPlatformEnableTrackMouseLeave(void)
    // Enable Tracking Mouse Leave
    _glfwPlatformEnableTrackMouseLeave();
 }
+
+/* enable transparent window */
+GLFWAPI void GLFWAPIENTRY glfwEnableTransparent(const float *col)
+{
+   // Is GLFW initialized?
+   if (!_glfwInitialized || !_glfwWin.opened)
+   {
+      return;
+   }
+
+   _glfwPlatformEnableTransparent(col);
+}
+
+/* disable transparent window */
+GLFWAPI void GLFWAPIENTRY glfwDisableTransparent()
+{
+   // Is GLFW initialized?
+   if (!_glfwInitialized || !_glfwWin.opened)
+   {
+      return;
+   }
+
+   _glfwPlatformDisableTransparent();
+}
+
 #endif /* _WIN32 */
 
 #endif /* MMDAGENT */

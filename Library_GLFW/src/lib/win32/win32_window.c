@@ -1286,6 +1286,7 @@ static int createWindow( const _GLFWwndconfig *wndconfig,
     _glfwWin.context = NULL;
 #ifdef MMDAGENT
     _glfwWin.context2 = NULL;
+    _glfwWin.isTransparent = 0;
 #endif
     _glfwWin.window = NULL;
 
@@ -1626,6 +1627,9 @@ void _glfwPlatformEnableFullScreen( void )
     dwStyle &= ~WS_SYSMENU;
     dwStyle &= ~WS_MINIMIZEBOX;
     dwStyle &= ~WS_THICKFRAME;
+    // with OWNDC window, WS_EX_LAYERED transparency breaks without WS_THICKFRAME
+    // keeping border with thinner WS_BORDER works, but I do not now why
+    dwStyle |= WS_BORDER;
     SetWindowLong( _glfwWin.window, GWL_STYLE, dwStyle );
 
     // Set full screen
@@ -1644,6 +1648,7 @@ void _glfwPlatformDisableFullScreen( void )
 
     // Reset window setting
     dwStyle = GetWindowLong(_glfwWin.window, GWL_STYLE);
+    dwStyle &= ~WS_BORDER;
     if (_glfwWin.hideTitleBar == 0)
        dwStyle |= WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_THICKFRAME;
     else
@@ -1775,6 +1780,56 @@ void _glfwPlatformEnableTrackMouseLeave(void)
    tme.hwndTrack = _glfwWin.window;
    TrackMouseEvent(&tme);
 }
+
+/* enable transparent window */
+void _glfwPlatformEnableTransparent(const float *col)
+{
+   if (_glfwWin.isTransparent == 1)
+      return;
+
+   LONG style = GetWindowLong(_glfwWin.window, GWL_EXSTYLE);
+   if (style == 0)
+      return;
+   if (SetWindowLong(_glfwWin.window, GWL_EXSTYLE, style | WS_EX_LAYERED) == 0)
+      return;
+
+   int c[3];
+   for (int i = 0; i < 3; i++) {
+      c[i] = (int)(col[i] * 256.0);
+      if (c[i] > 255) c[i] = 255;
+   }
+
+   if (!SetLayeredWindowAttributes(_glfwWin.window, RGB(c[0], c[1], c[2]), 0, LWA_COLORKEY))
+      return;
+
+   /* also make this window top-most so that, because people does not want transparent window to go bihind */
+   SetWindowPos(_glfwWin.window, HWND_TOPMOST, 0, 0, 0, 0, (SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW));
+
+   _glfwWin.isTransparent = 1;
+}
+
+/* disable transparent window */
+void _glfwPlatformDisableTransparent()
+{
+   if (_glfwWin.isTransparent == 0)
+      return;
+
+   LONG style = GetWindowLong(_glfwWin.window, GWL_EXSTYLE);
+   if (style == 0)
+      return;
+   if (SetWindowLong(_glfwWin.window, GWL_EXSTYLE, style & ~WS_EX_LAYERED) == 0)
+      return;
+
+   /* also make this window top-most so that, because people does not want transparent window to go bihind */
+   SetWindowPos(_glfwWin.window, HWND_NOTOPMOST, 0, 0, 0, 0, (SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW));
+
+
+
+//   RedrawWindow(_glfwWin.window, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
+
+   _glfwWin.isTransparent = 0;
+}
+
 #endif /* _WIN32 */
 
 #endif /* MMDAGENT */
