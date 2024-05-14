@@ -283,6 +283,8 @@ void _glfwPlatformSetWindowTitle( const char *title );
 #ifdef _WIN32
 HDC  _glfwPlatformGetDeviceContext( void );
 void _glfwPlatformEnableTrackMouseLeave(void);
+void _glfwPlatformEnableTransparent(const float *col);
+void _glfwPlatformDisableTransparent();
 #endif /* _WIN32 */
 void _glfwPlatformEnableFullScreen( void );
 void _glfwPlatformDisableFullScreen( void );

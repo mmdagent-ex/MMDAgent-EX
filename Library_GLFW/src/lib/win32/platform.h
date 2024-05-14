@@ -386,6 +386,7 @@ struct _GLFWwin_struct {
     RECT      originalWindowSize;
     int       isFullScreen;
     int       hideTitleBar;
+    int       isTransparent;
 #endif /* MMDAGENT */
 
     // Framebuffer attributes

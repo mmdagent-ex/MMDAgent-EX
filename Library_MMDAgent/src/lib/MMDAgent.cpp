@@ -1953,15 +1953,6 @@ bool MMDAgent::setupSystem(const char *systemDirName, const char *pluginDirName,
       }
       m_screenSize[0] = m_option->getWindowSize()[0];
       m_screenSize[1] = m_option->getWindowSize()[1];
-      if (m_option->getTransparentWindow() == true) {
-         const float *tcol = m_option->getTransparentColor();
-         if (m_screen->setTransparentWindow(tcol) == false) {
-            sendLogString(m_moduleId, MLOG_ERROR, "failed to make screen transparent");
-            clear();
-            return false;
-         }
-         sendLogString(m_moduleId, MLOG_STATUS, "transparent screen, color=(%.1f,%.1f,%.1f)", tcol[0], tcol[1], tcol[2]);
-      }
    }
 
    /* load toon textures from system directory */
@@ -2345,6 +2336,24 @@ bool MMDAgent::setupWorld()
    /* set full screen */
    if (m_option->getFullScreen() == true)
       m_screen->setFullScreen();
+
+   /* set transparent window */
+   if (m_option->getTransparentWindow() == true && m_screen->isTransparentWindow() == false) {
+      const float *tcol = m_option->getTransparentColor();
+      if (m_screen->setTransparentWindow(tcol) == false) {
+         sendLogString(m_moduleId, MLOG_ERROR, "failed to make screen transparent");
+         clear();
+         return false;
+      }
+      sendLogString(m_moduleId, MLOG_STATUS, "transparent screen, color=(%.1f,%.1f,%.1f)", tcol[0], tcol[1], tcol[2]);
+   } else if (m_option->getTransparentWindow() == false && m_screen->isTransparentWindow() == true) {
+      if (m_screen->setTransparentWindow(NULL) == false) {
+         sendLogString(m_moduleId, MLOG_ERROR, "failed to make screen non-transparent");
+         clear();
+         return false;
+      }
+      sendLogString(m_moduleId, MLOG_STATUS, "transparent screen reverted");
+   }
 
    /* update light */
    updateLight();
@@ -6112,6 +6121,38 @@ void MMDAgent::procReceivedMessage(const char *type, const char *value)
          return;
       }
       m_content->clearHome();
+   } else if (MMDAgent_strequal(type, MMDAGENT_COMMAND_TRANSPARENT_START)) {
+      sendLogString(m_moduleId, MLOG_MESSAGE_CAPTURED, "%s|%s", type, value);
+      if (num < 0 || num > 1) {
+         sendLogString(m_moduleId, MLOG_ERROR, "%s: number of arguments should be 0 or 1.", type);
+         return;
+      }
+      const float *tcol;
+      if (num == 0) {
+         tcol = m_option->getTransparentColor();
+      } else {
+         if (MMDAgent_str2fvec(argv[0], fvec, 3) == false) {
+            sendLogString(m_moduleId, MLOG_ERROR, "%s: \"%s\" is not RGB color.", type, argv[0]);
+            return;
+         }
+         tcol = fvec;
+      }
+      if (m_screen->setTransparentWindow(tcol) == false) {
+         sendLogString(m_moduleId, MLOG_ERROR, "%s: failed to make screen transparent", type);
+         return;
+      }
+      sendLogString(m_moduleId, MLOG_STATUS, "transparent screen, color=(%.1f,%.1f,%.1f)", tcol[0], tcol[1], tcol[2]);
+   } else if (MMDAgent_strequal(type, MMDAGENT_COMMAND_TRANSPARENT_STOP)) {
+      sendLogString(m_moduleId, MLOG_MESSAGE_CAPTURED, "%s|%s", type, value);
+      if (num != 0) {
+         sendLogString(m_moduleId, MLOG_ERROR, "%s: should have no argument.", type);
+         return;
+      }
+      if (m_screen->setTransparentWindow(NULL) == false) {
+         sendLogString(m_moduleId, MLOG_ERROR, "failed to make screen non-transparent");
+         return;
+      }
+      sendLogString(m_moduleId, MLOG_STATUS, "transparent screen reverted");
    }
    if (m_infotext)
       m_infotext->processMessage(type, argv, num);
