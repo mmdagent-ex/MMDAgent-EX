@@ -1287,6 +1287,7 @@ static int createWindow( const _GLFWwndconfig *wndconfig,
 #ifdef MMDAGENT
     _glfwWin.context2 = NULL;
     _glfwWin.isTransparent = 0;
+    _glfwWin.isTransparentByUpdates = 0;
 #endif
     _glfwWin.window = NULL;
 
@@ -1782,7 +1783,7 @@ void _glfwPlatformEnableTrackMouseLeave(void)
 }
 
 /* enable transparent window */
-void _glfwPlatformEnableTransparent(const float *col)
+void _glfwPlatformEnableTransparent(const float *col, int flag)
 {
    if (_glfwWin.isTransparent == 1)
       return;
@@ -1799,13 +1800,52 @@ void _glfwPlatformEnableTransparent(const float *col)
       if (c[i] > 255) c[i] = 255;
    }
 
-   if (!SetLayeredWindowAttributes(_glfwWin.window, RGB(c[0], c[1], c[2]), 0, LWA_COLORKEY))
-      return;
+   /* flag == 0: transparent by color, 1: transparent by updates */
+   if (flag == 0) {
+      /* set transparent color */
+      if (!SetLayeredWindowAttributes(_glfwWin.window, RGB(c[0], c[1], c[2]), 0, LWA_COLORKEY))
+         return;
+   }
 
    /* also make this window top-most so that, because people does not want transparent window to go bihind */
    SetWindowPos(_glfwWin.window, HWND_TOPMOST, 0, 0, 0, 0, (SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW));
 
    _glfwWin.isTransparent = 1;
+   _glfwWin.isTransparentByUpdates = flag;
+}
+
+void _glfwPlatformUpdateTransparent(int width, int height, void *pixels)
+{
+   if (_glfwWin.isTransparent == 0)
+      return;
+
+   if (_glfwWin.isTransparentByUpdates == 0)
+      return;
+
+   // copy pixel data to HDC
+   HDC memDC = CreateCompatibleDC(_glfwWin.DC);
+   BITMAPINFO bmi = { 0 };
+   bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+   bmi.bmiHeader.biWidth = width;
+   bmi.bmiHeader.biHeight = height;
+   bmi.bmiHeader.biPlanes = 1;
+   bmi.bmiHeader.biBitCount = 32;
+   bmi.bmiHeader.biCompression = BI_RGB;
+   void *bits = NULL;
+   HBITMAP hBitmap = CreateDIBSection(memDC, &bmi, DIB_RGB_COLORS, &bits, NULL, 0);
+   memcpy(bits, pixels, width * height * 4);
+
+   // update transparent window
+   HBITMAP oldBitmap = (HBITMAP)SelectObject(memDC, hBitmap);
+   POINT ptPos = { 0, 0 };
+   SIZE sizeWnd = { width, height };
+   POINT ptSrc = { 0, 0 };
+   BLENDFUNCTION blend = { AC_SRC_OVER, 0, 255, AC_SRC_ALPHA };
+   UpdateLayeredWindow(_glfwWin.window, _glfwWin.DC, &ptPos, &sizeWnd, memDC, &ptSrc, 0, &blend, ULW_ALPHA);
+
+   SelectObject(memDC, oldBitmap);
+   DeleteObject(hBitmap);
+   DeleteDC(memDC);
 }
 
 /* disable transparent window */
@@ -1822,10 +1862,6 @@ void _glfwPlatformDisableTransparent()
 
    /* also make this window top-most so that, because people does not want transparent window to go bihind */
    SetWindowPos(_glfwWin.window, HWND_NOTOPMOST, 0, 0, 0, 0, (SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW));
-
-
-
-//   RedrawWindow(_glfwWin.window, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
 
    _glfwWin.isTransparent = 0;
 }

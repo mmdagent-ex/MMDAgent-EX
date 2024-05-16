@@ -895,7 +895,7 @@ GLFWAPI void GLFWAPIENTRY glfwPlatformEnableTrackMouseLeave(void)
 }
 
 /* enable transparent window */
-GLFWAPI void GLFWAPIENTRY glfwEnableTransparent(const float *col)
+GLFWAPI void GLFWAPIENTRY glfwEnableTransparent(const float *col, int flag)
 {
    // Is GLFW initialized?
    if (!_glfwInitialized || !_glfwWin.opened)
@@ -903,7 +903,20 @@ GLFWAPI void GLFWAPIENTRY glfwEnableTransparent(const float *col)
       return;
    }
 
-   _glfwPlatformEnableTransparent(col);
+   _glfwPlatformEnableTransparent(col, flag);
+}
+
+/* updates for transparent window */
+GLFWAPI void GLFWAPIENTRY glfwUpdateTransparent(int width, int height, void *pixels)
+{
+   // Is GLFW initialized?
+   if (!_glfwInitialized || !_glfwWin.opened)
+   {
+      return;
+   }
+
+   _glfwPlatformUpdateTransparent(width, height, pixels);
+
 }
 
 /* disable transparent window */

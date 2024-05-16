@@ -154,6 +154,8 @@ private:
 
    GLuint m_defaultFrameBuffer;    /* default frame buffer to render */
 
+   bool m_backgroundTransparency;
+
 
    /* applyProjectionMatirx: update projection matrix */
    void applyProjectionMatrix(double nearVal, double farVal);
@@ -326,4 +328,6 @@ public:
    /* setDefaultFrameBufferId: set default frame buffer id */
    void setDefaultFrameBufferId(GLuint id);
 
+   /* setBackgroundTransparency: set background transparency */
+   void setBackgroundTransparency(bool flag);
 };

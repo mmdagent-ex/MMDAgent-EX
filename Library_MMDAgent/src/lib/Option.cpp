@@ -166,7 +166,7 @@ void Option::initialize()
    m_transparentColor[0] = OPTION_TRANSPARENTCOLORR_DEF;
    m_transparentColor[1] = OPTION_TRANSPARENTCOLORG_DEF;
    m_transparentColor[2] = OPTION_TRANSPARENTCOLORB_DEF;
-
+   m_transparentPixmap = OPTION_TRANSPARENTPIXMAP_DEF;
 }
 
 /* Option::Option: constructor */
@@ -363,6 +363,8 @@ bool Option::load(const char *file, ZFileKey *key, char **errstr)
       } else if (MMDAgent_strequal(buf, OPTION_TRANSPARENTCOLOR_STR)) {
          if (MMDAgent_str2fvec(p1, fvec3, 3))
             setTransparentColor(fvec3);
+      } else if (MMDAgent_strequal(buf, OPTION_TRANSPARENTPIXMAP_STR)) {
+         setTransparentPixmap(MMDAgent_str2bool(p1));
       }
    }
 
@@ -1254,7 +1256,6 @@ void Option::setLightEdge(bool b)
    m_lightEdge = b;
 }
 
-
 /* Option::getTransparentWindow: get transparent window */
 bool Option::getTransparentWindow()
 {
@@ -1284,4 +1285,16 @@ void Option::setTransparentColor(const float* f)
       else
          m_transparentColor[i] = f[i];
    }
+}
+
+/* Option::getTransparentPixmap: get transparent pixmap */
+bool Option::getTransparentPixmap()
+{
+   return m_transparentPixmap;
+}
+
+/* Option::setTransparentPixmap: set transparent pixmap */
+void Option::setTransparentPixmap(bool b)
+{
+   m_transparentPixmap = b;
 }

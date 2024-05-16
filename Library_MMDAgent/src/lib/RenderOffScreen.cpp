@@ -18,6 +18,10 @@
 
 #include "MMDAgent.h"
 
+#ifdef _WIN32
+#define MMDAGENT_TRANSPARENT_WINDOW
+#endif
+
 /* shader programs */
 
 /* basic vertex shader */
@@ -185,34 +189,47 @@ void RenderOffScreen::initialize()
    m_processTextureColorbuffer = 0;
    m_quadVBO = 0;
    m_quadVAO = 0;
-   m_buffersActive = false;
-   m_buffersRequireInit = false;
+   m_requireSurfaceInit = false;
    m_width = 0;
    m_height = 0;
-   m_enabled = false;
    m_intensity = 0.0f;
    m_scalingFactor = 1.0f;
    m_render = NULL;
    m_pauseCount = 0;
+   m_skip = false;
+   m_tpUsePixmap = false;
+   m_tpPixels = NULL;
+   m_tpWindow = false;
+   m_base = false;
+   m_effect = false;
+   m_transparent = false;
+   m_baseCurrent = false;
+   m_effectCurrent = false;
+   m_transparentCurrent = false;
+   m_baseActive = false;
+   m_effectActive = false;
+   m_transparentActive = false;
 }
 
 /* RenderOffScreen::clear: free */
 void RenderOffScreen::clear()
 {
-   clearBuffers();
+   clearTransparentBuffers();
+   clearEffectBuffers();
+   clearBaseBuffers();
    initialize();
 }
 
-/* RenderOffScreen::initBuffers: initialize buffers */
-bool RenderOffScreen::initBuffers()
+/* RenderOffScreen::initBaseBuffers: initialize base buffers */
+bool RenderOffScreen::initBaseBuffers()
 {
-   /* generate frame buffer */
+   /* generate rendering frame buffer */
    glGenFramebuffers(1, &m_framebuffer);
    glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
-   /* generate texture to use for the output of the frame buffer */
    /* use texture unit #3 for texture rendering */
    glActiveTexture(GL_TEXTURE0 + 3);
    glGenTextures(1, &m_textureColorbuffer);
+   /* rendering needs multisample texture */
    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_textureColorbuffer);
    glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
    glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -260,8 +277,59 @@ bool RenderOffScreen::initBuffers()
       glDeleteFramebuffers(1, &m_framebuffer);
       return false;
    }
+   /* revert to default frame buffer (screen) */
    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+   /* generate VBO and VAO for texture-to-screen post rendering */
+   glGenBuffers(1, &m_quadVBO);
+   glGenVertexArrays(1, &m_quadVAO);
+   glBindVertexArray(m_quadVAO);
+   glBindBuffer(GL_ARRAY_BUFFER, m_quadVBO);
+   glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+   glEnableVertexAttribArray(0);
+   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
+   glEnableVertexAttribArray(1);
+   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)(2 * sizeof(float)));
+   /* revert to default */
+   glBindBuffer(GL_ARRAY_BUFFER, 0);
+   glBindVertexArray(0);
+
+   /* revert texture unit to default */
+   glActiveTexture(GL_TEXTURE0);
+
+   m_baseActive = true;
+   m_requireSurfaceInit = true;
+
+   return true;
+}
+
+/* RenderOffScreen::clearBaseBuffers: clear base buffers */
+void RenderOffScreen::clearBaseBuffers()
+{
+   if (m_baseActive) {
+      glDeleteVertexArrays(1, &m_quadVAO);
+      glDeleteBuffers(1, &m_quadVBO);
+      glDeleteTextures(1, &m_resolvedTexture);
+      glDeleteFramebuffers(1, &m_resolveFramebuffer);
+      glDeleteRenderbuffers(1, &m_renderbuffer);
+      glDeleteTextures(1, &m_textureColorbuffer);
+      glDeleteFramebuffers(1, &m_framebuffer);
+   }
+   m_framebuffer = 0;
+   m_textureColorbuffer = 0;
+   m_renderbuffer = 0;
+   m_resolveFramebuffer = 0;
+   m_resolvedTexture = 0;
+   m_quadVBO = 0;
+   m_quadVAO = 0;
+
+   m_baseActive = false;
+   m_requireSurfaceInit = true;
+}
+
+/* RenderOffScreen::initEffectBuffers: initialize effect buffers */
+bool RenderOffScreen::initEffectBuffers()
+{
    /* prepare another frame buffer with texture for multi-pass shader */
    glGenFramebuffers(1, &m_processFramebuffer);
    glBindFramebuffer(GL_FRAMEBUFFER, m_processFramebuffer);
@@ -279,74 +347,98 @@ bool RenderOffScreen::initBuffers()
       MMDAgent_snprintf(m_infoLog, 512, "could not generate frame buffer for resolving");
       glDeleteTextures(1, &m_processTextureColorbuffer);
       glDeleteFramebuffers(1, &m_processFramebuffer);
-      glDeleteTextures(1, &m_resolvedTexture);
-      glDeleteFramebuffers(1, &m_resolveFramebuffer);
-      glDeleteRenderbuffers(1, &m_renderbuffer);
-      glDeleteTextures(1, &m_textureColorbuffer);
-      glDeleteFramebuffers(1, &m_framebuffer);
       return false;
    }
+   /* revert to default frame buffer (screen) */
    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-   /* generate VBO and VAO for texture-to-screen post rendering */
-   glGenBuffers(1, &m_quadVBO);
-   glGenVertexArrays(1, &m_quadVAO);
-   glBindVertexArray(m_quadVAO);
-   glBindBuffer(GL_ARRAY_BUFFER, m_quadVBO);
-   glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-   glEnableVertexAttribArray(0);
-   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-   glEnableVertexAttribArray(1);
-   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
-   /* revert to default */
-   glBindBuffer(GL_ARRAY_BUFFER, 0);
-   glBindVertexArray(0);
-
-   m_buffersActive = true;
-   m_buffersRequireInit = true;
 
    /* load shader */
    if (loadShader() == false) {
-      clear();
+      MMDAgent_snprintf(m_infoLog, 512, "could not load shader");
+      glDeleteTextures(1, &m_processTextureColorbuffer);
+      glDeleteFramebuffers(1, &m_processFramebuffer);
       return false;
    }
 
    /* revert texture unit to default */
    glActiveTexture(GL_TEXTURE0);
 
+   m_effectActive = true;
+   m_requireSurfaceInit = true;
+
    return true;
 }
 
-/* RenderOffScreen::clearBuffers: clear buffers */
-void RenderOffScreen::clearBuffers()
+/* RenderOffScreen::clearEffectBuffers: clear effect buffers */
+void RenderOffScreen::clearEffectBuffers()
 {
    if (m_shaderLoaded) {
       glDeleteProgram(m_shaderProgram);
    }
-   if (m_buffersActive) {
-      glDeleteVertexArrays(1, &m_quadVAO);
-      glDeleteBuffers(1, &m_quadVBO);
+   if (m_effectActive) {
       glDeleteTextures(1, &m_processTextureColorbuffer);
       glDeleteFramebuffers(1, &m_processFramebuffer);
-      glDeleteTextures(1, &m_resolvedTexture);
-      glDeleteFramebuffers(1, &m_resolveFramebuffer);
-      glDeleteRenderbuffers(1, &m_renderbuffer);
-      glDeleteTextures(1, &m_textureColorbuffer);
-      glDeleteFramebuffers(1, &m_framebuffer);
    }
    m_shaderProgram = 0;
    m_shaderLoaded = false;
-   m_framebuffer = 0;
-   m_renderbuffer = 0;
-   m_textureColorbuffer = 0;
-   m_resolveFramebuffer = 0;
-   m_resolvedTexture = 0;
    m_processFramebuffer = 0;
    m_processTextureColorbuffer = 0;
-   m_quadVBO = 0;
-   m_quadVAO = 0;
-   m_buffersActive = false;
-   m_buffersRequireInit = false;
+
+   m_effectActive = false;
+   m_requireSurfaceInit = true;
+}
+
+/* RenderOffScreen::initTransparentBuffers: initialize transparent buffers */
+bool RenderOffScreen::initTransparentBuffers()
+{
+   /* prepare another frame buffer with texture for last rendering for effect */
+   glGenFramebuffers(1, &m_transFramebuffer);
+   glBindFramebuffer(GL_FRAMEBUFFER, m_transFramebuffer);
+   glActiveTexture(GL_TEXTURE0);
+   glGenTextures(1, &m_transTexture);
+   glBindTexture(GL_TEXTURE_2D, m_transTexture);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_transTexture, 0);
+   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+      /* error */
+      MMDAgent_snprintf(m_infoLog, 512, "could not generate frame buffer for resolving");
+      glDeleteTextures(1, &m_transTexture);
+      glDeleteFramebuffers(1, &m_transFramebuffer);
+      return false;
+   }
+   /* revert to default frame buffer (screen) */
+   glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+   if (m_tpPixels)
+      free(m_tpPixels);
+   m_tpPixels = (void *)malloc(m_width * m_height * 4);
+
+   m_transparentActive = true;
+   m_requireSurfaceInit = true;
+
+   return true;
+}
+
+/* RenderOffScreen::clearTransparentBuffers: clear transparent buffers */
+void RenderOffScreen::clearTransparentBuffers()
+{
+   if (m_transparentActive) {
+      glDeleteTextures(1, &m_transTexture);
+      glDeleteFramebuffers(1, &m_transFramebuffer);
+   }
+   m_transFramebuffer = 0;
+   m_transTexture = 0;
+
+   if (m_tpPixels)
+      free(m_tpPixels);
+   m_tpPixels = NULL;
+
+   m_transparentActive = false;
+   m_requireSurfaceInit = true;
 }
 
 /* RenderOffScreen::updateRender: update render status */
@@ -355,10 +447,42 @@ void RenderOffScreen::updateRender()
    if (m_render == NULL)
       return;
 
-   m_render->setDefaultFrameBufferId(m_framebuffer);
-   if (m_buffersRequireInit) {
+   /* update status and initialize or clear buffers */
+   if (m_effect || m_transparent)
+      m_base = true;
+   else
+      m_base = false;
+
+   if (m_baseCurrent == false && m_base == true) {
+      initBaseBuffers();
+   } else if (m_baseCurrent == true && m_base == false) {
+      clearBaseBuffers();
+   }
+   m_baseCurrent = m_base;
+
+   if (m_effectCurrent == false && m_effect == true) {
+      initEffectBuffers();
+   } else if (m_effectCurrent == true && m_effect == false) {
+      clearEffectBuffers();
+   }
+   m_effectCurrent = m_effect;
+
+   if (m_transparentCurrent == false && m_transparent == true) {
+      initTransparentBuffers();
+   } else if (m_transparentCurrent == true && m_transparent == false) {
+      clearTransparentBuffers();
+   }
+   m_transparentCurrent = m_transparent;
+
+   /* set up rendering surface */
+   if (m_base)
+      m_render->setDefaultFrameBufferId(m_framebuffer);
+   else
+      m_render->setDefaultFrameBufferId(0);
+
+   if (m_requireSurfaceInit) {
       m_render->initSurface();
-      m_buffersRequireInit = false;
+      m_requireSurfaceInit = false;
    }
 }
 
@@ -446,9 +570,13 @@ const char *RenderOffScreen::getInfoLog()
 /* RenderOffScreen::start: start off-screen rendering */
 void RenderOffScreen::start()
 {
-   if (m_enabled == false)
+   if (m_skip)
       return;
-   if (m_buffersActive == false || m_shaderLoaded == false)
+   if (m_baseActive == false)
+      return;
+   if (m_effectCurrent && m_effectActive == false)
+      return;
+   if (m_transparentCurrent && m_transparentActive == false)
       return;
 
    glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
@@ -457,9 +585,13 @@ void RenderOffScreen::start()
 /* RenderOffScreen::finish: finish off-screen rendering */
 void RenderOffScreen::finish()
 {
-   if (m_enabled == false)
+   if (m_skip)
       return;
-   if (m_buffersActive == false || m_shaderLoaded == false)
+   if (m_baseActive == false)
+      return;
+   if (m_effectCurrent && m_effectActive == false)
+      return;
+   if (m_transparentCurrent && m_transparentActive == false)
       return;
 
    /* draw rendered texture back to screen */
@@ -468,62 +600,102 @@ void RenderOffScreen::finish()
    glBindFramebuffer(GL_READ_FRAMEBUFFER, m_framebuffer);
    glBlitFramebuffer(0, 0,m_width, m_height, 0, 0, m_width, m_height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
-   /* tell GPU to activate shader for the following drawings */
-   glUseProgram(m_shaderProgram);
-   GLint textureLocation = glGetUniformLocation(m_shaderProgram, "screenTexture");
-   GLint processedTextureLocation = glGetUniformLocation(m_shaderProgram, "processedTexture");
-   GLint resolutionLocation = glGetUniformLocation(m_shaderProgram, "resolution");
-   GLint strengthLocation = glGetUniformLocation(m_shaderProgram, "Strength");
-   GLint scalingLocation = glGetUniformLocation(m_shaderProgram, "scaling");
-   GLint horizontalLocation = glGetUniformLocation(m_shaderProgram, "horizontal");
-   glUniform1i(textureLocation, 3);
-   glUniform1i(processedTextureLocation, 2);
-   glUniform2f(resolutionLocation, static_cast<float>(m_width), static_cast<float>(m_height));
-   glUniform1f(strengthLocation, m_intensity);
-   glUniform1f(scalingLocation, m_scalingFactor);
+   GLint horizontalLocation;
 
-   /* process resolved texture to generate processed texture */
-   glUniform1i(horizontalLocation, 1);
-   glBindFramebuffer(GL_FRAMEBUFFER, m_processFramebuffer);
-   glClear(GL_COLOR_BUFFER_BIT);
-   glActiveTexture(GL_TEXTURE0 + 3);
-   glBindTexture(GL_TEXTURE_2D, m_resolvedTexture);
-   glBindVertexArray(m_quadVAO);
-   glDrawArrays(GL_TRIANGLES, 0, 6);
+   if (m_effectActive) {
+      /* tell GPU to activate shader for the following drawings */
+      glUseProgram(m_shaderProgram);
+      GLint textureLocation = glGetUniformLocation(m_shaderProgram, "screenTexture");
+      GLint processedTextureLocation = glGetUniformLocation(m_shaderProgram, "processedTexture");
+      GLint resolutionLocation = glGetUniformLocation(m_shaderProgram, "resolution");
+      GLint strengthLocation = glGetUniformLocation(m_shaderProgram, "Strength");
+      GLint scalingLocation = glGetUniformLocation(m_shaderProgram, "scaling");
+      horizontalLocation = glGetUniformLocation(m_shaderProgram, "horizontal");
+      glUniform1i(textureLocation, 3);
+      glUniform1i(processedTextureLocation, 2);
+      glUniform2f(resolutionLocation, static_cast<float>(m_width), static_cast<float>(m_height));
+      glUniform1f(strengthLocation, m_intensity);
+      glUniform1f(scalingLocation, m_scalingFactor);
+
+      /* process resolved texture to generate processed texture */
+      glUniform1i(horizontalLocation, 1);
+      glBindFramebuffer(GL_FRAMEBUFFER, m_processFramebuffer);
+      glClear(GL_COLOR_BUFFER_BIT);
+      glActiveTexture(GL_TEXTURE0 + 3);
+      glBindTexture(GL_TEXTURE_2D, m_resolvedTexture);
+      glBindVertexArray(m_quadVAO);
+      glDrawArrays(GL_TRIANGLES, 0, 6);
+   }
 
    /* revert to screen buffer */
    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-   /* clear screen */
-   glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-   /* disable unused tests for performance */
-   glDisable(GL_DEPTH_TEST);
-   /* render texture to screen width resolved texture and processed texture */
-   glUniform1i(horizontalLocation, 0);
-   glActiveTexture(GL_TEXTURE0 + 3);
-   glBindTexture(GL_TEXTURE_2D, m_resolvedTexture);
-   glActiveTexture(GL_TEXTURE0 + 2);
-   glBindTexture(GL_TEXTURE_2D, m_processTextureColorbuffer);
-   glBindVertexArray(m_quadVAO);
-   glDrawArrays(GL_TRIANGLES, 0, 6);
-   /* revert to default settings */
-   glBindTexture(GL_TEXTURE_2D, 0);
-   glActiveTexture(GL_TEXTURE0);
-   glUseProgram(0);
-   glBindBuffer(GL_ARRAY_BUFFER, 0);
-   glBindVertexArray(0);
-   glEnable(GL_DEPTH_TEST);
+
+   if (m_transparentActive) {
+      if (m_effectActive) {
+         /* re-render final result to texture */
+         glBindFramebuffer(GL_FRAMEBUFFER, m_transFramebuffer);
+         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+         glUniform1i(horizontalLocation, 0);
+         glActiveTexture(GL_TEXTURE0 + 3);
+         glBindTexture(GL_TEXTURE_2D, m_resolvedTexture);
+         glActiveTexture(GL_TEXTURE0 + 2);
+         glBindTexture(GL_TEXTURE_2D, m_processTextureColorbuffer);
+         glBindVertexArray(m_quadVAO);
+         glDrawArrays(GL_TRIANGLES, 0, 6);
+         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+         glBindTexture(GL_TEXTURE_2D, m_transTexture);
+      } else {
+         /* use first resolved texture */
+         glBindTexture(GL_TEXTURE_2D, m_resolvedTexture);
+      }
+      glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_tpPixels);
+      glBindTexture(GL_TEXTURE_2D, 0);
+      glActiveTexture(GL_TEXTURE0);
+      if (m_effectActive) {
+         glUseProgram(0);
+         glBindBuffer(GL_ARRAY_BUFFER, 0);
+         glBindVertexArray(0);
+      }
+      glEnable(GL_DEPTH_TEST);
+      // RGBA to BGRA
+      GLubyte *data = (GLubyte *)m_tpPixels;
+      for (int i = 0; i < m_width * m_height; i++) {
+         GLubyte tmp = data[i * 4 + 0];
+         data[i * 4 + 0] = data[i * 4 + 2];
+         data[i * 4 + 2] = tmp;
+      }
+      glfwUpdateTransparent(m_width, m_height, m_tpPixels);
+   } else {
+      /* clear screen */
+      glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      /* disable unused tests for performance */
+      glDisable(GL_DEPTH_TEST);
+      /* render texture to screen width resolved texture and processed texture */
+      glUniform1i(horizontalLocation, 0);
+      glActiveTexture(GL_TEXTURE0 + 3);
+      glBindTexture(GL_TEXTURE_2D, m_resolvedTexture);
+      glActiveTexture(GL_TEXTURE0 + 2);
+      glBindTexture(GL_TEXTURE_2D, m_processTextureColorbuffer);
+      glBindVertexArray(m_quadVAO);
+      glDrawArrays(GL_TRIANGLES, 0, 6);
+      /* revert to default settings */
+      glBindTexture(GL_TEXTURE_2D, 0);
+      glActiveTexture(GL_TEXTURE0);
+      glUseProgram(0);
+      glBindBuffer(GL_ARRAY_BUFFER, 0);
+      glBindVertexArray(0);
+      glEnable(GL_DEPTH_TEST);
+   }
 }
 
 /* RenderOffScreen::pause: pause */
 void RenderOffScreen::pause()
 {
    if (m_pauseCount == 0) {
-      if (m_enabled == true) {
-         clearBuffers();
-         m_enabled = false;
-         updateRender();
-      }
+      m_skip = true;
+      m_render->setDefaultFrameBufferId(0);
+      m_render->initSurface();
    }
    m_pauseCount++;
 }
@@ -536,11 +708,8 @@ void RenderOffScreen::resume()
 
    m_pauseCount--;
    if (m_pauseCount == 0) {
-      if (m_intensity > 0.0f) {
-         initBuffers();
-         m_enabled = true;
-         updateRender();
-      }
+      m_skip = false;
+      updateRender();
    }
 }
 
@@ -550,39 +719,53 @@ void RenderOffScreen::changeScreenSize(int width, int height)
    m_width = width;
    m_height = height;
 
-   if (m_buffersActive == false || m_shaderLoaded == false)
+   if (m_skip)
       return;
-   if (m_enabled == false)
+   if (m_baseActive == false)
+      return;
+   if (m_effectCurrent && m_effectActive == false)
+      return;
+   if (m_transparentCurrent && m_transparentActive == false)
       return;
 
-   glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
-   glActiveTexture(GL_TEXTURE0 + 3);
-   glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_textureColorbuffer);
-   glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGBA8, m_width, m_height, GL_TRUE);
+   if (m_baseActive) {
+      glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
+      glActiveTexture(GL_TEXTURE0 + 3);
+      glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_textureColorbuffer);
+      glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGBA8, m_width, m_height, GL_TRUE);
+      glBindRenderbuffer(GL_RENDERBUFFER, m_renderbuffer);
+      glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, m_width, m_height);
+      glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_renderbuffer);
 
-   /* generate render buffer to render with depth test and stencil test */
-   glBindRenderbuffer(GL_RENDERBUFFER, m_renderbuffer);
-   glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, m_width, m_height);
-   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_renderbuffer);
-
-   glBindFramebuffer(GL_FRAMEBUFFER, m_resolveFramebuffer);
-   glActiveTexture(GL_TEXTURE0 + 3);
-   glBindTexture(GL_TEXTURE_2D, m_resolvedTexture);
-   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_resolvedTexture, 0);
-
-   glBindFramebuffer(GL_FRAMEBUFFER, m_processFramebuffer);
-   glActiveTexture(GL_TEXTURE0 + 3);
-   glBindTexture(GL_TEXTURE_2D, m_processTextureColorbuffer);
-   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_processTextureColorbuffer, 0);
+      glBindFramebuffer(GL_FRAMEBUFFER, m_resolveFramebuffer);
+      glActiveTexture(GL_TEXTURE0 + 3);
+      glBindTexture(GL_TEXTURE_2D, m_resolvedTexture);
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_resolvedTexture, 0);
+   }
+   if (m_effectActive) {
+      glBindFramebuffer(GL_FRAMEBUFFER, m_processFramebuffer);
+      glActiveTexture(GL_TEXTURE0 + 3);
+      glBindTexture(GL_TEXTURE_2D, m_processTextureColorbuffer);
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_processTextureColorbuffer, 0);
+   }
+   if (m_transparentActive) {
+      glBindFramebuffer(GL_FRAMEBUFFER, m_transFramebuffer);
+      glActiveTexture(GL_TEXTURE0);
+      glBindTexture(GL_TEXTURE_2D, m_transTexture);
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_transTexture, 0);
+      if (m_tpPixels)
+         free(m_tpPixels);
+      m_tpPixels = (void *)malloc(m_width * m_height * 4);
+   }
 
    /* revert to default frame buffer (screen) */
    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
    /* revert texture unit to default */
    glActiveTexture(GL_TEXTURE0);
-
 }
 
 /* RenderOffScreen::getIntensity: get intensity */
@@ -595,12 +778,10 @@ float RenderOffScreen::getIntensity()
 void RenderOffScreen::setParam(float intensity, float scaling)
 {
    m_intensity = intensity;
-   if (m_enabled == false && m_intensity > 0.0f) {
-      m_enabled = true;
-      initBuffers();
-   } else if (m_enabled == true && m_intensity == 0.0f) {
-      clearBuffers();
-      m_enabled = false;
+   if (m_effect == false && m_intensity > 0.0f) {
+      m_effect = true;
+   } else if (m_effect == true && m_intensity == 0.0f) {
+      m_effect = false;
    }
    m_scalingFactor = scaling;
    updateRender();
@@ -610,13 +791,11 @@ void RenderOffScreen::setParam(float intensity, float scaling)
 void RenderOffScreen::setRelativeIntensity(float addval)
 {
    if (m_intensity == 0.0f) {
-      m_enabled = true;
-      initBuffers();
+      m_effect = true;
    }
    m_intensity += addval;
    if (m_intensity > 1.0f) {
-      clearBuffers();
-      m_enabled = false;
+      m_effect = false;
       m_intensity = 0.0f;
    }
    updateRender();
@@ -635,4 +814,51 @@ void RenderOffScreen::setRelativeScaling(float mulval)
    if (m_scalingFactor > 5.0f) {
       m_scalingFactor = 1.0f;
    }
+}
+
+/* RenderOffScreen::isTransparentWindow: true when window is transparent */
+bool RenderOffScreen::isTransparentWindow()
+{
+   return m_tpWindow;
+}
+
+/* RenderOffScreen::enableTransparentWindow: enable transparent window */
+bool RenderOffScreen::enableTransparentWindow(const float *transparentColor, bool usePixmap)
+{
+#ifdef MMDAGENT_TRANSPARENT_WINDOW
+   if (m_tpWindow)
+      return true;
+   m_tpUsePixmap = usePixmap;
+   if (m_tpUsePixmap) {
+      /* if usePixmap is true, enable pixmap-based transparenct method */
+      m_transparent = true;
+      updateRender();
+   }
+   m_render->setBackgroundTransparency(m_tpUsePixmap);
+   glfwEnableTransparent(transparentColor, m_tpUsePixmap);
+
+   m_tpWindow = true;
+   return true;
+#else
+   return false;
+#endif /* MMDAGENT_TRANSPARENT_WINDOW */
+}
+
+/* RenderOffScreen::disableTransparentWindow: disable transparent window */
+bool RenderOffScreen::disableTransparentWindow()
+{
+#ifdef MMDAGENT_TRANSPARENT_WINDOW
+   if (m_tpWindow == false)
+      return true;
+   if (m_tpUsePixmap) {
+      m_transparent = false;
+      updateRender();
+   }
+   glfwDisableTransparent();
+   m_render->setBackgroundTransparency(false);
+   m_tpWindow = false;
+   return true;
+#else
+   return true;
+#endif /* MMDAGENT_TRANSPARENT_WINDOW */
 }

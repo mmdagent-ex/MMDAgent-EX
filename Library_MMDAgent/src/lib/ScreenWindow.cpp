@@ -74,10 +74,6 @@ void ScreenWindow::initialize()
    m_mouseActiveLeftFrame = 0.0;
    m_fullScreen = false;
    m_HideTitleBar = false;
-
-#ifdef MMDAGENT_TRANSPARENT_WINDOW
-   m_transparentWindow = false;
-#endif /* MMDAGENT_TRANSPARENT_WINDOW */
 }
 
 /* ScreenWindow::clear: free screen */
@@ -134,36 +130,8 @@ bool ScreenWindow::setup(const int *size, const char *title, int maxMultiSamplin
 
    glfwSwapInterval(m_intervalFrameOfVsync);
 
-#ifdef MMDAGENT_TRANSPARENT_WINDOW
-   /* set initial transparent state */
-   m_transparentWindow = false;
-#endif /* MMDAGENT_TRANSPARENT_WINDOW */
-
    m_enable = true;
    return true;
-}
-
-/* ScreenWindow::setTransparentWindow: set transparent window */
-bool ScreenWindow::setTransparentWindow(const float *transparentColor)
-{
-#ifdef MMDAGENT_TRANSPARENT_WINDOW
-   if (transparentColor) {
-      glfwEnableTransparent(transparentColor);
-      m_transparentWindow = true;
-   } else {
-      glfwDisableTransparent();
-      m_transparentWindow = false;
-   }
-   return true;
-#else /* ~MMDAGENT_TRANSPARENT_WINDOW */
-   return false;
-#endif /* MMDAGENT_TRANSPARENT_WINDOW */
-}
-
-/* ScreenWindow::isTransparentWindow: return true when transparent window */
-bool ScreenWindow::isTransparentWindow()
-{
-   return m_transparentWindow;
 }
 
 /* ScreenWindow::swapBuffers: swap buffers */

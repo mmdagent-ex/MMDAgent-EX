@@ -2337,24 +2337,6 @@ bool MMDAgent::setupWorld()
    if (m_option->getFullScreen() == true)
       m_screen->setFullScreen();
 
-   /* set transparent window */
-   if (m_option->getTransparentWindow() == true && m_screen->isTransparentWindow() == false) {
-      const float *tcol = m_option->getTransparentColor();
-      if (m_screen->setTransparentWindow(tcol) == false) {
-         sendLogString(m_moduleId, MLOG_ERROR, "failed to make screen transparent");
-         clear();
-         return false;
-      }
-      sendLogString(m_moduleId, MLOG_STATUS, "transparent screen, color=(%.1f,%.1f,%.1f)", tcol[0], tcol[1], tcol[2]);
-   } else if (m_option->getTransparentWindow() == false && m_screen->isTransparentWindow() == true) {
-      if (m_screen->setTransparentWindow(NULL) == false) {
-         sendLogString(m_moduleId, MLOG_ERROR, "failed to make screen non-transparent");
-         clear();
-         return false;
-      }
-      sendLogString(m_moduleId, MLOG_STATUS, "transparent screen reverted");
-   }
-
    /* update light */
    updateLight();
 
@@ -2396,6 +2378,28 @@ bool MMDAgent::setupWorld()
    if (m_option->getUseHttpServer() == true) {
       m_httpServer = new HttpServer(this, m_option->getHttpServerPortNumber());
       m_httpServer->start();
+   }
+
+   /* set transparent window handling */
+   if (m_offscreen) {
+      if (m_option->getTransparentWindow() == true && m_offscreen->isTransparentWindow() == false) {
+         /* enable */
+         const float *tcol = m_option->getTransparentColor();
+         if (m_offscreen->enableTransparentWindow(tcol, m_option->getTransparentPixmap()) == false) {
+            sendLogString(m_moduleId, MLOG_ERROR, "failed to make screen transparent");
+            clear();
+            return false;
+         }
+         sendLogString(m_moduleId, MLOG_STATUS, "transparent screen enabled");
+      } else if (m_option->getTransparentWindow() == false && m_offscreen->isTransparentWindow() == true) {
+         /* disable */
+         if (m_offscreen->disableTransparentWindow() == false) {
+            sendLogString(m_moduleId, MLOG_ERROR, "failed to make screen non-transparent");
+            clear();
+            return false;
+         }
+         sendLogString(m_moduleId, MLOG_STATUS, "transparent screen disabled");
+      }
    }
 
    return true;
@@ -6137,22 +6141,23 @@ void MMDAgent::procReceivedMessage(const char *type, const char *value)
          }
          tcol = fvec;
       }
-      if (m_screen->setTransparentWindow(tcol) == false) {
+      /* enable */
+      if (m_offscreen && m_offscreen->enableTransparentWindow(tcol, m_option->getTransparentPixmap()) == false) {
          sendLogString(m_moduleId, MLOG_ERROR, "%s: failed to make screen transparent", type);
          return;
       }
-      sendLogString(m_moduleId, MLOG_STATUS, "transparent screen, color=(%.1f,%.1f,%.1f)", tcol[0], tcol[1], tcol[2]);
+      sendLogString(m_moduleId, MLOG_STATUS, "transparent screen enabled");
    } else if (MMDAgent_strequal(type, MMDAGENT_COMMAND_TRANSPARENT_STOP)) {
-      sendLogString(m_moduleId, MLOG_MESSAGE_CAPTURED, "%s|%s", type, value);
+      sendLogString(m_moduleId, MLOG_MESSAGE_CAPTURED, "%s", type);
       if (num != 0) {
          sendLogString(m_moduleId, MLOG_ERROR, "%s: should have no argument.", type);
          return;
       }
-      if (m_screen->setTransparentWindow(NULL) == false) {
-         sendLogString(m_moduleId, MLOG_ERROR, "failed to make screen non-transparent");
+      if (m_offscreen && m_offscreen->disableTransparentWindow() == false) {
+         sendLogString(m_moduleId, MLOG_ERROR, "%s: failed to make screen non-transparent", type);
          return;
       }
-      sendLogString(m_moduleId, MLOG_STATUS, "transparent screen reverted");
+      sendLogString(m_moduleId, MLOG_STATUS, "transparent screen disabled");
    }
    if (m_infotext)
       m_infotext->processMessage(type, argv, num);
