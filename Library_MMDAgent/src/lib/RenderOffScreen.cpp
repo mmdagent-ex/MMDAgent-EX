@@ -664,7 +664,9 @@ void RenderOffScreen::finish()
          data[i * 4 + 0] = data[i * 4 + 2];
          data[i * 4 + 2] = tmp;
       }
+#ifdef MMDAGENT_TRANSPARENT_WINDOW
       glfwUpdateTransparent(m_width, m_height, m_tpPixels);
+#endif
    } else {
       /* clear screen */
       glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
