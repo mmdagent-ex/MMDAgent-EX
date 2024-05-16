@@ -27,8 +27,9 @@ private:
    GLuint m_processTextureColorbuffer;  /* second texture buffer for second pass rendering */
    GLuint m_quadVBO;              /* VBO for drawing resolve texture on screen */
    GLuint m_quadVAO;              /* VAO for drawing resolve texture on screen */
-   bool m_buffersActive;          /* true when buffers are assigned */
-   bool m_buffersRequireInit;     /* true when buffers are just assigned and needs initialization */
+   GLuint m_transFramebuffer;
+   GLuint m_transTexture;
+   bool m_requireSurfaceInit;     /* true when buffers are just assigned and needs initialization */
 
    GLuint m_shaderProgram;   /* shader program id */
    bool m_shaderLoaded;      /* true when shader has been loaded */
@@ -37,12 +38,26 @@ private:
    int m_width;            /* screen width */
    int m_height;           /* screen height */
 
-   bool m_enabled;         /* true when off-screen rendering is enabled now */
    float m_intensity;      /* intensity of effect */
    float m_scalingFactor;  /* scale of effect */
 
    Render *m_render;       /* render buffer */
    int m_pauseCount;       /* pause call counter */
+   bool m_skip;
+
+   bool m_tpUsePixmap;      /* ttue when use pixmap, else use color-based */
+   void *m_tpPixels; /* pixel work area */
+   bool m_tpWindow;
+
+   bool m_base;         /* true when base off-screen rendering is enabled */
+   bool m_effect;       /* true when effect rendering is enabled */
+   bool m_transparent;  /* true when current window is (being) transparent */
+   bool m_baseCurrent;
+   bool m_effectCurrent;
+   bool m_transparentCurrent;
+   bool m_baseActive;          /* true when base buffers are assigned */
+   bool m_effectActive;        /* true when effect buffers are assigned */
+   bool m_transparentActive;   /* true when transparent buffers are assigned */
 
    /* initialize: initialzie Render */
    void initialize();
@@ -53,11 +68,23 @@ private:
    /* loadShader: load shader programs */
    bool loadShader();
 
-   /* initBuffers: initialize buffers */
-   bool initBuffers();
+   /* initBaseBuffers: initialize base buffers */
+   bool initBaseBuffers();
 
-   /* clearBuffers: clear buffers */
-   void clearBuffers();
+   /* initEffectBuffers: initialize effect buffers */
+   bool initEffectBuffers();
+
+   /* initTransparentBuffers: initialize transparent buffers */
+   bool initTransparentBuffers();
+
+   /* clearBaseBuffers: clear base buffers */
+   void clearBaseBuffers();
+
+   /* clearEffectBuffers: clear effect buffers */
+   void clearEffectBuffers();
+
+   /* clearTransparentBuffers: clear transparent buffers */
+   void clearTransparentBuffers();
 
 public:
 
@@ -106,4 +133,12 @@ public:
    /* setRelativeScaling: set relative scaling */
    void setRelativeScaling(float mulval);
 
+   /* isTransparentWindow: true when window is transparent */
+   bool isTransparentWindow();
+
+   /* enableTransparentWindow: enable transparent window */
+   bool enableTransparentWindow(const float *transparentColor, bool usePixmap);
+
+   /* disableTransparentWindow: disable transparent window */
+   bool disableTransparentWindow();
 };

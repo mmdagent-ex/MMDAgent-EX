@@ -54,12 +54,6 @@
 /* POSSIBILITY OF SUCH DAMAGE.                                       */
 /* ----------------------------------------------------------------- */
 
-#ifdef _WIN32
-#define MMDAGENT_TRANSPARENT_WINDOW
-#else
-#undef MMDAGENT_TRANSPARENT_WINDOW
-#endif /* _WIN32 */
-
 /* ScreenWindow: screen window */
 class ScreenWindow
 {
@@ -73,10 +67,6 @@ private:
    double m_mouseActiveLeftFrame;    /* store display frame after moving mouse */
    bool m_fullScreen;                /* true if full screen mode */
    bool m_HideTitleBar;              /* true when hiding title bar */
-
-#ifdef MMDAGENT_TRANSPARENT_WINDOW
-   bool m_transparentWindow;         /* true when current window is (being) transparent */
-#endif /* MMDAGENT_TRANSPARENT_WINDOW */
 
    /* initialize: initialize screen */
    void initialize();

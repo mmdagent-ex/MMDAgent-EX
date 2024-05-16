@@ -459,7 +459,7 @@ void Render::renderSceneShadowMap(PMDObject *objs, const int *order, int num, St
    if (m_doppelShadowFlag) {
       glDisable(GL_DEPTH_TEST);
       glDisable(GL_LIGHTING);
-      glColor4f(m_doppelShadowColor[0], m_doppelShadowColor[1], m_doppelShadowColor[2], 1.0f);
+      glColor4f(m_doppelShadowColor[0], m_doppelShadowColor[1], m_doppelShadowColor[2], m_backgroundTransparency ? 0.0f : 1.0f);
       glPushMatrix();
       glLoadIdentity();
       glTranslatef(m_doppelShadowOffset[0], m_doppelShadowOffset[1], m_doppelShadowOffset[2]);
@@ -602,7 +602,7 @@ void Render::renderScene(PMDObject *objs, const int *order, int num, Stage *stag
    bool toonLight = true;
 
    /* clear rendering buffer */
-   glClearColor(m_backgroundColor[0], m_backgroundColor[1], m_backgroundColor[2], 1.0f);
+   glClearColor(m_backgroundColor[0], m_backgroundColor[1], m_backgroundColor[2], m_backgroundTransparency ? 0.0f : 1.0f);
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
    glEnable(GL_CULL_FACE);
@@ -641,7 +641,7 @@ void Render::renderScene(PMDObject *objs, const int *order, int num, Stage *stag
    if (m_doppelShadowFlag) {
       glDisable(GL_DEPTH_TEST);
       glDisable(GL_LIGHTING);
-      glColor4f(m_doppelShadowColor[0], m_doppelShadowColor[1], m_doppelShadowColor[2], 1.0f);
+      glColor4f(m_doppelShadowColor[0], m_doppelShadowColor[1], m_doppelShadowColor[2], m_backgroundTransparency ? 0.0 : 1.0f);
       glPushMatrix();
       glLoadIdentity();
       glTranslatef(m_doppelShadowOffset[0], m_doppelShadowOffset[1], m_doppelShadowOffset[2]);
@@ -693,7 +693,7 @@ void Render::renderScene(PMDObject *objs, const int *order, int num, Stage *stag
       glStencilMask(0x0);
       glDisable(GL_DEPTH_TEST);
       glDisable(GL_LIGHTING);
-      glColor4f(shadowDensity, shadowDensity, shadowDensity, 1.0f );
+      glColor4f(shadowDensity, shadowDensity, shadowDensity, m_backgroundTransparency ? 0.0f : 1.0f);
       stage->renderFloor();
       glEnable(GL_DEPTH_TEST);
       glDepthMask(GL_TRUE);
@@ -859,9 +859,9 @@ void Render::renderBloomTexture(PMDObject *objs, const int *order, int num, Stag
    glBindFramebuffer(GL_FRAMEBUFFER, m_bloomFboID);
 
    /* clear rendering buffer in black */
-   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+   glClearColor(0.0f, 0.0f, 0.0f, m_backgroundTransparency ? 0.0f : 1.0f);
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-   glClearColor(m_backgroundColor[0], m_backgroundColor[1], m_backgroundColor[2], 1.0f);
+   glClearColor(m_backgroundColor[0], m_backgroundColor[1], m_backgroundColor[2], m_backgroundTransparency ? 0.0 : 1.0);
 
    /* render depth information for bloom */
    /* write only depth information */
@@ -1152,6 +1152,8 @@ void Render::initialize()
    m_doppelShadowFlag = false;
 
    m_defaultFrameBuffer = 0;
+
+   m_backgroundTransparency = false;
 }
 
 /* Render::clear: free Render */
@@ -1180,7 +1182,7 @@ Render::~Render()
 bool Render::initSurface()
 {
    /* set clear color */
-   glClearColor(m_backgroundColor[0], m_backgroundColor[1], m_backgroundColor[2], 1.0f);
+   glClearColor(m_backgroundColor[0], m_backgroundColor[1], m_backgroundColor[2], m_backgroundTransparency ? 0.0 : 1.0);
 
    glClearStencil(0);
 
@@ -1724,4 +1726,10 @@ void Render::setDefaultFrameBufferId(GLuint id)
 {
    m_defaultFrameBuffer = id;
    glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFrameBuffer);
+}
+
+/* Render::setBackgroundTransparency: set background transparency */
+void Render::setBackgroundTransparency(bool flag)
+{
+   m_backgroundTransparency = flag;
 }

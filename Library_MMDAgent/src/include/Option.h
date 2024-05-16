@@ -314,6 +314,9 @@
 #define OPTION_TRANSPARENTCOLOR_MAX  1.0f
 #define OPTION_TRANSPARENTCOLOR_MIN  0.0f
 
+#define OPTION_TRANSPARENTPIXMAP_STR "transparent_pixmap"
+#define OPTION_TRANSPARENTPIXMAP_DEF false
+
 /* Option: user options */
 class Option
 {
@@ -423,6 +426,7 @@ private:
    /* transparent window */
    bool m_transparentWindow;
    float m_transparentColor[3];
+   bool m_transparentPixmap;
 
    /* initialize: initialize options */
    void initialize();
@@ -749,4 +753,11 @@ public:
 
    /* setTransparentColor: set transparent color */
    void setTransparentColor(const float* f);
+
+   /* getTransparentPixmap: get transparent pixmap */
+   bool getTransparentPixmap();
+
+   /* setTransparentPixmap: set transparent pixmap */
+   void setTransparentPixmap(bool b);
+
 };
