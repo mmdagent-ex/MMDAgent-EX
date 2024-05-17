@@ -853,6 +853,9 @@ public:
 
    /* getKeyHandler: get key handler */
    KeyHandler *getKeyHandler();
+
+   /* procToggleTransparent: process toggle transparent window */
+   void procToggleTransparent();
 };
 
 class LogToFile {

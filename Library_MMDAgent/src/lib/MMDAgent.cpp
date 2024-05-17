@@ -6756,6 +6756,33 @@ KeyHandler *MMDAgent::getKeyHandler()
    return &m_keyHandler;
 }
 
+/* MMDAgent::procToggleTransparent: process toggle transparent window */
+void MMDAgent::procToggleTransparent()
+{
+   if (m_enable == false)
+      return;
+
+   if (m_offscreen == NULL)
+      return;
+
+   if (m_option == NULL)
+      return;
+
+   if (m_offscreen->isTransparentWindow()) {
+      if (m_offscreen->disableTransparentWindow() == false) {
+         sendLogString(m_moduleId, MLOG_ERROR, "failed to make screen non-transparent");
+         return;
+      }
+      sendLogString(m_moduleId, MLOG_STATUS, "transparent screen disabled");
+   } else {
+      if (m_offscreen->enableTransparentWindow(m_option->getTransparentColor(), m_option->getTransparentPixmap()) == false) {
+         sendLogString(m_moduleId, MLOG_ERROR, "failed to make screen transparent");
+         return;
+      }
+      sendLogString(m_moduleId, MLOG_STATUS, "transparent screen enabled");
+   }
+}
+
 /* LogToFile::initialize: initialize LogToFile */
 void LogToFile::initialize()
 {

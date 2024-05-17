@@ -1623,15 +1623,18 @@ void _glfwPlatformEnableFullScreen( void )
     GetWindowRect( _glfwWin.window, &_glfwWin.originalWindowSize );
 
     // Remove window appendage
-    dwStyle = GetWindowLong( _glfwWin.window, GWL_STYLE );
-    dwStyle &= ~WS_CAPTION;
-    dwStyle &= ~WS_SYSMENU;
-    dwStyle &= ~WS_MINIMIZEBOX;
-    dwStyle &= ~WS_THICKFRAME;
-    // with OWNDC window, WS_EX_LAYERED transparency breaks without WS_THICKFRAME
-    // keeping border with thinner WS_BORDER works, but I do not now why
-    dwStyle |= WS_BORDER;
-    SetWindowLong( _glfwWin.window, GWL_STYLE, dwStyle );
+    if (_glfwWin.isTransparent == 0) {
+       dwStyle = GetWindowLong(_glfwWin.window, GWL_STYLE);
+       dwStyle &= ~WS_CAPTION;
+       dwStyle &= ~WS_SYSMENU;
+       dwStyle &= ~WS_MINIMIZEBOX;
+       dwStyle &= ~WS_THICKFRAME;
+       SetWindowLong(_glfwWin.window, GWL_STYLE, dwStyle);
+    } else {
+       dwStyle = GetWindowLong(_glfwWin.window, GWL_STYLE);
+       dwStyle |= WS_BORDER;
+       SetWindowLong(_glfwWin.window, GWL_STYLE, dwStyle);
+    }
 
     // Set full screen
     GetWindowRect(_glfwWin.window, &rc);
@@ -1648,13 +1651,18 @@ void _glfwPlatformDisableFullScreen( void )
     DWORD dwStyle;
 
     // Reset window setting
-    dwStyle = GetWindowLong(_glfwWin.window, GWL_STYLE);
-    dwStyle &= ~WS_BORDER;
-    if (_glfwWin.hideTitleBar == 0)
-       dwStyle |= WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_THICKFRAME;
-    else
-       dwStyle |= WS_THICKFRAME;
-    SetWindowLong( _glfwWin.window, GWL_STYLE, dwStyle );
+    if (_glfwWin.isTransparent == 0) {
+       dwStyle = GetWindowLong(_glfwWin.window, GWL_STYLE);
+       if (_glfwWin.hideTitleBar == 0)
+          dwStyle |= WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_THICKFRAME;
+       else
+          dwStyle |= WS_THICKFRAME;
+       SetWindowLong(_glfwWin.window, GWL_STYLE, dwStyle);
+    } else {
+       dwStyle = GetWindowLong(_glfwWin.window, GWL_STYLE);
+       dwStyle &= ~WS_BORDER;
+       SetWindowLong(_glfwWin.window, GWL_STYLE, dwStyle);
+    }
 
     // Reset window size
     SetWindowPos( _glfwWin.window, NULL,
@@ -1785,8 +1793,25 @@ void _glfwPlatformEnableTrackMouseLeave(void)
 /* enable transparent window */
 void _glfwPlatformEnableTransparent(const float *col, int flag)
 {
+   DWORD dwStyle;
+
    if (_glfwWin.isTransparent == 1)
       return;
+
+   // Remove window appendage
+   if (_glfwWin.isFullScreen == 1) {
+      dwStyle = GetWindowLong(_glfwWin.window, GWL_STYLE);
+      dwStyle |= WS_BORDER;
+      SetWindowLong(_glfwWin.window, GWL_STYLE, dwStyle);
+   } else {
+      dwStyle = GetWindowLong(_glfwWin.window, GWL_STYLE);
+      dwStyle &= ~WS_CAPTION;
+      dwStyle &= ~WS_SYSMENU;
+      dwStyle &= ~WS_MINIMIZEBOX;
+      dwStyle &= ~WS_THICKFRAME;
+      SetWindowLong(_glfwWin.window, GWL_STYLE, dwStyle);
+   }
+   SetWindowPos(_glfwWin.window, NULL, 0, 0, 0, 0, (SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED));
 
    LONG style = GetWindowLong(_glfwWin.window, GWL_EXSTYLE);
    if (style == 0)
@@ -1837,7 +1862,9 @@ void _glfwPlatformUpdateTransparent(int width, int height, void *pixels)
 
    // update transparent window
    HBITMAP oldBitmap = (HBITMAP)SelectObject(memDC, hBitmap);
-   POINT ptPos = { 0, 0 };
+   RECT rectWindow;
+   GetWindowRect(_glfwWin.window, &rectWindow);
+   POINT ptPos = { rectWindow.left, rectWindow.top };
    SIZE sizeWnd = { width, height };
    POINT ptSrc = { 0, 0 };
    BLENDFUNCTION blend = { AC_SRC_OVER, 0, 255, AC_SRC_ALPHA };
@@ -1851,8 +1878,25 @@ void _glfwPlatformUpdateTransparent(int width, int height, void *pixels)
 /* disable transparent window */
 void _glfwPlatformDisableTransparent()
 {
+   DWORD dwStyle;
+
    if (_glfwWin.isTransparent == 0)
       return;
+
+   // Reset window setting
+   if (_glfwWin.isFullScreen == 1) {
+      dwStyle = GetWindowLong(_glfwWin.window, GWL_STYLE);
+      dwStyle &= ~WS_BORDER;
+      SetWindowLong(_glfwWin.window, GWL_STYLE, dwStyle);
+   } else {
+      dwStyle = GetWindowLong(_glfwWin.window, GWL_STYLE);
+      if (_glfwWin.hideTitleBar == 0)
+         dwStyle |= WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_THICKFRAME;
+      else
+         dwStyle |= WS_THICKFRAME;
+      SetWindowLong(_glfwWin.window, GWL_STYLE, dwStyle);
+   }
+   SetWindowPos(_glfwWin.window, NULL, 0, 0, 0, 0, (SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED));
 
    LONG style = GetWindowLong(_glfwWin.window, GWL_EXSTYLE);
    if (style == 0)
