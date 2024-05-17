@@ -491,6 +491,8 @@ bool KeyHandler::processCharMessage(int key, int action)
    case 'J':
       m_mmdagent->procToggleDoppelShadowMessage();
       break;
+   case 't':
+      m_mmdagent->procToggleTransparent();
    default:
       break;
    }
