@@ -154,8 +154,8 @@ private:
 
    GLuint m_defaultFrameBuffer;    /* default frame buffer to render */
 
-   bool m_backgroundTransparency;
-
+   bool m_backgroundForTransparent;         /* true when performing transparent window rendering */
+   float m_backgroundTransparentColor[4]; /* background color to be used while transparent window rendering */
 
    /* applyProjectionMatirx: update projection matrix */
    void applyProjectionMatrix(double nearVal, double farVal);
@@ -329,5 +329,5 @@ public:
    void setDefaultFrameBufferId(GLuint id);
 
    /* setBackgroundTransparency: set background transparency */
-   void setBackgroundTransparency(bool flag);
+   void setBackgroundTransparency(bool flag, const float *bgcolor);
 };

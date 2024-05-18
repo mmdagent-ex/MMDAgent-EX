@@ -828,6 +828,8 @@ bool RenderOffScreen::isTransparentWindow()
 bool RenderOffScreen::enableTransparentWindow(const float *transparentColor, bool usePixmap)
 {
 #ifdef MMDAGENT_TRANSPARENT_WINDOW
+   float trcol[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+
    if (m_tpWindow)
       return true;
    m_tpUsePixmap = usePixmap;
@@ -835,8 +837,13 @@ bool RenderOffScreen::enableTransparentWindow(const float *transparentColor, boo
       /* if usePixmap is true, enable pixmap-based transparenct method */
       m_transparent = true;
       updateRender();
+      m_render->setBackgroundTransparency(true, trcol);
+   } else {
+      for (int i = 0; i < 3; i++)
+         trcol[i] = transparentColor[i];
+      trcol[3] = 1.0f;
+      m_render->setBackgroundTransparency(true, trcol);
    }
-   m_render->setBackgroundTransparency(m_tpUsePixmap);
    glfwEnableTransparent(transparentColor, m_tpUsePixmap);
 
    m_tpWindow = true;
@@ -857,7 +864,7 @@ bool RenderOffScreen::disableTransparentWindow()
       updateRender();
    }
    glfwDisableTransparent();
-   m_render->setBackgroundTransparency(false);
+   m_render->setBackgroundTransparency(false, NULL);
    m_tpWindow = false;
    return true;
 #else
