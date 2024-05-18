@@ -648,7 +648,7 @@ void RenderOffScreen::finish()
          /* use first resolved texture */
          glBindTexture(GL_TEXTURE_2D, m_resolvedTexture);
       }
-      glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_tpPixels);
+      glGetTexImage(GL_TEXTURE_2D, 0, GL_BGRA, GL_UNSIGNED_BYTE, m_tpPixels);
       glBindTexture(GL_TEXTURE_2D, 0);
       glActiveTexture(GL_TEXTURE0);
       if (m_effectActive) {
@@ -657,13 +657,6 @@ void RenderOffScreen::finish()
          glBindVertexArray(0);
       }
       glEnable(GL_DEPTH_TEST);
-      // RGBA to BGRA
-      GLubyte *data = (GLubyte *)m_tpPixels;
-      for (int i = 0; i < m_width * m_height; i++) {
-         GLubyte tmp = data[i * 4 + 0];
-         data[i * 4 + 0] = data[i * 4 + 2];
-         data[i * 4 + 2] = tmp;
-      }
 #ifdef MMDAGENT_TRANSPARENT_WINDOW
       glfwUpdateTransparent(m_width, m_height, m_tpPixels);
 #endif
