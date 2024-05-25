@@ -21,6 +21,9 @@
 #define SHAPEMAP_MORPH_TUNE_MAXNUM 30
 #define SHAPEMAP_MORPH_TUNE_MAXLEN 10
 
+// default shapemap name on system folder
+#define SHAPEMAP_DEFAULT_FILENAME "default.shapemap"
+
 /* ShapeMap: bone/face shape mapper */
 class ShapeMap
 {
