@@ -117,6 +117,7 @@ private:
    int m_deleteMessageNum;                           /* length of m_deleteMessage */
 
    ShapeMap *m_shapeMap;                             /* shape map for controlling */
+   bool m_isShapeMapDefault;                         /* true when default shape map is used */
 
    /* motion capture work area */
    char *m_motionCaptureSaveFileName;             /* file name to save captured motion */
@@ -157,7 +158,7 @@ public:
    void release();
 
    /* load: load model */
-   bool load(const char *fileName, const char *alias, btVector3 *offsetPos, btQuaternion *offsetRot, bool forcedPosition, PMDBone *assignBone, PMDObject *assignObject, BulletPhysics *bullet, SystemTexture *systex, LipSync *sysLipSync, bool useCartoonRendering, float cartoonEdgeWidth, bool useLightEdge, btVector3 *light, float commentFrame, PMDModel *preloadedPMDModel = NULL);
+   bool load(const char *fileName, const char *alias, btVector3 *offsetPos, btQuaternion *offsetRot, bool forcedPosition, PMDBone *assignBone, PMDObject *assignObject, BulletPhysics *bullet, SystemTexture *systex, LipSync *sysLipSync, bool useCartoonRendering, float cartoonEdgeWidth, bool useLightEdge, btVector3 *light, float commentFrame, PMDModel *preloadedPMDModel, const char *appDirName);
 
    /* skipNextSimulation: skip next physics simulation */
    void skipNextSimulation();
@@ -302,6 +303,9 @@ public:
 
    /* getShapeMap: get shape map */
    ShapeMap *getShapeMap();
+
+   /* isShapeMapDefault: return true when using system default shape map */
+   bool isShapeMapDefault();
 
    /* setLoadingProgressRate: set loading progress rate */
    void setLoadingProgressRate(float value);

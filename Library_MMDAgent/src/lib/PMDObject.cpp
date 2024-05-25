@@ -114,6 +114,7 @@ void PMDObject::initialize()
    m_deleteMessageNum = 0;
 
    m_shapeMap = NULL;
+   m_isShapeMapDefault = false;
 
    m_motionCaptureSaveFileName = NULL;
    m_motionCaptureDataStorage[0] = m_motionCaptureDataStorage[1] = NULL;
@@ -191,12 +192,13 @@ void PMDObject::release()
 }
 
 /* PMDObject::load: load model */
-bool PMDObject::load(const char *fileName, const char *alias, btVector3 *offsetPos, btQuaternion *offsetRot, bool forcedPosition, PMDBone *assignBone, PMDObject *assignObject, BulletPhysics *bullet, SystemTexture *systex, LipSync *sysLipSync, bool useCartoonRendering, float cartoonEdgeWidth, bool useLightEdge, btVector3 *light, float commentFrame, PMDModel *preloadedPMDModel)
+bool PMDObject::load(const char *fileName, const char *alias, btVector3 *offsetPos, btQuaternion *offsetRot, bool forcedPosition, PMDBone *assignBone, PMDObject *assignObject, BulletPhysics *bullet, SystemTexture *systex, LipSync *sysLipSync, bool useCartoonRendering, float cartoonEdgeWidth, bool useLightEdge, btVector3 *light, float commentFrame, PMDModel *preloadedPMDModel, const char *appDirName)
 {
    int i;
    int len;
    char *buf;
    LipSync *lip;
+   char buff[MMDAGENT_MAXBUFLEN];
 
    if (fileName == NULL || alias == NULL) return false;
 
@@ -315,11 +317,12 @@ bool PMDObject::load(const char *fileName, const char *alias, btVector3 *offsetP
    clearLoadMessages();
    loadModelMessagesFromFile(fileName);
 
-   /* load shape2morph mapping data if exist */
+   /* load shape2morph mapping data */
    if (m_shapeMap) {
       delete m_shapeMap;
       m_shapeMap = NULL;
    }
+   m_isShapeMapDefault = false;
    char *mapFileName = (char *)malloc(MMDAgent_strlen(fileName) + 10);
    strcpy(mapFileName, fileName);
    strcat(mapFileName, ".shapemap");
@@ -331,6 +334,18 @@ bool PMDObject::load(const char *fileName, const char *alias, btVector3 *offsetP
          m_shapeMap = NULL;
       }
       free(dirname);
+   } else {
+      /* if not found, try to use system default */
+      MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%c%s", appDirName, MMDAGENT_DIRSEPARATOR, SHAPEMAP_DEFAULT_FILENAME);
+      if (MMDAgent_exist(buff)) {
+         m_shapeMap = new ShapeMap();
+         if (m_shapeMap->load(buff, m_pmd, appDirName) == false) {
+            delete m_shapeMap;
+            m_shapeMap = NULL;
+         } else {
+            m_isShapeMapDefault = true;
+         }
+      }
    }
    free(mapFileName);
 
@@ -1451,6 +1466,12 @@ bool PMDObject::stopCapture()
 ShapeMap *PMDObject::getShapeMap()
 {
    return m_shapeMap;
+}
+
+/* PMDObject::isShapeMapDefault: return true when using system default shape map */
+bool PMDObject::isShapeMapDefault()
+{
+   return m_isShapeMapDefault;
 }
 
 /* PMDObject::setLoadingProgressRate: set loading progress rate */

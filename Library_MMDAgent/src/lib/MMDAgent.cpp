@@ -481,12 +481,14 @@ bool MMDAgent::addModel(const char *modelAlias, const char *fileName, btVector3 
       free(name);
       return false;
    }
-   if (!m_model[id].load(fileName, name, &offsetPos, &offsetRot, forcedPosition, assignBone, assignObject, m_bullet, m_systex, m_lipSync, useCartoonRendering, m_option->getCartoonEdgeWidth(), m_option->getLightEdge(), &light, m_option->getDisplayCommentTime() * 30.0f)) {
+   if (!m_model[id].load(fileName, name, &offsetPos, &offsetRot, forcedPosition, assignBone, assignObject, m_bullet, m_systex, m_lipSync, useCartoonRendering, m_option->getCartoonEdgeWidth(), m_option->getLightEdge(), &light, m_option->getDisplayCommentTime() * 30.0f, NULL, m_appDirName)) {
       sendLogString(m_moduleId, MLOG_ERROR, "addModel: %s cannot be loaded.", fileName);
       m_model[id].release();
       free(name);
       return false;
    }
+   if (m_model[id].getShapeMap() && m_model[id].isShapeMapDefault())
+      sendLogString(m_moduleId, MLOG_WARNING, "addModel: \"%s\": no model-specific shapemap exist, use system default shapemap", fileName);
 
    /* initialize motion manager */
    m_model[id].resetMotionManager();
@@ -553,10 +555,12 @@ bool MMDAgent::changeModel(const char *modelAlias, const char *fileName, PMDMode
       sendLogString(m_moduleId, MLOG_ERROR, "changeModel: not found: %s", fileName);
       return false;
    }
-   if (!m_model[id].load(fileName, modelAlias, NULL, NULL, false, NULL, NULL, m_bullet, m_systex, m_lipSync, m_model[id].useCartoonRendering(), m_option->getCartoonEdgeWidth(), m_option->getLightEdge(), &light, m_option->getDisplayCommentTime() * 30.0f, pmd)) {
+   if (!m_model[id].load(fileName, modelAlias, NULL, NULL, false, NULL, NULL, m_bullet, m_systex, m_lipSync, m_model[id].useCartoonRendering(), m_option->getCartoonEdgeWidth(), m_option->getLightEdge(), &light, m_option->getDisplayCommentTime() * 30.0f, pmd, m_appDirName)) {
       sendLogString(m_moduleId, MLOG_ERROR, "changeModel: %s cannot be loaded.", fileName);
       return false;
    }
+   if (m_model[id].getShapeMap() && m_model[id].isShapeMapDefault())
+      sendLogString(m_moduleId, MLOG_WARNING, "changeModel: \"%s\": no model-specific shapemap exist, use system default shapemap", fileName);
 
    /* update motion manager */
    if (m_model[id].getMotionManager())
