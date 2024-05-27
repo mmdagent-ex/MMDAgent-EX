@@ -116,6 +116,9 @@
 #define MMDAGENT_COMMAND_ROTATESTOP       "ROTATE_STOP"
 #define MMDAGENT_COMMAND_STAGE            "STAGE"
 #define MMDAGENT_COMMAND_WINDOWFRAME      "WINDOWFRAME"
+#define MMDAGENT_COMMAND_WINDOWFRAME_ADD       "WINDOWFRAME_ADD"
+#define MMDAGENT_COMMAND_WINDOWFRAME_DELETE    "WINDOWFRAME_DELETE"
+#define MMDAGENT_COMMAND_WINDOWFRAME_DELETEALL "WINDOWFRAME_DELETEALL"
 #define MMDAGENT_COMMAND_LIGHTCOLOR       "LIGHTCOLOR"
 #define MMDAGENT_COMMAND_LIGHTDIRECTION   "LIGHTDIRECTION"
 #define MMDAGENT_COMMAND_LIPSYNCSTART     "LIPSYNC_START"
@@ -181,6 +184,9 @@
 #define MMDAGENT_EVENT_CAPTION_SETSTYLE "CAPTION_EVENT_SETSTYLE"
 #define MMDAGENT_EVENT_CAPTION_START    "CAPTION_EVENT_START"
 #define MMDAGENT_EVENT_CAPTION_STOP     "CAPTION_EVENT_STOP"
+#define MMDAGENT_EVENT_WINDOWFRAME_ADD    "WINDOWFRAME_EVENT_ADD"
+#define MMDAGENT_EVENT_WINDOWFRAME_DELETE "WINDOWFRAME_EVENT_DELETE"
+
 
 #define MMDAGENT_CURRENTTIME
 #define MMDAGENT_TAPPED
@@ -441,6 +447,15 @@ private:
 
    /* setWindowFrame: set window frame */
    bool setWindowFrame(const char *fileName);
+
+   /* addWindowFrame: add window frame */
+   bool addWindowFrame(const char *frameAlias, const char *fileName);
+
+   /* deleteWindowFrame: delete window frame */
+   bool deleteWindowFrame(const char *frameAlias);
+
+   /* deleteAllWindowFrame: delete all window frame */
+   bool deleteAllWindowFrame();
 
    /* changeCamera: change camera setting */
    bool changeCamera(const char *pos, const char *rot, const char *distance, const char *fovy, const char *time, const char *modelalias, const char *bonename);

@@ -1168,12 +1168,46 @@ bool MMDAgent::setWindowFrame(const char *fileName)
    }
    if (MMDAgent_strequal(fileName, "NONE")) {
       /* delete window frame */
-      m_stage->loadFrameTexture(NULL);
-   } else if (m_stage->loadFrameTexture(fileName) == false) {
+      m_stage->deleteAllFrameTexture();
+   } else if (m_stage->addFrameTexture("__default", fileName) == false) {
       sendLogString(m_moduleId, MLOG_ERROR, "setWindowFrame: failed to load: %s", fileName);
       return false;
    }
 
+   /* don't send message */
+   return true;
+}
+
+/* MMDAgent::addWindowFrame: add window frame */
+bool MMDAgent::addWindowFrame(const char *frameAlias, const char *fileName)
+{
+   if (MMDAgent_exist(fileName) == false) {
+      sendLogString(m_moduleId, MLOG_ERROR, "addWindowFrame: %s: not found: %s", frameAlias, fileName);
+      return false;
+   }
+   if (m_stage->addFrameTexture(frameAlias, fileName) == false) {
+      sendLogString(m_moduleId, MLOG_ERROR, "addWindowFrame: %s: failed to load or exceeds limit: %s", frameAlias, fileName);
+      return false;
+   }
+   sendMessage(m_moduleId, MMDAGENT_EVENT_WINDOWFRAME_ADD, "%s", frameAlias);
+   return true;
+}
+
+/* MMDAgent::deleteWindowFrame: delete window frame */
+bool MMDAgent::deleteWindowFrame(const char *frameAlias)
+{
+   if (m_stage->deleteFrameTexture(frameAlias) == false) {
+      sendLogString(m_moduleId, MLOG_WARNING, "deleteWindowFrame: frame alias not exist: %s", frameAlias);
+      return false;
+   }
+   sendMessage(m_moduleId, MMDAGENT_EVENT_WINDOWFRAME_DELETE, "%s", frameAlias);
+   return true;
+}
+
+/* MMDAgent::deleteAllWindowFrame: delete all window frame */
+bool MMDAgent::deleteAllWindowFrame()
+{
+   m_stage->deleteAllFrameTexture();
    /* don't send message */
    return true;
 }
@@ -5694,13 +5728,37 @@ void MMDAgent::procReceivedMessage(const char *type, const char *value)
       }
       free(buf);
    } else if (MMDAgent_strequal(type, MMDAGENT_COMMAND_WINDOWFRAME)) {
-      /* change window frame */
+      /* change window frame (old) */
       sendLogString(m_moduleId, MLOG_MESSAGE_CAPTURED, "%s|%s", type, value);
       if (num != 1) {
          sendLogString(m_moduleId, MLOG_ERROR, "%s: number of arguments should be 1.", type);
          return;
       }
       setWindowFrame(value);
+   } else if (MMDAgent_strequal(type, MMDAGENT_COMMAND_WINDOWFRAME_ADD)) {
+      /* add or swap window frame */
+      sendLogString(m_moduleId, MLOG_MESSAGE_CAPTURED, "%s|%s", type, value);
+      if (num != 2) {
+         sendLogString(m_moduleId, MLOG_ERROR, "%s: number of arguments should be 2.", type);
+         return;
+      }
+      addWindowFrame(argv[0], argv[1]);
+   } else if (MMDAgent_strequal(type, MMDAGENT_COMMAND_WINDOWFRAME_DELETE)) {
+      /* delete window frame */
+      sendLogString(m_moduleId, MLOG_MESSAGE_CAPTURED, "%s|%s", type, value);
+      if (num != 1) {
+         sendLogString(m_moduleId, MLOG_ERROR, "%s: number of arguments should be 1.", type);
+         return;
+      }
+      deleteWindowFrame(argv[0]);
+   } else if (MMDAgent_strequal(type, MMDAGENT_COMMAND_WINDOWFRAME_DELETEALL)) {
+      /* delete window frame */
+      sendLogString(m_moduleId, MLOG_MESSAGE_CAPTURED, "%s|%s", type, value);
+      if (num != 0) {
+         sendLogString(m_moduleId, MLOG_ERROR, "%s: number of arguments should be 0.", type);
+         return;
+      }
+      deleteAllWindowFrame();
    } else if (MMDAgent_strequal(type, MMDAGENT_COMMAND_CAMERA)) {
       /* camera */
       sendLogString(m_moduleId, MLOG_MESSAGE_CAPTURED, "%s|%s", type, value);

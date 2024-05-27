@@ -54,6 +54,9 @@
 /* POSSIBILITY OF SUCH DAMAGE.                                       */
 /* ----------------------------------------------------------------- */
 
+/* maximum number of frame textures */
+#define MMDAGENT_STAGE_FRAME_TEXTURE_MAX 30
+
 /* Stage: stage */
 class Stage
 {
@@ -69,12 +72,18 @@ private:
    /* work area */
    GLfloat m_floorShadow[4][4]; /* matrix for shadow of floor */
 
-   PMDTexture *m_frameTexture; /* window frame texture */
-   GLfloat m_frameVertices[12];
-   GLindices m_frameIndices[6];
-   GLfloat m_frameTexcoords[8];
-   float m_width;
-   float m_height;
+   /* frame texture */
+   struct FrameTexture {
+      PMDTexture *texture;  // texture image
+      char *alias;          // alias name
+   };
+   FrameTexture m_frameTextures[MMDAGENT_STAGE_FRAME_TEXTURE_MAX]; // list of frame textures
+   int m_frameTextureNum;          // valid num of frame textures
+   GLfloat m_frameVertices[12];    // vertices to draw frame textures
+   GLindices m_frameIndices[6];    // indices to draw frame textures
+   GLfloat m_frameTexcoords[8];    // texture coordinates to draw frame textures
+   float m_width;                  // stored screen width
+   float m_height;                 // stored screen height
 
    /* initialize: initialize stage */
    void initialize();
@@ -126,8 +135,14 @@ public:
    /* update: update */
    void update(double ellapsedFrame);
 
-   /* loadFrameTexture: load frame texture */
-   bool loadFrameTexture(const char *file);
+   /* addFrameTexture: add frame texture */
+   bool addFrameTexture(const char *alias, const char *file);
+
+   /* deleteFrameTexture: delete frame texture */
+   bool deleteFrameTexture(const char *alias);
+
+   /* deleteAllFrameTexture: delete all frame texture */
+   bool deleteAllFrameTexture();
 
    /* hasFrameTexture: return TRUE if has frame texture */
    bool hasFrameTexture();

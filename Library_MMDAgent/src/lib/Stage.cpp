@@ -69,7 +69,27 @@ void Stage::initialize()
          m_floorShadow[i][j] = 0.0f;
    m_range = 0.0f;
 
-   m_frameTexture = NULL;
+   for (int i = 0; i < MMDAGENT_STAGE_FRAME_TEXTURE_MAX; i++) {
+      m_frameTextures[i].texture = NULL;
+      m_frameTextures[i].alias = NULL;
+   }
+   m_frameTextureNum = 0;
+
+   m_frameIndices[0] = 0;
+   m_frameIndices[1] = 1;
+   m_frameIndices[2] = 2;
+   m_frameIndices[3] = 0;
+   m_frameIndices[4] = 2;
+   m_frameIndices[5] = 3;
+   m_frameTexcoords[0] = 0.0f;
+   m_frameTexcoords[1] = 0.0f;
+   m_frameTexcoords[2] = 0.0f;
+   m_frameTexcoords[3] = 1.0f;
+   m_frameTexcoords[4] = 1.0f;
+   m_frameTexcoords[5] = 1.0f;
+   m_frameTexcoords[6] = 1.0f;
+   m_frameTexcoords[7] = 0.0f;
+
    m_width = -1.0f;
    m_height = -1.0f;
 }
@@ -77,8 +97,12 @@ void Stage::initialize()
 /* Stage::clear: free stage */
 void Stage::clear()
 {
-   if (m_frameTexture)
-      delete m_frameTexture;
+   for (int i = 0; i < m_frameTextureNum; i++) {
+      if (m_frameTextures[i].texture)
+         delete m_frameTextures[i].texture;
+      if (m_frameTextures[i].alias)
+         free(m_frameTextures[i].alias);
+   }
    initialize();
 }
 
@@ -263,21 +287,34 @@ void Stage::update(double ellapsedFrame)
    }
 }
 
-/* Stage::loadFrameTexture: load frame texture */
-bool Stage::loadFrameTexture(const char *file)
+/* Stage::addFrameTexture: add frame texture */
+bool Stage::addFrameTexture(const char *alias, const char *file)
 {
    PMDTexture *tex;
    bool ret;
+   int i;
 
-   if (file == NULL) {
-      if (m_frameTexture)
-         delete m_frameTexture;
-      m_frameTexture = NULL;
-      m_width = -1.0f;
-      m_height = -1.0f;
-      return true;
+   if (alias == NULL || file == NULL)
+      return false;
+
+   /* check name */
+   for (i = 0; i < m_frameTextureNum; i++) {
+      if (MMDAgent_strequal(m_frameTextures[i].alias, alias))
+         break;
    }
-   tex = new PMDTexture;
+   if (i < m_frameTextureNum) {
+      /* found, replace */
+      delete m_frameTextures[i].texture;
+      free(m_frameTextures[i].alias);
+   } else {
+      /* not found, assign new */
+      if (m_frameTextureNum >= MMDAGENT_STAGE_FRAME_TEXTURE_MAX)
+         return false;
+      i = m_frameTextureNum++;
+   }
+
+   /* load texture from file */
+   tex = new PMDTexture();
    glActiveTexture(GL_TEXTURE0);
    glClientActiveTexture(GL_TEXTURE0);
    glEnable(GL_TEXTURE_2D);
@@ -287,34 +324,61 @@ bool Stage::loadFrameTexture(const char *file)
       delete tex;
       return false;
    }
-   if (m_frameTexture)
-      delete m_frameTexture;
-   m_frameTexture = tex;
 
-   m_frameIndices[0] = 0;
-   m_frameIndices[1] = 1;
-   m_frameIndices[2] = 2;
-   m_frameIndices[3] = 0;
-   m_frameIndices[4] = 2;
-   m_frameIndices[5] = 3;
-   m_frameTexcoords[0] = 0.0f;
-   m_frameTexcoords[1] = 0.0f;
-   m_frameTexcoords[2] = 0.0f;
-   m_frameTexcoords[3] = 1.0f;
-   m_frameTexcoords[4] = 1.0f;
-   m_frameTexcoords[5] = 1.0f;
-   m_frameTexcoords[6] = 1.0f;
-   m_frameTexcoords[7] = 0.0f;
-   m_width = -1.0f;
-   m_height = -1.0f;
+   /* assign */
+   m_frameTextures[i].texture = tex;
+   m_frameTextures[i].alias = MMDAgent_strdup(alias);
 
    return true;
 }
 
+/* Stage::deleteFrameTexture: delete frame texture */
+bool Stage::deleteFrameTexture(const char *alias)
+{
+   int n;
+
+   if (alias == NULL)
+      return false;
+
+   /* check name */
+   for (n = 0; n < m_frameTextureNum; n++) {
+      if (MMDAgent_strequal(m_frameTextures[n].alias, alias))
+         break;
+   }
+   if (n >= m_frameTextureNum) {
+      /* not found */
+      return false;
+   }
+
+   /* delete */
+   delete m_frameTextures[n].texture;
+   free(m_frameTextures[n].alias);
+   for (int i = n; i < m_frameTextureNum - 1; i++) {
+      m_frameTextures[i].texture = m_frameTextures[i + 1].texture;
+      m_frameTextures[i].alias = m_frameTextures[i + 1].alias;
+   }
+   m_frameTextureNum--;
+
+   return true;
+}
+
+/* Stage::deleteAllFrameTexture: delete all frame texture */
+bool Stage::deleteAllFrameTexture()
+{
+   for (int i = 0; i < m_frameTextureNum; i++) {
+      delete m_frameTextures[i].texture;
+      free(m_frameTextures[i].alias);
+   }
+   m_frameTextureNum = 0;
+
+   return true;
+}
+
+
 /* Stage::hasFrameTexture: return TRUE if has frame texture */
 bool Stage::hasFrameTexture()
 {
-   if (m_frameTexture)
+   if (m_frameTextureNum > 0)
       return true;
    return false;
 }
@@ -322,8 +386,10 @@ bool Stage::hasFrameTexture()
 /* Stage::renderFrameTexture2D: render frame texture */
 void Stage::renderFrameTexture2D(float screenWidth, float screenHeight)
 {
-   if (m_frameTexture == NULL)
+   if (m_frameTextureNum == 0)
       return;
+
+   /* detect screen size change */
    if (m_width != screenWidth || m_height != screenHeight) {
       m_width = screenWidth;
       m_height = screenHeight;
@@ -342,13 +408,19 @@ void Stage::renderFrameTexture2D(float screenWidth, float screenHeight)
       m_frameVertices[10] = h;
       m_frameVertices[11] = 0;
    }
+
+   /* render */
    glEnable(GL_TEXTURE_2D);
    glVertexPointer(3, GL_FLOAT, 0, m_frameVertices);
    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
    glTexCoordPointer(2, GL_FLOAT, 0, m_frameTexcoords);
-   glBindTexture(GL_TEXTURE_2D, m_frameTexture->getID());
    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-   glDrawElements(GL_TRIANGLES, 6, GL_INDICES, (const GLvoid *)m_frameIndices);
+   for (int i = 0; i < m_frameTextureNum; i++) {
+      glBindTexture(GL_TEXTURE_2D, m_frameTextures[i].texture->getID());
+      glDrawElements(GL_TRIANGLES, 6, GL_INDICES, (const GLvoid *)m_frameIndices);
+   }
    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+   glBindTexture(GL_TEXTURE_2D, 0);
    glDisable(GL_TEXTURE_2D);
+
 }
