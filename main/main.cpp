@@ -1237,6 +1237,24 @@ int commonMainExec(int argc, char **argv)
 
 /* main: main function */
 #if defined(_WIN32) && !defined(__MINGW32__)
+bool wTailMatch(const wchar_t *str1, const wchar_t *str2)
+{
+   int len1, len2;
+
+   if (str1 == NULL || str2 == NULL)
+      return false;
+   if (str1 == str2)
+      return true;
+   len1 = wcslen(str1);
+   len2 = wcslen(str2);
+   if (len1 < len2)
+      return false;
+   if (_wcsicmp(&str1[len1 - len2], str2) == 0)
+      return true;
+   else
+      return false;
+}
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
    int i;
@@ -1270,7 +1288,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
    argv = (char **) malloc(sizeof(char *) * argc);
    for(i = 0; i < argc; i++) {
       wchar_t *warg = wargv[i];
-      if (i == 0) {
+      if (i == 0 || wTailMatch(wargv[i], L".mdf") || wTailMatch(wargv[i], L".mmda")) {
          /* convert to full path */
          GetFullPathNameW(wargv[i], MAX_PATH, wbuf, NULL);
          warg = wbuf;
