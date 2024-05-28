@@ -699,7 +699,7 @@ public:
          }
          catch (const Poco::Net::ConnectionRefusedException& e) {
             // unable to find server or service unavailable
-            m_mmdagent->sendLogString(m_id, MLOG_ERROR, "%s", e.what());
+            m_mmdagent->sendLogString(m_id, MLOG_WARNING, "Connection Refused Exception occured: %s", e.what());
             if (retry_count >= m_retryCount) {
                sendLog(MLOG_ERROR, "failed to connect to %s:%d%s", m_ws_host, m_ws_portnum, m_ws_dir);
                break;
@@ -710,7 +710,7 @@ public:
          }
          catch (const Poco::Net::WebSocketException& e) {
             // connection refused by server, perhaps maximum connection limit
-            m_mmdagent->sendLogString(m_id, MLOG_ERROR, "%s", e.what());
+            m_mmdagent->sendLogString(m_id, MLOG_WARNING, "WebSocket Exception occured: %s", e.what());
             if (retry_count >= m_retryCount) {
                sendLog(MLOG_ERROR, "failed to connect to %s:%d%s", m_ws_host, m_ws_portnum, m_ws_dir);
                break;
@@ -719,7 +719,7 @@ public:
             if (e.message().find("Too Many Requests") != std::string::npos) {
                // re-try with modified channel name
                MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s-%d", m_ws_dir, retry_count);
-               sendLog(MLOG_ERROR, "\"%s\" already used, retrying with \"%s\" (%d/%d)", m_ws_dir, buff, retry_count, m_retryCount);
+               sendLog(MLOG_WARNING, "\"%s\" already used, retrying with \"%s\" (%d/%d)", m_ws_dir, buff, retry_count, m_retryCount);
                free(m_ws_dir);
                m_ws_dir = MMDAgent_strdup(buff);
                MMDAgent_sleep(PLUGIN_REMOTE_CONNECTION_OTHER_RETRY_INTERVAL_SEC);
@@ -730,7 +730,7 @@ public:
          }
          catch (const std::exception& e) {
             // any other error
-            m_mmdagent->sendLogString(m_id, MLOG_ERROR, "%s", e.what());
+            m_mmdagent->sendLogString(m_id, MLOG_WARNING, "Exception occured: %s", e.what());
             if (retry_count >= m_retryCount) {
                sendLog(MLOG_ERROR, "failed to connect to %s:%d%s", m_ws_host, m_ws_portnum, m_ws_dir);
                break;
