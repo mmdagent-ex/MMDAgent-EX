@@ -162,17 +162,25 @@
 /* MBR Extension by Hiroaki Nanjo and Ryo Furutani */
 #define USE_MBR 1
 
+#ifdef USE_PREGENERATED_CONFIG_INTEL
+
 /* Define if include SIMD FMA instruction set */
-#define HAS_SIMD_FMA 1
+#define HAS_SIMD_FMA
 
 /* Define if include SIMD AVX instruction set */
-#define HAS_SIMD_AVX 1
+#define HAS_SIMD_AVX
 
 /* Define if include SIMD SSE instruction set */
-#define HAS_SIMD_SSE 1
+#define HAS_SIMD_SSE
+
+#endif /* USE_PREGENERATED_CONFIG_INTEL */
+
+#ifdef USE_PREGENERATED_CONFIG_ARM
 
 /* Define if include SIMD NEON instruction set */
-/* #undef HAS_SIMD_NEON */
+#define HAS_SIMD_NEON 1
 
 /* Define if include SIMDv2 NEON instruction set */
-/* #undef HAS_SIMD_NEONV2 */
+#define HAS_SIMD_NEONV2 1
+
+#endif /* USE_PREGENERATED_CONFIG_ARM */

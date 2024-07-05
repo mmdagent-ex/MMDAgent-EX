@@ -162,8 +162,9 @@
 /* MBR Extension by Hiroaki Nanjo and Ryo Furutani */
 #define USE_MBR 1
 
-#ifdef USE_PREGENERATED_CONFIG_APPLE_M_INTEL
+#ifdef USE_PREGENERATED_CONFIG_INTEL
 
+/* Define if include SIMD FMA instruction set */
 #define HAS_SIMD_FMA
 
 /* Define if include SIMD AVX instruction set */
@@ -172,9 +173,9 @@
 /* Define if include SIMD SSE instruction set */
 #define HAS_SIMD_SSE
 
-#endif /* USE_PREGENERATED_CONFIG_APPLE_M_INTEL */
+#endif /* USE_PREGENERATED_CONFIG_INTEL */
 
-#ifdef USE_PREGENERATED_CONFIG_APPLE_M_ARM
+#ifdef USE_PREGENERATED_CONFIG_ARM
 
 /* Define if include SIMD NEON instruction set */
 #define HAS_SIMD_NEON 1
@@ -182,4 +183,4 @@
 /* Define if include SIMDv2 NEON instruction set */
 #define HAS_SIMD_NEONV2 1
 
-#endif /* USE_PREGENERATED_CONFIG_APPLE_M_ARM */
+#endif /* USE_PREGENERATED_CONFIG_ARM */
