@@ -199,11 +199,24 @@ target_include_directories(JULIUS PRIVATE
 
 # compiler options for private build
 if(APPLE)
-    target_compile_options(JULIUS PRIVATE
-        -march=native
-        -ffast-math
-        -Wno-deprecated-non-prototype
-    )
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" OR CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
+        target_compile_options(JULIUS PRIVATE
+            -mcpu=apple-m1
+            -ffast-math
+            -Wno-deprecated-non-prototype
+        )
+    elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^i?86" OR CMAKE_SYSTEM_PROCESSOR MATCHES "^x86_64*")
+        target_compile_options(JULIUS PRIVATE
+            -march=native
+            -ffast-math
+            -Wno-deprecated-non-prototype
+        )
+    else()
+        target_compile_options(JULIUS PRIVATE
+            -ffast-math
+            -Wno-deprecated-non-prototype
+        )
+    endif()
 else()
     target_compile_options(JULIUS PRIVATE
         -march=native
@@ -221,21 +234,22 @@ set(DEFS_PUBLIC
     MMDAGENT
 )
 if(APPLE)
-  if(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" OR CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
     list(APPEND DEFS_PUBLIC
         USE_PREGENERATED_CONFIG_APPLE_M
-        USE_PREGENERATED_CONFIG_APPLE_M_ARM
     )
-  endif()
-  if(CMAKE_SYSTEM_PROCESSOR MATCHES "^i?86" OR CMAKE_SYSTEM_PROCESSOR MATCHES "^x86_64*")
-    list(APPEND DEFS_PUBLIC
-        USE_PREGENERATED_CONFIG_APPLE_M
-        USE_PREGENERATED_CONFIG_APPLE_M_INTEL
-    )
-  endif()
 else()
     list(APPEND DEFS_PUBLIC
         USE_PREGENERATED_CONFIG_UBUNTU
+    )
+endif()
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" OR CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
+    list(APPEND DEFS_PUBLIC
+        USE_PREGENERATED_CONFIG_ARM
+    )
+endif()
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "^i?86" OR CMAKE_SYSTEM_PROCESSOR MATCHES "^x86_64*")
+    list(APPEND DEFS_PUBLIC
+        USE_PREGENERATED_CONFIG_INTEL
     )
 endif()
 target_compile_definitions(JULIUS PRIVATE
