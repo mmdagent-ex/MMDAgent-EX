@@ -198,28 +198,22 @@ target_include_directories(JULIUS PRIVATE
 #)
 
 # compiler options for private build
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" OR CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
+    SET(OPT_ARCH_FLAG "-mcpu=apple-m1")
+elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^i?86" OR CMAKE_SYSTEM_PROCESSOR MATCHES "^x86_64*")
+    SET(OPT_ARCH_FLAG "-march=native")
+else()
+    SET(OPT_ARCH_FLAG "")
+endif()
 if(APPLE)
-    if(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" OR CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
-        target_compile_options(JULIUS PRIVATE
-            -mcpu=apple-m1
-            -ffast-math
-            -Wno-deprecated-non-prototype
-        )
-    elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^i?86" OR CMAKE_SYSTEM_PROCESSOR MATCHES "^x86_64*")
-        target_compile_options(JULIUS PRIVATE
-            -march=native
-            -ffast-math
-            -Wno-deprecated-non-prototype
-        )
-    else()
-        target_compile_options(JULIUS PRIVATE
-            -ffast-math
-            -Wno-deprecated-non-prototype
-        )
-    endif()
+    target_compile_options(JULIUS PRIVATE
+        ${OPT_ARCH_FLAG}
+        -ffast-math
+        -Wno-deprecated-non-prototype
+    )
 else()
     target_compile_options(JULIUS PRIVATE
-        -march=native
+        ${OPT_ARCH_FLAG}
         -ffast-math
         -Wno-deprecated-non-prototype
         -Wno-format-overflow
