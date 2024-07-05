@@ -198,13 +198,6 @@ target_include_directories(JULIUS PRIVATE
 #)
 
 # compiler options for private build
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" OR CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
-    SET(OPT_ARCH_FLAG "-mcpu=apple-m1")
-elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^i?86" OR CMAKE_SYSTEM_PROCESSOR MATCHES "^x86_64*")
-    SET(OPT_ARCH_FLAG "-march=native")
-else()
-    SET(OPT_ARCH_FLAG "")
-endif()
 if(APPLE)
     target_compile_options(JULIUS PRIVATE
         ${OPT_ARCH_FLAG}

@@ -78,12 +78,21 @@ else()
 endif()
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" OR CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
-    SET(OPT_ARCH_FLAG "-mcpu=apple-m1")
+    if(APPLE)
+        # assume gcc is clang.  Apple M1 mac and later.
+        SET(OPT_ARCH_FLAG "-mcpu=apple-m1")
+    else()
+        # assume gcc is gcc.  Ubuntu on arm. 
+        SET(OPT_ARCH_FLAG "-march=armv8.5-a")
+    endif()
 elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^i?86" OR CMAKE_SYSTEM_PROCESSOR MATCHES "^x86_64*")
+    # gcc for x86_64
     SET(OPT_ARCH_FLAG "-march=native")
 else()
+    # could not determine target architecture, disable architecture-dependent flag
     SET(OPT_ARCH_FLAG "")
 endif()
+
 SET(CMAKE_C_FLAGS_RELEASE "-O3 -fomit-frame-pointer ${OPT_ARCH_FLAG} -ffast-math")
 SET(CMAKE_CXX_FLAGS_RELEASE "-O3 -fomit-frame-pointer ${OPT_ARCH_FLAG} -ffast-math")
 SET(CMAKE_POSITION_INDEPENDENT_CODE "On")
