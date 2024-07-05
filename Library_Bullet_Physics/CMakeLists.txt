@@ -175,12 +175,12 @@ target_include_directories(BulletPhysics PRIVATE
 # compiler options for private build
 if(APPLE)
     target_compile_options(BulletPhysics PRIVATE
-        -march=native
+        ${OPT_ARCH_FLAG}
         -ffast-math
     )
 else()
     target_compile_options(BulletPhysics PRIVATE
-        -march=native
+        ${OPT_ARCH_FLAG}
         -ffast-math
         -Wno-stringop-overflow
     )
