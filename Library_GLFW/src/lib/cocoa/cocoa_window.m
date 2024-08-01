@@ -835,7 +835,7 @@ int  _glfwPlatformOpenWindow( int width, int height,
 #endif /* MMDAGENT */
     [_glfwWin.window setDelegate:_glfwWin.delegate];
     [_glfwWin.window setAcceptsMouseMovedEvents:YES];
-    [_glfwWin.window center];
+    [(NSWindow *)_glfwWin.window center];
 
     if( [_glfwWin.window respondsToSelector:@selector(setRestorable)] )
     {
@@ -1041,11 +1041,15 @@ void _glfwPlatformSetWindowTitle( const char *title )
 #ifdef MMDAGENT
 void _glfwPlatformEnableFullScreen()
 {
-   [_glfwWin.window toggleFullScreen:true];
+    if (!([_glfwWin.window styleMask] & NSWindowStyleMaskFullScreen)) {
+            [_glfwWin.window toggleFullScreen:nil];
+    }
 }
 void _glfwPlatformDisableFullScreen()
 {
-   [_glfwWin.window toggleFullScreen:false];
+    if ([_glfwWin.window styleMask] & NSWindowStyleMaskFullScreen) {
+        [_glfwWin.window toggleFullScreen:nil];
+    }
 }
 void _glfwPlatformGetRenderingSize( int *width, int *height)
 {
