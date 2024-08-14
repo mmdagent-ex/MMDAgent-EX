@@ -955,7 +955,7 @@ bool FTGLTextureFont::getTextDrawElementsWithScale(const char *text, FTGLTextDra
       if (buff[i] == L'\r' || buff[i] == L'\n') {
          /* newline */
          px = x;
-         py -= 1.0f + linespace;
+         py -= (1.0f + linespace) * scalefactor;
          if (buff[i] == L'\r' && buff[i + 1] == L'\n')
             i++;
          continue;
