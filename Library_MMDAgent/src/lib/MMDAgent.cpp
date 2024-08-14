@@ -865,7 +865,11 @@ bool MMDAgent::configureMotion(const char *modelAlias, const char *motionAlias, 
 
    /* configure motion */
    if (m_model[id].getMotionManager()->configureMotion(motionAlias, key, value) == false) {
-      sendLogString(m_moduleId, MLOG_ERROR, "configureMotion: failed to set %s|%s to %s.", key, value, motionAlias);
+      if (value) {
+         sendLogString(m_moduleId, MLOG_ERROR, "configureMotion: failed to set %s|%s to %s.", key, value, motionAlias);
+      } else {
+         sendLogString(m_moduleId, MLOG_ERROR, "configureMotion: failed to set %s to %s.", key, motionAlias);
+      }
       return false;
    }
 
