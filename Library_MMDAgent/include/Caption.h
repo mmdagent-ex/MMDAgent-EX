@@ -164,6 +164,9 @@ public:
 
    /* setChecked: set checked flag */
    void setChecked(bool flag);
+
+   /* swapStyle: swap style */
+   void swapStyle(CaptionStyle *src, CaptionStyle *dst);
 };
 
 /* Caption: text caption class */

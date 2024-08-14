@@ -198,12 +198,37 @@ bool TimeCaption::load(const char *fileName)
 /* TimeCaption::set: set */
 bool TimeCaption::set(const char *string, double durationFrame)
 {
+   char *formatted_string = NULL;
+   int i, j;
+   char c;
+
    clear();
+
+   if (string) {
+      /* text re-formatting */
+      formatted_string = MMDAgent_strdup(string);
+      for (j = 0, i = 0; i < MMDAgent_strlen(string); i++) {
+         c = string[i];
+         if (c == '_') {
+            /* replace '_' to ' ' */
+            c = ' ';
+         }
+         if (string[i] == '\\') {
+            /* replace '\' + 'n' or 'r' to '\n' */
+            if (i + 1 < MMDAgent_strlen(string) && (string[i + 1] == 'r' || string[i + 1] == 'n')) {
+               c = '\n';
+               i++;
+            }
+         }
+         formatted_string[j++] = c;
+      }
+      formatted_string[j] = '\0';
+   }
 
    m_listLen = 2;
    m_list = (TimeCaptionList *)malloc(sizeof(TimeCaptionList) * m_listLen);
    m_list[0].id = 0;
-   m_list[0].string = string ? MMDAgent_strdup(string) : NULL;
+   m_list[0].string = string ? formatted_string : NULL;
    m_list[0].frame = 0.0;
    memset(&m_list[0].elem, 0, sizeof(FTGLTextDrawElements));
    memset(&m_list[0].elemOut, 0, sizeof(FTGLTextDrawElements));
@@ -544,6 +569,13 @@ void CaptionElement::setChecked(bool flag)
    m_endChecked = flag;
 }
 
+/* CaptionElement::swapStyle: swap style */
+void CaptionElement::swapStyle(CaptionStyle *src, CaptionStyle *dst)
+{
+   if (m_style == src)
+      m_style = dst;
+}
+
 /***********************************************************/
 
 /* Caption::initialize: initialize */
@@ -813,6 +845,10 @@ bool Caption::setStyle(const char *name, const char *fontPath, float *col, float
 
    if (sid != -1) {
       /* style already exist, swap it */
+      // re-set existing captions
+      for (int i = 0; i < m_numCaptions; i++)
+         if (m_captions[i])
+            m_captions[i]->swapStyle(m_styles[sid], s);
       free(m_styles[sid]);
    } else {
       /* assign new */
