@@ -579,6 +579,7 @@ void VIManager::initialize()
    VIManager_VList_initialize(&m_variableList);
    m_currentState = NULL;
    m_append_num = 0;
+   m_block_id = 0;
    for (int i = 0; i < VIMANAGER_HISTORY_LEN; i++)
       m_history[i] = NULL;
    m_historyPoint = 0;
@@ -906,7 +907,6 @@ bool VIManager::loadFSTFile(ZFileKey *key, const char *file, unsigned int *arc_c
    unsigned int arc_count = 0;
    bool top;
    bool within_block;
-   unsigned int block_id = 0;
 
    char buff[MMDAGENT_MAXBUFLEN];
    char buff_s1[MMDAGENT_MAXBUFLEN];
@@ -1000,7 +1000,7 @@ bool VIManager::loadFSTFile(ZFileKey *key, const char *file, unsigned int *arc_c
             top = false;
             if (idx == 0) {
                /* non-indented line: a state definition */
-               block_id++;
+               m_block_id++;
                size_s1 = getTokenFromString(buff, &idx, buff_s1, true);
                size_s2 = getTokenFromString(buff, &idx, buff_s2, true);
                size_is = getTokenFromString(buff, &idx, buff_is, true);
@@ -1031,7 +1031,7 @@ bool VIManager::loadFSTFile(ZFileKey *key, const char *file, unsigned int *arc_c
                         err = true;
                      }
                   }
-                  arc = VIManager_SList_addArc(&m_stateList, label1, &m_stateList, label2, buff_is, buff_os, buff_vs, block_id, line, label);
+                  arc = VIManager_SList_addArc(&m_stateList, label1, &m_stateList, label2, buff_is, buff_os, buff_vs, m_block_id, line, label);
                   if (arc == NULL)
                      err = true;
                   else
@@ -1073,9 +1073,9 @@ bool VIManager::loadFSTFile(ZFileKey *key, const char *file, unsigned int *arc_c
                            err = true;
                         } else {
                            if (size_is > 0 && size_os > 0 && size_er == 0) {
-                              arc = VIManager_SList_addArc(last_state_list, last_state_label, &m_stateList, label2, &(buff_is[1]), buff_os, buff_vs, block_id, line, label);
+                              arc = VIManager_SList_addArc(last_state_list, last_state_label, &m_stateList, label2, &(buff_is[1]), buff_os, buff_vs, m_block_id, line, label);
                            } else if (size_is > 0 && size_er == 0) {
-                              arc = VIManager_SList_addArc(last_state_list, last_state_label, &m_stateList, label2, &(buff_is[1]), buff_last_os, buff_vs, block_id, line, label);
+                              arc = VIManager_SList_addArc(last_state_list, last_state_label, &m_stateList, label2, &(buff_is[1]), buff_last_os, buff_vs, m_block_id, line, label);
                            }
                            if (arc == NULL)
                               err = true;
@@ -1093,7 +1093,7 @@ bool VIManager::loadFSTFile(ZFileKey *key, const char *file, unsigned int *arc_c
                            }
                         }
                         if (arc == NULL) {
-                           arc = VIManager_SList_addArc(&m_stateList, label1, &m_stateList, label2, buff_is, buff_os, buff_vs, block_id, line, label);
+                           arc = VIManager_SList_addArc(&m_stateList, label1, &m_stateList, label2, buff_is, buff_os, buff_vs, m_block_id, line, label);
                            last_state_list = &m_stateList;
                            strcpy(last_state_label, label1);
                            strcpy(buff_last_os, buff_os);
@@ -1102,8 +1102,8 @@ bool VIManager::loadFSTFile(ZFileKey *key, const char *file, unsigned int *arc_c
                            VIManager_State *s = VIManager_SList_searchStateAndCreate(&m_stateListAppend, appendlabel);
                            s->virtual_fromState = VIManager_SList_findState(&m_stateList, label1);
                            s->virtual_toState = VIManager_SList_findState(&m_stateList, label2);
-                           VIManager_State_rewriteArc(last_state_list, last_state_label, &m_stateList, label2, s, block_id);
-                           arc = VIManager_SList_addArc(&m_stateListAppend, appendlabel, &m_stateList, label2, buff_is, buff_os, buff_vs, block_id, line, label);
+                           VIManager_State_rewriteArc(last_state_list, last_state_label, &m_stateList, label2, s, m_block_id);
+                           arc = VIManager_SList_addArc(&m_stateListAppend, appendlabel, &m_stateList, label2, buff_is, buff_os, buff_vs, m_block_id, line, label);
                            last_state_list = &m_stateListAppend;
                            strcpy(last_state_label, appendlabel);
                            strcpy(buff_last_os, buff_os);
@@ -1175,6 +1175,7 @@ bool VIManager::load(MMDAgent *mmdagent, int id, ZFileKey *key, const char *file
 
    /* load FST */
    arc_count_total = 0;
+   m_block_id = 0;
    if (loadFSTFile(key, file, &arc_count, 0, NULL) == true) {
       m_mmdagent->sendLogString(m_id, MLOG_STATUS, "FST %s \"%s\"", name, file);
       arc_count_total += arc_count;

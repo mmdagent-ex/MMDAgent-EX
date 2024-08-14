@@ -139,6 +139,7 @@ private:
    VIManager_SList m_stateList;     /* state list */
    VIManager_SList m_stateListAppend;  /* state list append */
    unsigned int m_append_num; /* current number of appended status */
+   unsigned int m_block_id;   /* current block id */
    VIManager_State *m_currentState; /* pointer to current state */
    VIManager_VList m_variableList;  /* variable list */
    VIManager_Arc *m_history[VIMANAGER_HISTORY_LEN]; /* transition history */
