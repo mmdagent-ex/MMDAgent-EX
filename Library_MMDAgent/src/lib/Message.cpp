@@ -168,6 +168,8 @@ static bool MessageQueue_dequeue(MessageQueue *q, int *id, unsigned int *flag, c
    strcpy(type, q->head->type);
    if(q->head->value != NULL && value != NULL)
       strcpy(value, q->head->value);
+   else
+      strcpy(value, "");
 
    tmp = q->head->next;
    MessageLink_clear(q->head);
