@@ -108,6 +108,8 @@ void HttpServer::exec(const char *message)
    char buff[MMDAGENT_MAXBUFLEN];
    char *p, *q, *psave;
 
+   m_mmdagent->sendLogString(0, MLOG_STATUS, "HttpServer: %s", message);
+
    MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s", message);
    p = MMDAgent_strtok(buff, "|\r\n", &psave);
    q = MMDAgent_strtok(NULL, "\r\n", &psave);
@@ -146,7 +148,7 @@ char* HttpServer::getHtmlString(const char *text)
       for (int i = m_historyCurrent - 1; i >= 0; i--) {
          page += html_history_head + m_history[i] + html_history_tail;
       }
-      for (int i = m_historyLen - 1; i >= m_historyCurrent; i++) {
+      for (int i = m_historyLen - 1; i >= m_historyCurrent; i--) {
          page += html_history_head + m_history[i] + html_history_tail;
       }
    }
