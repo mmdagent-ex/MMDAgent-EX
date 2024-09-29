@@ -572,7 +572,7 @@ bool PMDObject::updateModelRootOffset(float fps)
 /* PMDObject::updateModelRootRotation: update model rotation of root bone */
 bool PMDObject::updateModelRootRotation(float fps)
 {
-   btQuaternion tmpRot;
+   btQuaternion tmpRot, tmpRot2;
    PMDBone *b;
    bool ret = false;
    btQuaternion r;
@@ -598,9 +598,22 @@ bool PMDObject::updateModelRootRotation(float fps)
             maxStep = MMDFILES_RAD(m_spinSpeed) / fps;
             if (diff > maxStep) {
                b->getCurrentRotation(&tmpRot);
-               tmpRot = tmpRot.slerp(m_offsetRot, btScalar(maxStep / diff));
-               b->setCurrentRotation(&tmpRot);
-               m_isRotating = true;
+               /* slerp does not progress for very small diff, so this is workaround... */
+               btQuaternion t;
+               t = tmpRot - m_offsetRot;
+               if (t.length2() < 0.00001) {
+                  tmpRot2 = tmpRot * 0.5f + m_offsetRot * 0.5f;
+               } else {
+                  tmpRot2 = tmpRot.slerp(m_offsetRot, btScalar(btScalar(maxStep / diff)));
+               }
+               if (tmpRot == tmpRot2) {
+                  /* no difference, force end */
+                  b->setCurrentRotation(&m_offsetRot);
+                  ret = true;
+               } else {
+                  b->setCurrentRotation(&tmpRot2);
+                  m_isRotating = true;
+               }
             } else {
                b->setCurrentRotation(&m_offsetRot);
                ret = true;
@@ -608,9 +621,22 @@ bool PMDObject::updateModelRootRotation(float fps)
          } else {
             /* current * 0.95 + target * 0.05 */
             b->getCurrentRotation(&tmpRot);
-            tmpRot = tmpRot.slerp(m_offsetRot, btScalar(1.0f - PMDOBJECT_SPINSPEEDRATE));
-            b->setCurrentRotation(&tmpRot);
-            m_isRotating = true;
+            /* slerp does not progress for very small diff, so this is workaround... */
+            btQuaternion t;
+            t = tmpRot - m_offsetRot;
+            if (t.length2() < 0.00001) {
+               tmpRot2 = tmpRot * 0.5f + m_offsetRot * 0.5f;
+            } else {
+               tmpRot2 = tmpRot.slerp(m_offsetRot, btScalar(1.0f - PMDOBJECT_SPINSPEEDRATE));
+            }
+            if (tmpRot == tmpRot2) {
+               /* no difference, force end */
+               b->setCurrentRotation(&m_offsetRot);
+               ret = true;
+            } else {
+               b->setCurrentRotation(&tmpRot2);
+               m_isRotating = true;
+            }
          }
       } else {
          /* set target offset directory if small difference */
