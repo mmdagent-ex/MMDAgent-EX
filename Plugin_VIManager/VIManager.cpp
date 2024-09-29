@@ -1229,14 +1229,25 @@ bool VIManager::transition(const char *itype, const InputArguments *iargs, char 
       /* check if input matches this arc, consulting variables and wildcards */
       if (checkArcMatch(arc->input_event_type, itype, &arc->input_event_args, iargs)) {
          dispNum(buff, 128, m_currentState, arc->next_state);
-         if (iargs == NULL || iargs->str == NULL)
-            m_mmdagent->sendLogString(m_id, MLOG_MESSAGE_CAPTURED, "%s", itype);
-         else
-            m_mmdagent->sendLogString(m_id, MLOG_MESSAGE_CAPTURED, "%s|%s", itype, iargs->str);
-         if (arc->input_event_args.str == NULL)
-            m_mmdagent->sendLogString(m_id, MLOG_STATUS, "[%s:%u] %s %s %s|%s %s", arc->label ? arc->label : m_name, arc->line_number, buff, arc->input_event_type, arc->output_command_type, arc->output_command_args, arc->variable_action);
-         else
-            m_mmdagent->sendLogString(m_id, MLOG_STATUS, "[%s:%u] %s %s|%s %s|%s %s", arc->label ? arc->label : m_name, arc->line_number, buff, arc->input_event_type, arc->input_event_args.str, arc->output_command_type, arc->output_command_args, arc->variable_action);
+         if (MMDAgent_strequal(itype, VIMANAGER_EPSILON) == false) {
+            if (iargs == NULL || iargs->str == NULL)
+               m_mmdagent->sendLogString(m_id, MLOG_MESSAGE_CAPTURED, "%s", itype);
+            else
+               m_mmdagent->sendLogString(m_id, MLOG_MESSAGE_CAPTURED, "%s|%s", itype, iargs->str);
+         }
+         if (arc->input_event_args.str == NULL) {
+            if (arc->output_command_args == NULL) {
+               m_mmdagent->sendLogString(m_id, MLOG_STATUS, "[%s:%u] %s %s %s %s", arc->label ? arc->label : m_name, arc->line_number, buff, arc->input_event_type, arc->output_command_type, arc->variable_action);
+            } else {
+               m_mmdagent->sendLogString(m_id, MLOG_STATUS, "[%s:%u] %s %s %s|%s %s", arc->label ? arc->label : m_name, arc->line_number, buff, arc->input_event_type, arc->output_command_type, arc->output_command_args, arc->variable_action);
+            }
+         } else {
+            if (arc->output_command_args == NULL) {
+               m_mmdagent->sendLogString(m_id, MLOG_STATUS, "[%s:%u] %s %s|%s %s %s", arc->label ? arc->label : m_name, arc->line_number, buff, arc->input_event_type, arc->input_event_args.str, arc->output_command_type, arc->variable_action);
+            } else {
+               m_mmdagent->sendLogString(m_id, MLOG_STATUS, "[%s:%u] %s %s|%s %s|%s %s", arc->label ? arc->label : m_name, arc->line_number, buff, arc->input_event_type, arc->input_event_args.str, arc->output_command_type, arc->output_command_args, arc->variable_action);
+            }
+         }
          /* set output string, consulting variables if any */
          substituteVariableAndCopy(arc->output_command_type, otype);
          substituteVariableAndCopy(arc->output_command_args, oargs);

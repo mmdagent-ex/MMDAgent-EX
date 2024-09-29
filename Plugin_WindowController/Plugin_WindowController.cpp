@@ -287,6 +287,7 @@ EXPORT void extProcMessage(MMDAgent *mmdagent, const char *type, const char *arg
                }
                free(wp);
             }
+         }
       } else if(MMDAgent_strequal(type, PLUGINWINDOWCONTROLLER_KEYPOST) == true) {
          postKeyMessage(args);
       }

@@ -982,6 +982,8 @@ bool MMDAgent::startTurn(const char *modelAlias, btVector3 *pos, bool local, flo
       targetPos = (*pos);
    else
       targetPos = (*pos) - currentPos;
+   if (targetPos.fuzzyZero())
+      return false;
    targetPos.normalize();
 
    /* calculate target rotation from (0,0,1) */
@@ -2236,6 +2238,7 @@ bool MMDAgent::setupContent(int argc, char **argv)
          /* load home content */
          urlPath = m_content->getHomeURLdup(&urlPathStartIdx);
          if (urlPath) {
+            sendLogString(m_moduleId, MLOG_STATUS, "starting with home content: %s", urlPath);
             if (urlPathStartIdx == 0) {
                /* this is file home */
                hasMDF = true;
@@ -2245,7 +2248,6 @@ bool MMDAgent::setupContent(int argc, char **argv)
                free(urlPath);
                urlPath = NULL;
             }
-            sendLogString(m_moduleId, MLOG_STATUS, "starting with home content: %s", urlPath);
          }
       }
    }
@@ -2303,7 +2305,7 @@ bool MMDAgent::setupWorld()
 {
    /* re-set window size if needed */
    int *sizes = m_option->getWindowSize();
-   if (m_screenSize[0] != sizes[0] || m_screenSize[1] != sizes[1])
+   if ((m_screenSize[0] != sizes[0] || m_screenSize[1] != sizes[1]) && m_option->getFullScreen() == false)
       m_screen->setWindowSize(sizes[0], sizes[1]);
 
    /* initialize BulletPhysics */
@@ -2384,7 +2386,7 @@ bool MMDAgent::setupWorld()
 
    /* open log file */
    if (MMDAgent_strlen(m_option->getLogFile()) > 0)
-      m_fpLog = MMDAgent_fopen(m_option->getLogFile(), "w");
+      m_fpLog = MMDAgent_fopen(m_option->getLogFile(), "a");
 
    /* load plugins */
    m_plugin = new Plugin();
