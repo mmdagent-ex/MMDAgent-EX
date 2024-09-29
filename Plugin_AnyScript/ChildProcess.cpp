@@ -36,6 +36,7 @@
 /* definitions */
 #define PLUGINANYSCRIPT_PROCESSTERMINATEWAITMSEC 5000
 #define FILEDESCRIPTOR_UNDEFINED -1
+#define CREATEPIPE_BUFFER_SIZE 65535
 
 #ifdef CHILDPROCESS_UNIX
 #define CHILDPROCESS_ARG_MAX 100
@@ -221,7 +222,7 @@ bool ChildProcess::runProcess(const char *title, const char *execString)
    HANDLE current = GetCurrentProcess();
 
    /* create pipe for child-to-parent: children write stdout and strerr, parent read */
-   if (!CreatePipe(&m_hReadFromChild, &m_hChildOut, &s, 0)) {
+   if (!CreatePipe(&m_hReadFromChild, &m_hChildOut, &s, CREATEPIPE_BUFFER_SIZE)) {
       m_mmdagent->sendLogString(m_id, MLOG_ERROR, "failed to create pipe");
       return false;
    }
@@ -231,7 +232,7 @@ bool ChildProcess::runProcess(const char *title, const char *execString)
       return false;
    }
    /* create pipe for parent-to-child: parent write, children read from stdin */
-   if (!CreatePipe(&m_hChildIn, &m_hWriteToChild, &s, 0)) {
+   if (!CreatePipe(&m_hChildIn, &m_hWriteToChild, &s, CREATEPIPE_BUFFER_SIZE)) {
       m_mmdagent->sendLogString(m_id, MLOG_ERROR, "failed to create pipe");
       return false;
    }
