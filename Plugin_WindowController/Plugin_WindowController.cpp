@@ -274,8 +274,19 @@ EXPORT void extProcMessage(MMDAgent *mmdagent, const char *type, const char *arg
             mmdagent->sendMessage(mid, MMDAGENT_EVENT_PLUGINDISABLE, "%s", PLUGINWINDOWCONTROLLER_NAME);
          }
       } else if(MMDAgent_strequal(type, PLUGINWINDOWCONTROLLER_EXECUTE) == true) {
-         if(MMDAgent_strlen(args) > 0)
-            ShellExecuteA(NULL, NULL, args, NULL, NULL, SW_SHOWNORMAL);
+         if (MMDAgent_strlen(args) > 0) {
+            WCHAR *wp = MMDFiles_pathdup_from_application_to_widechar(args);
+            if (wp) {
+               STARTUPINFOW si;
+               PROCESS_INFORMATION pi;
+               ZeroMemory(&si, sizeof(si));
+               si.cb = sizeof(si);
+               ZeroMemory(&pi, sizeof(pi));
+               if (!CreateProcessW(NULL, wp, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
+                  mmdagent->sendLogString(0, MLOG_ERROR, "CreateProcess failed: %s", args);
+               }
+               free(wp);
+            }
       } else if(MMDAgent_strequal(type, PLUGINWINDOWCONTROLLER_KEYPOST) == true) {
          postKeyMessage(args);
       }
