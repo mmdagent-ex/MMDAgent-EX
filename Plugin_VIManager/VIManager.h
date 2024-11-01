@@ -68,6 +68,7 @@
 #define VIMANAGER_REGEXP_BRACE '@'
 #define VIMANAGER_STATE_LABEL_MAXLEN 128
 #define VIMANAGER_HISTORY_LEN 128
+#define VIMANAGER_ATEXIST_STATE_LABEL "AT_EXIT"
 
 /* InputArguments: input for state transition */
 typedef struct _InputArguments {
@@ -145,6 +146,7 @@ private:
    VIManager_Arc *m_history[VIMANAGER_HISTORY_LEN]; /* transition history */
    int m_historyPoint; /* transition history entry point */
    std::mutex m_mutexHistory; /* mutex for history handling */
+   bool m_end;             /* true when reached a state with no arc */
 
    /* initialize: initialize VIManager */
    void initialize();
@@ -204,4 +206,10 @@ public:
 
    /* getTransitionHistory: get allocated list of transition history */
    int getTransitionHistory(VIManager_Arc **list, int maxlen);
+
+   /* getEndFlag: get end flag */
+   bool getEndFlag();
+
+   /* jumpToState: jump to the state if exist */
+   bool jumpToState(const char *state_label);
 };
