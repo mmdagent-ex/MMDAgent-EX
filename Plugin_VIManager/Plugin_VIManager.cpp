@@ -146,7 +146,35 @@ EXPORT void extProcMessage(MMDAgent *mmdagent, const char *type, const char *arg
             mmdagent->sendMessage(mid, MMDAGENT_EVENT_PLUGINDISABLE, "%s", PLUGINVIMANAGER_NAME);
          }
       } else if (MMDAgent_strequal(type, PLUGINVIMANAGER_LOADCOMMAND)) {
+         mmdagent->sendLogString(mid, MLOG_MESSAGE_CAPTURED, "%s|%s", type, args);
          vimanager_thread.reload(type, args);
+      } else if (MMDAgent_strequal(type, PLUGINVIMANAGER_SUB_COMMAND_START)) {
+         if (args) {
+            mmdagent->sendLogString(mid, MLOG_MESSAGE_CAPTURED, "%s|%s", type, args);
+            char *buff = MMDAgent_strdup(args);
+            char *save;
+            char *p1 = MMDAgent_strtok(buff, "|", &save);
+            char *p2 = MMDAgent_strtok(NULL, "|", &save);
+            if (p1 != NULL && p2 != NULL)
+               vimanager_thread.addSub(p1, p2);
+            free(buff);
+         }
+      } else if (MMDAgent_strequal(type, PLUGINVIMANAGER_SUB_COMMAND_STARTIF)) {
+         if (args) {
+            mmdagent->sendLogString(mid, MLOG_MESSAGE_CAPTURED, "%s|%s", type, args);
+            char *buff = MMDAgent_strdup(args);
+            char *save;
+            char *p1 = MMDAgent_strtok(buff, "|", &save);
+            char *p2 = MMDAgent_strtok(NULL, "|", &save);
+            if (p1 != NULL && p2 != NULL && MMDAgent_exist(p2))
+               vimanager_thread.addSub(p1, p2);
+            free(buff);
+         }
+      } else if (MMDAgent_strequal(type, PLUGINVIMANAGER_SUB_COMMAND_STOP)) {
+         if (args) {
+            mmdagent->sendLogString(mid, MLOG_MESSAGE_CAPTURED, "%s|%s", type, args);
+            vimanager_thread.delSub(args);
+         }
       } else if (vimanager_thread.isRunning()) {
          if (type != NULL) {
             vimanager_thread.enqueueBuffer(type, args); /* enqueue */

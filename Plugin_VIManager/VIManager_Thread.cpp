@@ -134,7 +134,10 @@ static int VIManager_EventQueue_dequeue(VIManager_EventQueue *q, char *type, cha
    if (type != NULL)
       strcpy(type, q->head->type);
    if (args != NULL)
-      strcpy(args, q->head->args);
+      if (q->head->args)
+         strcpy(args, q->head->args);
+      else
+         strcpy(args, "");
    tmp = q->head->next;
    VIManager_Event_clear(q->head);
    free(q->head);
@@ -163,6 +166,7 @@ void VIManager_Thread::initialize()
    m_kill = false;
 
    m_mutex = NULL;
+   m_mutex_sub = NULL;
    m_cond = NULL;
    m_thread = -1;
    m_vimList = NULL;
@@ -187,7 +191,7 @@ void VIManager_Thread::clear()
       glfwSignalCond(m_cond);
 
    /* stop thread & close mutex */
-   if(m_mutex != NULL || m_cond != NULL || m_thread >= 0) {
+   if(m_mutex != NULL || m_mutex_sub != NULL || m_cond != NULL || m_thread >= 0) {
       if(m_thread >= 0) {
          glfwWaitThread(m_thread, GLFW_WAIT);
          glfwDestroyThread(m_thread);
@@ -196,6 +200,8 @@ void VIManager_Thread::clear()
          glfwDestroyCond(m_cond);
       if(m_mutex != NULL)
          glfwDestroyMutex(m_mutex);
+      if (m_mutex_sub != NULL)
+         glfwDestroyMutex(m_mutex_sub);
    }
 
    /* free */
@@ -229,6 +235,115 @@ VIManager_Thread::~VIManager_Thread()
    clear();
 }
 
+/* VIManager_Thread::addSub: add sub FST */
+bool VIManager_Thread::addSub(const char *label, const char *filename)
+{
+   VIManager_Link *l = NULL;
+
+   /* load file */
+   l = new VIManager_Link;
+   if (l->vim.load(m_mmdagent, m_id, m_key, filename, label) == false) {
+      delete l;
+      return false;
+   }
+
+   /* sub FST's initial state is always set to default initial state */
+   if (l->vim.setCurrentState(VIMANAGER_INITIAL_STATE_LABEL_DEFAULT) == false) {
+      m_mmdagent->sendLogString(m_id, MLOG_ERROR, "%s (%s): failed to set initial state to %s, skipped", label, filename, VIMANAGER_INITIAL_STATE_LABEL_DEFAULT);
+      delete l;
+      return false;
+   }
+
+   /* add to list */
+   glfwLockMutex(m_mutex_sub);
+   l->next = NULL;
+   if (m_sub == NULL) {
+      m_sub = l;
+   } else {
+      VIManager_Link *ltmp = m_sub;
+      while (ltmp->next) {
+         ltmp = ltmp->next;
+      }
+      ltmp->next = l;
+   }
+
+   updateSubList();
+
+   glfwUnlockMutex(m_mutex_sub);
+
+   m_mmdagent->sendMessage(m_id, PLUGINVIMANAGER_SUB_EVENT_START, "%s", label);
+
+   return true;
+}
+
+/* VIManager_Thread::delSub: delete sub FST */
+bool VIManager_Thread::delSub(const char *label)
+{
+   bool deleted = false;
+   bool jumped = false;
+
+   glfwLockMutex(m_mutex_sub);
+   if (m_sub && MMDAgent_strequal(m_sub->vim.getName(), label)) {
+      if (m_sub->vim.jumpToState(VIMANAGER_ATEXIST_STATE_LABEL) == true) {
+         /* succeeded in jumping to at-exit state, do not delete here */
+         m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: deletion ordered, jump to %s state", label, VIMANAGER_ATEXIST_STATE_LABEL);
+         jumped = true;
+         /* force trigger state transition after jump */
+         enqueueBuffer(VIMANAGER_EPSILON, NULL);
+      } else {
+         m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: deleted by order", label);
+         m_mmdagent->sendMessage(m_id, PLUGINVIMANAGER_SUB_EVENT_STOP, "%s", m_sub->vim.getName());
+         delete m_sub;
+         m_sub = NULL;
+         deleted = true;
+      }
+   }
+   if (jumped == false && deleted == false) {
+      for (VIManager_Link *l = m_sub; l != NULL; l = l->next) {
+         if (l->next && MMDAgent_strequal(l->next->vim.getName(), label) == true) {
+            if (l->next->vim.jumpToState(VIMANAGER_ATEXIST_STATE_LABEL) == true) {
+               /* succeeded in jumping to at-exit state, do not delete here */
+               m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: deletion ordered, jump to %s state", label, VIMANAGER_ATEXIST_STATE_LABEL);
+               /* force trigger state transition after jump */
+               enqueueBuffer(VIMANAGER_EPSILON, NULL);
+            } else {
+               m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: deleted by order", label);
+               VIManager_Link *ltmp = l->next;
+               m_mmdagent->sendMessage(m_id, PLUGINVIMANAGER_SUB_EVENT_STOP, "%s", ltmp->vim.getName());
+               l->next = l->next->next;
+               delete ltmp;
+               deleted = true;
+            }
+         }
+      }
+   }
+   if (deleted)
+      updateSubList();
+   glfwUnlockMutex(m_mutex_sub);
+
+   return deleted;
+}
+
+/* VIManager_Thread::updateSubList: update sub list */
+void VIManager_Thread::updateSubList()
+{
+   VIManager_Link *l;
+
+   /* update vim list */
+   if (m_vimList)
+      free(m_vimList);
+   int n = 1;
+   for (l = m_sub; l != NULL; l = l->next)
+      n++;
+   m_vimNum = n;
+   m_vimList = (VIManager **)malloc(sizeof(VIManager *) * m_vimNum);
+   m_vimList[0] = m_vim;
+   n = 1;
+   for (l = m_sub; l != NULL; l = l->next)
+      m_vimList[n++] = &(l->vim);
+}
+
+
 /* VIManager_Thread::loadAndStart: load FST and start thread */
 void VIManager_Thread::loadAndStart(MMDAgent *mmdagent, int id, const char *file, const char *initial_state_label)
 {
@@ -236,7 +351,6 @@ void VIManager_Thread::loadAndStart(MMDAgent *mmdagent, int id, const char *file
    char buf[MMDAGENT_MAXBUFLEN];
    char buf2[MMDAGENT_MAXBUFLEN];
    char *dir, *fst;
-   VIManager_Link *l, *last = NULL;
    int i;
 
    if(mmdagent == NULL)
@@ -263,6 +377,8 @@ void VIManager_Thread::loadAndStart(MMDAgent *mmdagent, int id, const char *file
       return;
    }
 
+   updateSubList();
+
    /* setup logger */
    m_logger.setup(m_mmdagent);
 
@@ -276,25 +392,8 @@ void VIManager_Thread::loadAndStart(MMDAgent *mmdagent, int id, const char *file
    if(dp != NULL) {
       while(MMDAgent_readdir(dp, buf) == true) {
          if(MMDAgent_strequal(buf, fst) == false && MMDAgent_strheadmatch(buf, fst) == true && (MMDAgent_strtailmatch(buf, ".fst") == true || MMDAgent_strtailmatch(buf, ".FST") == true)) {
-            l = new VIManager_Link;
-            l->id = ++i;
-            l->next = NULL;
-            MMDAgent_snprintf(buf2, MMDAGENT_MAXBUFLEN, "sub%d", l->id);
-            if(l->vim.load(m_mmdagent, m_id, m_key, buf, buf2) == false)
-               delete l;
-            else {
-               /* sub FST's initial state is always set to default initial state */
-               if (l->vim.setCurrentState(VIMANAGER_INITIAL_STATE_LABEL_DEFAULT) == false) {
-                  m_mmdagent->sendLogString(m_id, MLOG_ERROR, "failed to set initial state to %s, skipped", VIMANAGER_INITIAL_STATE_LABEL_DEFAULT);
-                  delete l;
-               } else {
-                  if (m_sub == NULL)
-                     m_sub = l;
-                  else
-                     last->next = l;
-                  last = l;
-               }
-            }
+            MMDAgent_snprintf(buf2, MMDAGENT_MAXBUFLEN, "sub%d", ++i);
+            addSub(buf2, buf);
          }
       }
       MMDAgent_closedir(dp);
@@ -303,20 +402,10 @@ void VIManager_Thread::loadAndStart(MMDAgent *mmdagent, int id, const char *file
    free(dir);
    free(fst);
 
-   /* make vim list */
-   int n = 1;
-   for (l = m_sub; l != NULL; l = l->next)
-      n++;
-   m_vimNum = n;
-   m_vimList = (VIManager **)malloc(sizeof(VIManager *) * m_vimNum);
-   m_vimList[0] = m_vim;
-   n = 1;
-   for (l = m_sub; l != NULL; l = l->next)
-      m_vimList[n++] = &(l->vim);
-
    /* start thread */
    glfwInit();
    m_mutex = glfwCreateMutex();
+   m_mutex_sub = glfwCreateMutex();
    m_cond = glfwCreateCond();
    m_thread = glfwCreateThread(mainThread, this);
    if(m_mutex == NULL || m_cond == NULL || m_thread < 0) {
@@ -339,14 +428,17 @@ void VIManager_Thread::run()
    char otype[MMDAGENT_MAXBUFLEN];
    char oargs[MMDAGENT_MAXBUFLEN];
    InputArguments ia;
-   VIManager_Link *l;
+   VIManager_Link *l, *ltmp;
    bool trans;
+   bool sub_deleted;
 
    /* first epsilon step */
    while (m_vim->transition(VIMANAGER_EPSILON, NULL, otype, oargs)) {
       if (MMDAgent_strequal(otype, VIMANAGER_EPSILON) == false)
          m_mmdagent->sendMessage(m_id, otype, "%s", oargs);
    }
+
+   glfwLockMutex(m_mutex_sub);
 
    for(l = m_sub; l != NULL; l = l->next) {
       while (l->vim.transition(VIMANAGER_EPSILON, NULL, otype, oargs)) {
@@ -356,6 +448,8 @@ void VIManager_Thread::run()
    }
 
    updatePredictWords();
+
+   glfwUnlockMutex(m_mutex_sub);
 
    while(m_kill == false) {
       /* wait transition event */
@@ -389,6 +483,8 @@ void VIManager_Thread::run()
             m_mmdagent->sendMessage(m_id, otype, "%s", oargs);
       }
 
+      glfwLockMutex(m_mutex_sub);
+
       for(l = m_sub; l != NULL; l = l->next) {
          if (l->vim.transition(itype, &ia, otype, oargs))
             trans = true;
@@ -402,11 +498,37 @@ void VIManager_Thread::run()
                m_mmdagent->sendMessage(m_id, otype, "%s", oargs);
          }
       }
+
+      /* check if a sub fst has reached no arc state and delete it */
+      sub_deleted = false;
+      if (m_sub && m_sub->vim.getEndFlag() == true) {
+         m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: reached state with no arc, finished itself", m_sub->vim.getName());
+         m_mmdagent->sendMessage(m_id, PLUGINVIMANAGER_SUB_EVENT_STOP, "%s", m_sub->vim.getName());
+         delete m_sub;
+         m_sub = NULL;
+         sub_deleted = true;
+      }
+      for (l = m_sub; l != NULL; l = l->next) {
+         if (l->next && l->next->vim.getEndFlag() == true) {
+            ltmp = l->next;
+            m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: reached state with no arc, finished itself", ltmp->vim.getName());
+            m_mmdagent->sendMessage(m_id, PLUGINVIMANAGER_SUB_EVENT_STOP, "%s", ltmp->vim.getName());
+            l->next = l->next->next;
+            delete ltmp;
+            sub_deleted = true;
+         }
+      }
+      if (sub_deleted)
+         updateSubList();
+
       InputArguments_clear(&ia);
 
       /* when some transition occurs, check updates of predicted words in current status */
       if (trans == true)
          updatePredictWords();
+
+      glfwUnlockMutex(m_mutex_sub);
+
    }
 }
 

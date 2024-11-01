@@ -54,6 +54,12 @@
 /* POSSIBILITY OF SUCH DAMAGE.                                       */
 /* ----------------------------------------------------------------- */
 
+#define PLUGINVIMANAGER_SUB_COMMAND_START "SUBFST_START"
+#define PLUGINVIMANAGER_SUB_COMMAND_STARTIF "SUBFST_START_IF"
+#define PLUGINVIMANAGER_SUB_EVENT_START "SUBFST_EVENT_START"
+#define PLUGINVIMANAGER_SUB_COMMAND_STOP "SUBFST_STOP"
+#define PLUGINVIMANAGER_SUB_EVENT_STOP "SUBFST_EVENT_STOP"
+
 /* VIManager_Event: input message buffer */
 typedef struct _VIManager_Event {
    char *type;
@@ -69,7 +75,6 @@ typedef struct _VIManager_EventQueue {
 
 typedef struct _VIManager_Link {
    VIManager vim;
-   int id;
    struct _VIManager_Link *next;
 } VIManager_Link;
 
@@ -82,6 +87,7 @@ private:
    int m_id;
 
    GLFWmutex m_mutex;      /* mutex */
+   GLFWmutex m_mutex_sub;  /* mutex */
    GLFWcond m_cond;        /* condition variable */
    GLFWthread m_thread;    /* thread */
 
@@ -115,6 +121,15 @@ public:
 
    /* ~VIManager_Thread: thread destructor */
    ~VIManager_Thread();
+
+   /* addSub: add sub FST */
+   bool addSub(const char *label, const char *filename);
+
+   /* delSub: delete sub FST */
+   bool delSub(const char *label);
+
+   /* updateSubList: update sub list */
+   void updateSubList();
 
    /* loadAndStart: load FST and start thread */
    void loadAndStart(MMDAgent *mmdagent, int id, const char *file, const char *initial_state_label);
