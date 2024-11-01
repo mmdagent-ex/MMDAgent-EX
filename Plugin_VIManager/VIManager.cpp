@@ -583,6 +583,7 @@ void VIManager::initialize()
    for (int i = 0; i < VIMANAGER_HISTORY_LEN; i++)
       m_history[i] = NULL;
    m_historyPoint = 0;
+   m_end = false;
 }
 
 /* VIManager:clear: free VIManager */
@@ -1190,6 +1191,8 @@ bool VIManager::load(MMDAgent *mmdagent, int id, ZFileKey *key, const char *file
       m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%u arcs, %u states", arc_count_total, c1 + c2);
    }
 
+   m_end = false;
+
    return ret;
 }
 
@@ -1221,8 +1224,10 @@ bool VIManager::transition(const char *itype, const InputArguments *iargs, char 
 
    /* state don't have arc list */
    arc_list = &m_currentState->arc_list;
-   if (arc_list->head == NULL)
+   if (arc_list->head == NULL) {
+      m_end = true;
       return false;
+   }
 
    /* match */
    for (arc = arc_list->head; arc != NULL; arc = arc->next) {
@@ -1347,4 +1352,22 @@ int VIManager::getTransitionHistory(VIManager_Arc **list, int maxlen)
    }
 
    return ret;
+}
+
+/* VIManager::getEndFlag: get end flag */
+bool VIManager::getEndFlag()
+{
+   return m_end;
+}
+
+/* VIManager::jumpToState: jump to the state if exist */
+bool VIManager::jumpToState(const char *state_label)
+{
+   VIManager_State *state;
+
+   state = VIManager_SList_findState(&m_stateList, state_label);
+   if (state == NULL)
+      return false;
+   m_currentState = state;
+   return true;
 }
