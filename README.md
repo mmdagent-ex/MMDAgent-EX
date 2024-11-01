@@ -17,11 +17,23 @@ MMDAgent was developed at Nagoya Institute of Technology since 2011 as an open-s
 
 MMDAgent-EX has its own OpenGL-based rendering engine compatible with MMD (MikuMikuDance), and can create interactive characters using 3D models and motion data in MMD format. It also includes speech recognition and synthesis engines developed at Nagoya Institute of Technology, such as Julius and Open JTalk, as well as an embedded FST-based state-transition primitive dialogue scripting feature, allowing you to build voice dialogue systems independently. Aside from the internal engines, it can be easily connected to other scripts like Python, so you can add another modules such as cloud-based speech recognition, speech synthesis engines, or large language models like ChatGPT with this system. Furthermore, it supports external control via socket connections, making it suitable for use as the input/output frontend for existing dialogue systems.
 
-## Documents
-
 All documents are available at the [official site](https://mmdagent-ex.dev/).
 
-> Notice: this repository uses Git LFS (Large File Storage) to serve large model files.  **Make sure to install Git LFS before cloning this repository**.  See [the site](https://mmdagent-ex.dev/) for details.
+## Running Environments
+
+Windows / macOS / Linux / WSL
+
+## Tutorial
+
+There is a [tutorial doc](https://mmdagent-ex.dev/docs/build/) that guides you how to build and run MMDAgent-EX.
+
+### Windows
+
+There are win32 pre-built binaries for [each release](https://github.com/mmdagent-ex/MMDAgent-EX/releases), uploaded as `MMDAgent-EX-win32-vx.x.x.zip`.  You can download that of the latest version, and start from ["Running Examples" page](https://mmdagent-ex.dev/docs/run/), skipping the first build phase.
+
+### Other OS
+
+Please build MMDAgent-EX by your own.  The overall procedure is fully described in [the document's tutorial page](https://mmdagent-ex.dev/docs/build/)
 
 ## License
 
