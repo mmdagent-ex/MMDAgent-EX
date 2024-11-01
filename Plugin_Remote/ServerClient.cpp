@@ -275,7 +275,7 @@ ServerClient::kStatus ServerClient::waitData(int *sd, int num, int *sd_ret)
    ret = select(sdmax + 1, &rfds, &wfds, NULL, NULL);
    if (ret <= 0)
       return ServerClient::SOCKET_HASERROR;
-   if (FD_ISSET(m_server_sd, &rfds))
+   if (m_server_sd >= 0 && FD_ISSET(m_server_sd, &rfds))
       return ServerClient::SOCKET_CONNECT;
    for (i = 0; i < num; i++) {
       if (FD_ISSET(sd[i], &rfds)) {
