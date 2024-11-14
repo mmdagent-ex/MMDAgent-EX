@@ -6062,8 +6062,9 @@ void MMDAgent::procReceivedMessage(const char *type, const char *value)
          sendLogString(m_moduleId, MLOG_ERROR, "%s: number of arguments should be 1.", type);
          return;
       }
-      MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s%c%s", m_configDirName, MMDAGENT_DIRSEPARATOR, value);
-      setResetFlag(buff);
+      char *buf = MMDAgent_fullpathname(value);
+      setResetFlag(buf);
+      free(buf);
    } else if (MMDAgent_strequal(type, MMDAGENT_COMMAND_SETPARALLELSKINNINGTHREADS)) {
       /* CONFIG_PARALLELSKINNING_THREADS|nThread */
       sendLogString(m_moduleId, MLOG_MESSAGE_CAPTURED, "%s|%s", type, value);
