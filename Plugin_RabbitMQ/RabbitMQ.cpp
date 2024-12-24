@@ -467,10 +467,17 @@ void RabbitMQ::parse_received_data(char *buf, int len)
          if (buf) {
             for (int i = 0; i < len; i++)
                buf[i] = decodedData[i];
+            // disable streaming mode (== silence cut off) 
+            m_sync->setStreamingSoundDataFlag(false);
             const char *audioMode = m_motion_config->getParam("audio_mode");
-            m_sync->processSoundData(buf, len);
             if (audioMode && MMDAgent_strequal(audioMode, "file")) {
+               // feed sound samples to processing thread
+               m_sync->processSoundData(buf, len, true);
+               // segment audio playing
                m_sync->segmentSoundData();
+            } else {
+               // feed sound samples to processing thread
+               m_sync->processSoundData(buf, len, false);
             }
             m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: audio len = %d", m_name, len);
             free(buf);
