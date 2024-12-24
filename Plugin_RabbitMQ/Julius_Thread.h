@@ -88,6 +88,8 @@ public:
    int m_maxvol;                               /* maximum volume at latest segment */
    bool m_localAdin;
    bool m_requestPlayFlush;
+   bool m_requestSegmentAfterPlayed;
+   bool m_disablePlay;
 
    // constructor
    AudioProcess(bool local);
@@ -201,7 +203,7 @@ public :
    double getFrameIntervalMSec();
 
    /* processAudio: process audio */
-   void processAudio(const char *data, int len);
+   void processAudio(const char *data, int len, bool requestSegmentAfterPlayed = false);
 
    // getStreamingFlag: get streaming flag
    bool getStreamingFlag();
@@ -211,6 +213,9 @@ public :
 
    // segmentAudio: segment the current audio
    void segmentAudio();
+
+   // clearAudio: clear the current audio
+   void clearAudio();
 
    /* enableRecording: enable recording */
    void enableRecording(const char *dirname);
