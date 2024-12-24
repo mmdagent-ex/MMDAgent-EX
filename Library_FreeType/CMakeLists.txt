@@ -77,10 +77,19 @@ target_include_directories(FreeType PRIVATE
     src/include
 )
 
+
 # compiler definitions (-D) for private build
-target_compile_definitions(FreeType PRIVATE
-    FT2_BUILD_LIBRARY
-)
+if(APPLE)
+    # workaround for build on macOS 15.2
+    target_compile_definitions(FreeType PRIVATE
+        FT2_BUILD_LIBRARY
+        FT_CONFIG_OPTION_SYSTEM_ZLIB
+    )
+else()
+    target_compile_definitions(FreeType PRIVATE
+        FT2_BUILD_LIBRARY
+    )
+endif()
 
 # compiler options for private build
 #target_compile_options(FreeType PRIVATE
