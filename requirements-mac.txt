@@ -1,0 +1,13 @@
+poco
+glew
+libjpeg
+re2
+portaudio
+minizip
+libsndfile
+libsamplerate
+sox
+rabbitmq-c
+libomp
+librdkafka
+jpeg-turbo
