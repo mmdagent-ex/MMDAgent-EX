@@ -60,6 +60,7 @@ void CameraController::control(float frameNow)
    float x, y, z, ww;
    float w;
    short idx;
+   bool do_lerp;
 
    /* clamp frame to the defined last frame */
    if (frame > m_motion->keyFrameList[m_motion->numKeyFrame - 1].keyFrame)
@@ -110,6 +111,7 @@ void CameraController::control(float frameNow)
 
    /* calculate the position and rotation */
    if (time1 != time2) {
+      do_lerp = false;
       if (frame <= time1) {
          m_distance = distance1;
          m_pos      = pos1;
@@ -120,13 +122,29 @@ void CameraController::control(float frameNow)
          m_pos      = pos2;
          m_angle    = angle2;
          m_fovy     = fovy2;
-      } else if (time2 - time1 <= 1.0f ) {
-         /* successive keyframe in camera motion means camera switching, so do not perform interpolate between the frame */
-         m_distance = distance1;
-         m_pos      = pos1;
-         m_angle    = angle1;
-         m_fovy     = fovy1;
+      } else if (time2 - time1 <= 1.0f) {
+         /* successive keyframe in camera motion */
+         /* if position or angle is far, do not perform interpolate between the frame */
+         btQuaternion rot1 = btQuaternion(btVector3(btScalar(0.0f), btScalar(0.0f), btScalar(1.0f)), btScalar(MMDFILES_RAD(angle1.z())))
+            * btQuaternion(btVector3(btScalar(1.0f), btScalar(0.0f), btScalar(0.0f)), btScalar(MMDFILES_RAD(angle1.x())))
+            * btQuaternion(btVector3(btScalar(0.0f), btScalar(1.0f), btScalar(0.0f)), btScalar(MMDFILES_RAD(angle1.y())));
+         btQuaternion rot2 = btQuaternion(btVector3(btScalar(0.0f), btScalar(0.0f), btScalar(1.0f)), btScalar(MMDFILES_RAD(angle1.z())))
+            * btQuaternion(btVector3(btScalar(1.0f), btScalar(0.0f), btScalar(0.0f)), btScalar(MMDFILES_RAD(angle2.x())))
+            * btQuaternion(btVector3(btScalar(0.0f), btScalar(1.0f), btScalar(0.0f)), btScalar(MMDFILES_RAD(angle2.y())));
+         btQuaternion q_diff = rot2 * rot1.inverse();
+         btScalar angle_diff = q_diff.getAngle();
+         if (pos1.distance2(pos2) > 3.0 || angle_diff > 0.08 || fabs(distance1 - distance2) > 3.0 || fabs(fovy1 - fovy2) > 2.0) {
+            m_distance = distance1;
+            m_pos = pos1;
+            m_angle = angle1;
+            m_fovy = fovy1;
+         } else {
+            do_lerp = true;
+         }
       } else {
+         do_lerp = true;
+      }
+      if (do_lerp) {
          /* lerp */
          w = (frame - time1) / (time2 - time1);
          idx = (short)(w * VMD_INTERPOLATIONTABLESIZE);
