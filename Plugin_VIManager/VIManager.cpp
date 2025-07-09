@@ -606,7 +606,7 @@ void VIManager::substituteVariableAndCopy(const char *input, char *output)
    const char *c;
    char *out, *cv;
    unsigned char size;
-   bool braced;
+   int braced_counter;
    VIManager_Variable *v;
 
    len = MMDAgent_strlen(input);
@@ -636,9 +636,9 @@ void VIManager::substituteVariableAndCopy(const char *input, char *output)
             size = 1;
             continue;
          }
-         braced = false;
+         braced_counter = 0;
          if (MMDAgent_getcharsize(c) == 1 && *c == '{') {
-            braced = true;
+            braced_counter++;
             c += 1;
             i += 1;
          }
@@ -648,8 +648,11 @@ void VIManager::substituteVariableAndCopy(const char *input, char *output)
                *out = '\0';
                return;
             }
-            if (braced == true) {
-               if (MMDAgent_getcharsize(c) == 1 && *c == '}') {
+            if (MMDAgent_getcharsize(c) == 1 && *c == '{') {
+               braced_counter++;
+            } else if (MMDAgent_getcharsize(c) == 1 && *c == '}') {
+               braced_counter--;
+               if (braced_counter == 0) {
                   c += 1;
                   i += 1;
                   break;
@@ -663,7 +666,22 @@ void VIManager::substituteVariableAndCopy(const char *input, char *output)
          }
          *out = '\0';
          /* search for variable */
-         if (*(cv + 1) == '%') {
+         if (MMDAgent_strstr(cv + 1, "%ENV")) {
+            /* consult environmental variables */
+            v = NULL;
+            out = cv;
+            char replaced_str[MMDAGENT_MAXBUFLEN];
+            m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s", cv + 1);
+            if (MMDAgent_replaceEnvDup(cv + 1, replaced_str) >= 0) {
+               m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: get \"%s\": \"%s\"", m_name, cv + 1, replaced_str);
+               vlen = MMDAgent_strlen(replaced_str);
+               memcpy(out, replaced_str, vlen);
+               out += vlen;
+            } else {
+               m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: \"%s\": not found", m_name, cv + 1);
+            }
+         } else if (*(cv + 1) == '%') {
+            /* consult global variable in KeyValue */
             v = NULL;
             /* rewind out buf to the start of variable name */
             out = cv;
