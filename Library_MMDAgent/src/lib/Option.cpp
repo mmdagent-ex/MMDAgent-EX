@@ -167,6 +167,8 @@ void Option::initialize()
    m_transparentColor[1] = OPTION_TRANSPARENTCOLORG_DEF;
    m_transparentColor[2] = OPTION_TRANSPARENTCOLORB_DEF;
    m_transparentPixmap = OPTION_TRANSPARENTPIXMAP_DEF;
+
+   m_useStdInOut = OPTION_USESTDINOUT_DEF;
 }
 
 /* Option::Option: constructor */
@@ -365,6 +367,8 @@ bool Option::load(const char *file, ZFileKey *key, char **errstr)
             setTransparentColor(fvec3);
       } else if (MMDAgent_strequal(buf, OPTION_TRANSPARENTPIXMAP_STR)) {
          setTransparentPixmap(MMDAgent_str2bool(p1));
+      } else if (MMDAgent_strequal(buf, OPTION_USESTDINOUT_STR)) {
+         setUseStdInOut(MMDAgent_str2bool(p1));
       }
    }
 
@@ -1297,4 +1301,16 @@ bool Option::getTransparentPixmap()
 void Option::setTransparentPixmap(bool b)
 {
    m_transparentPixmap = b;
+}
+
+/* Option::getUseStdInOut: get use of standard in and out for messaging */
+bool Option::getUseStdInOut()
+{
+   return m_useStdInOut;
+}
+
+/* Option::setUseStdInOut: set use of standard in and out for messaging  */
+void Option::setUseStdInOut(bool b)
+{
+   m_useStdInOut = b;
 }

@@ -298,6 +298,45 @@ static char *prepareCacheDirDup(char *basename)
    return(cacheDirName);
 }
 
+static boolean stdInputThreadRunning = false;
+static MMDAgent *mmdagent_for_stdin = NULL;
+
+static void assignStdInputInstance(MMDAgent *mmdagent)
+{
+   mmdagent_for_stdin = mmdagent;
+}
+
+/* thread main function receiving standard input and post them to message queue */
+static void stdInputReceivingThreadMain(void *param)
+{
+   char buff[MMDAGENT_MAXBUFLEN];
+   char *save, *type, *args;
+
+   stdInputThreadRunning = true;
+
+   mmdagent_for_stdin = (MMDAgent *)param;
+
+   mmdagent_for_stdin->sendLogString(0, MLOG_STATUS, "stdin thread started");
+
+   while (1) {
+      if (fgets(buff, MMDAGENT_MAXBUFLEN, stdin) == NULL) {
+         // EOF
+         break;
+      }
+      if (MMDAgent_strlen(buff) > 0) {
+         type = MMDAgent_strtok(buff, "|\r\n", &save);
+         if (type) {
+            args = MMDAgent_strtok(NULL, "\r\n", &save);
+            mmdagent_for_stdin->sendMessage(0, type, "%s", args ? args : "");
+         }
+      }
+   }
+
+   stdInputThreadRunning = false;
+
+   mmdagent_for_stdin->sendLogString(0, MLOG_WARNING, "stdin thread exited");
+}
+
 /* MMDAgent::getNewModelId: return new model ID */
 int MMDAgent::getNewModelId()
 {
@@ -2443,6 +2482,16 @@ bool MMDAgent::setupWorld()
             return false;
          }
          sendLogString(m_moduleId, MLOG_STATUS, "transparent screen disabled");
+      }
+   }
+
+   if (m_option->getUseStdInOut() == true) {
+      if (stdInputThreadRunning == false) {
+         /* start standard input receiving thread */
+         if (glfwCreateThread(stdInputReceivingThreadMain, this) == -1)
+            sendLogString(m_moduleId, MLOG_ERROR, "failed to create standard input receiving thread");
+      } else {
+         assignStdInputInstance(this);
       }
    }
 
@@ -5417,6 +5466,18 @@ void MMDAgent::procReceivedMessage(const char *type, const char *value)
    if(MMDAgent_strlen(type) <= 0)
       return;
 
+   if (m_option->getUseStdInOut() == true) {
+      /* output message to stdout */
+      if (MMDAgent_strlen(type) > 0) {
+         if (MMDAgent_strlen(value) > 0) {
+            printf("%s|%s\n", type, value);
+         } else {
+            printf("%s\n", type);
+         }
+         fflush(stdout);
+      }
+   }
+
    if (m_plugin)
       m_plugin->execProcMessage(this, type, value);
 
@@ -6245,12 +6306,12 @@ void MMDAgent::procReceivedLogString(int id, unsigned int flag, const char *log,
    // compose log string
    modulename = getModuleName(id);
    if (modulename == NULL) {
-      printf("InternalError: unknown module id = %d\n", id);
+      sendLogString(m_moduleId, MLOG_ERROR, "InternalError: unknown module id = %d", id);
       return;
    }
    flagString = m_message->getFlagString(flag);
    if (flagString == NULL) {
-      printf("InternalError: unknown flag id = %d\n", flag);
+      sendLogString(m_moduleId, MLOG_ERROR, "InternalError: unknown flag id = %d", flag);
       return;
    }
 
@@ -6270,8 +6331,10 @@ void MMDAgent::procReceivedLogString(int id, unsigned int flag, const char *log,
       __android_log_print(ANDROID_LOG_VERBOSE, "MMDAgent", "%s: %s", modulename, log);
    }
 #else
-   // write to stdout
-   printf("%s", buf);
+   if (m_option->getUseStdInOut() == false) {
+      // write to stdout
+      printf("%s", buf);
+   }
 #endif /* __ANDROID__ */
 
    // write to log file
