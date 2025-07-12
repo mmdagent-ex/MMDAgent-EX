@@ -298,7 +298,7 @@ static char *prepareCacheDirDup(char *basename)
    return(cacheDirName);
 }
 
-static boolean stdInputThreadRunning = false;
+static bool stdInputThreadRunning = false;
 static MMDAgent *mmdagent_for_stdin = NULL;
 
 static void assignStdInputInstance(MMDAgent *mmdagent)
