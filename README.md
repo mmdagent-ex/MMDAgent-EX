@@ -17,7 +17,9 @@ MMDAgent was developed at Nagoya Institute of Technology since 2011 as an open-s
 
 MMDAgent-EX has its own OpenGL-based rendering engine compatible with MMD (MikuMikuDance), and can create interactive characters using 3D models and motion data in MMD format. It also includes speech recognition and synthesis engines developed at Nagoya Institute of Technology, such as Julius and Open JTalk, as well as an embedded FST-based state-transition primitive dialogue scripting feature, allowing you to build voice dialogue systems independently. Aside from the internal engines, it can be easily connected to other scripts like Python, so you can add another modules such as cloud-based speech recognition, speech synthesis engines, or large language models like ChatGPT with this system. Furthermore, it supports external control via socket connections, making it suitable for use as the input/output frontend for existing dialogue systems.
 
-All documents are available at the [official site](https://mmdagent-ex.dev/).
+## Documents
+
+All documents about installation, tests and tutorials are on the [official site](https://mmdagent-ex.dev/).
 
 ## Running Environments
 
@@ -137,3 +139,4 @@ MMDAgent:
 - Akinobu Lee (Nagoya Institute of Technology, Japan)
 - Keiichiro Oura (Nagoya Institute of Technology, Japan)
 - Daisuke Yamamoto (Nagoya Institute of Technology, Japan)
+
