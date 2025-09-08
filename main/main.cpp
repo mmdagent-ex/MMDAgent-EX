@@ -1282,7 +1282,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
    /* set DLL directory */
    GetFullPathNameW(wargv[0], MAX_PATH, wbuf, NULL);
    PathRemoveFileSpecW(wbuf);
+#ifdef _WIN64
+   /* use "DLLs64" folder instead of "DLLs" for WIN64 */
+   PathCombineW(wbuf2, wbuf, L"DLLs64");
+#else
    PathCombineW(wbuf2, wbuf, L"DLLs");
+#endif
    SetDllDirectoryW(wbuf2);
 
    argv = (char **) malloc(sizeof(char *) * argc);

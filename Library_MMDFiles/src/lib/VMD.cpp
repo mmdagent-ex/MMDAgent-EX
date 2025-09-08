@@ -542,7 +542,7 @@ bool VMD::parse(const unsigned char *data, unsigned long size)
 
    data += sizeof(VMDFile_FaceFrame) * m_numTotalFaceKeyFrame;
 
-   if ((unsigned long) data - (unsigned long) start >= size) {
+   if ((uintptr_t)data - (uintptr_t)start >= size) {
       /* no further entry */
       return true;
    }
@@ -574,7 +574,7 @@ bool VMD::parse(const unsigned char *data, unsigned long size)
       }
       qsort(m_cameraMotion->keyFrameList, m_cameraMotion->numKeyFrame, sizeof(CameraKeyFrame), compareCameraKeyFrame);
    }
-   if ((unsigned long) data - (unsigned long) start >= size) {
+   if ((uintptr_t) data - (uintptr_t) start >= size) {
       /* no further entry */
       return true;
    }
@@ -583,7 +583,7 @@ bool VMD::parse(const unsigned char *data, unsigned long size)
    memcpy(&i, data, sizeof(unsigned int));
    data += sizeof(unsigned int);
    data += sizeof(VMDFile_LightFrame) * i;
-   if ((unsigned long) data - (unsigned long) start >= size) {
+   if ((uintptr_t) data - (uintptr_t) start >= size) {
       /* no further entry */
       return true;
    }
@@ -592,7 +592,7 @@ bool VMD::parse(const unsigned char *data, unsigned long size)
    memcpy(&i, data, sizeof(unsigned int));
    data += sizeof(unsigned int);
    data += sizeof(VMDFile_SelfShadowFrame) * i;
-   if ((unsigned long) data - (unsigned long) start >= size) {
+   if ((uintptr_t) data - (uintptr_t) start >= size) {
       /* no further entry */
       return true;
    }
