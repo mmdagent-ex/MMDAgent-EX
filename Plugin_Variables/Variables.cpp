@@ -146,7 +146,7 @@ void Variables::set(const char *alias, const char *str1, const char *str2)
    if(str2 == NULL) {
       val->sval = MMDAgent_strdup(str1);
    } else {
-      int plen = sizeof(char) * (MMDAgent_strlen(str1) + 1 + MMDAgent_strlen(str2) + 1);
+      size_t plen = sizeof(char) * (MMDAgent_strlen(str1) + 1 + MMDAgent_strlen(str2) + 1);
       val->sval = (char *) malloc(plen);
       MMDAgent_snprintf(val->sval, plen, "%s|%s", str1, str2);
    }

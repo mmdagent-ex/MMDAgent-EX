@@ -195,7 +195,7 @@ void PMDObject::release()
 bool PMDObject::load(const char *fileName, const char *alias, btVector3 *offsetPos, btQuaternion *offsetRot, bool forcedPosition, PMDBone *assignBone, PMDObject *assignObject, BulletPhysics *bullet, SystemTexture *systex, LipSync *sysLipSync, bool useCartoonRendering, float cartoonEdgeWidth, bool useLightEdge, btVector3 *light, float commentFrame, PMDModel *preloadedPMDModel, const char *appDirName)
 {
    int i;
-   int len;
+   size_t len;
    char *buf;
    LipSync *lip;
    char buff[MMDAGENT_MAXBUFLEN];
@@ -1389,7 +1389,7 @@ bool PMDObject::doCapture(double ellapsedFrame)
    /* expand work area if needed */
    if (m_motionCaptureDataTotalNum[0] + m_pmd->getNumBone() >= m_motionCaptureDataAllocated[0]) {
       /* store current position */
-      unsigned int len = m_motionCaptureDataP[0] - m_motionCaptureDataStorage[0];
+      intptr_t len = m_motionCaptureDataP[0] - m_motionCaptureDataStorage[0];
       /* increment allocate step */
       m_motionCaptureDataAllocStep[0] *= 2;
       /* re-allocate */
@@ -1399,7 +1399,7 @@ bool PMDObject::doCapture(double ellapsedFrame)
       m_motionCaptureDataP[0] = m_motionCaptureDataStorage[0] + len;
    }
    if (m_motionCaptureDataTotalNum[1] + m_pmd->getNumFace() >= m_motionCaptureDataAllocated[1]) {
-      unsigned int len = m_motionCaptureDataP[1] - m_motionCaptureDataStorage[1];
+      intptr_t len = m_motionCaptureDataP[1] - m_motionCaptureDataStorage[1];
       m_motionCaptureDataAllocStep[1] *= 2;
       m_motionCaptureDataAllocated[1] += m_motionCaptureDataAllocStep[1];
       m_motionCaptureDataStorage[1] = (unsigned char *)realloc(m_motionCaptureDataStorage[1], sizeof(VMDFile_FaceFrame) * m_motionCaptureDataAllocated[1]);

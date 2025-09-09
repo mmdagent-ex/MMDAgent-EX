@@ -29,8 +29,8 @@ private:
    struct LINK {
       char *url;
       float x1, y1, x2, y2;
-      int textloc;
-      int textlen;
+      size_t textloc;
+      size_t textlen;
       struct LINK *next;
       LINK() {
          url = NULL;

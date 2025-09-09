@@ -290,7 +290,7 @@ int ServerClient::send(int sd, const void *buf, size_t len)
 {
    int ret;
 #ifdef WINSOCK
-   ret = ::send(sd, (const char *)buf, len, 0);
+   ret = ::send(sd, (const char *)buf, (int)len, 0);
 #else
    ret = (int)::send(sd, buf, len, 0);
 #endif
@@ -301,7 +301,7 @@ int ServerClient::recv(int sd, void *buf, size_t maxlen)
 {
    int ret;
 #ifdef WINSOCK
-   ret = ::recv(sd, (char *)buf, maxlen, 0);
+   ret = ::recv(sd, (char *)buf, (int)maxlen, 0);
 #else
    ret = (int)::recv(sd, buf, maxlen, 0);
 #endif

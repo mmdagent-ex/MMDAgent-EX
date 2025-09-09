@@ -93,7 +93,7 @@ bool MMDFiles_strheadmatch(const char *str1, const char *str2);
 bool MMDFiles_strtailmatch(const char *str1, const char *str2);
 
 /* MMDFiles_strlen: strlen */
-int MMDFiles_strlen(const char *str);
+size_t MMDFiles_strlen(const char *str);
 
 /* MMDFiles_strtok: strtok */
 char *MMDFiles_strtok(char *str, const char *pat, char **save);

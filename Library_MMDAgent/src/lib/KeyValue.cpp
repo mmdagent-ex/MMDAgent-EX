@@ -73,7 +73,7 @@ void KeyValue::setup()
 bool KeyValue::loadBuf(const char *buffer)
 {
    char buf[MMDAGENT_MAXBUFLEN];
-   int len;
+   size_t len;
    char *p1;
 
    MMDAgent_snprintf(buf, MMDAGENT_MAXBUFLEN, "%s", buffer);
@@ -144,7 +144,7 @@ bool KeyValue::loadText(const char *file, ZFileKey *key, bool append)
    char buff2[MMDAGENT_MAXBUFLEN];
    ZFile *zf;
    bool sw;
-   int len;
+   size_t len;
    char *p;
 
    zf = new ZFile(key);
@@ -223,7 +223,7 @@ char **KeyValue::findData(const char *key)
       return NULL;
    if (m_index == NULL)
       return NULL;
-   if (m_index->search(key, MMDAgent_strlen(key), (void **) &data) == false)
+   if (m_index->search(key, (int)MMDAgent_strlen(key), (void **) &data) == false)
       return NULL;
    return data;
 }
@@ -232,7 +232,7 @@ char **KeyValue::findData(const char *key)
 bool KeyValue::setString(const char *key, const char *format, ...)
 {
    char buff[MMDAGENT_MAXBUFLEN];
-   int len;
+   size_t len;
    char **data;
    va_list args;
 
@@ -240,12 +240,12 @@ bool KeyValue::setString(const char *key, const char *format, ...)
       return false;
 
    len = MMDAgent_strlen(key);
-   if (m_index->search(key, len, (void **)&data) == false) {
+   if (m_index->search(key, (int)len, (void **)&data) == false) {
       if (m_num >= KEYVALUE_MAXNUM)
          return false;
       data = &(m_data[m_num]);
       *data = NULL;
-      m_index->add(key, len, (void *)data);
+      m_index->add(key, (int)len, (void *)data);
       m_num++;
    }
 
@@ -284,16 +284,16 @@ const char *KeyValue::getString(const char *key, const char *default_value)
 
    /* env has been embedded, keep buffer */
    char **dataEnv;
-   int len;
+   size_t len;
    if (m_env == NULL)
       m_env = new PTree;
    len = MMDAgent_strlen(key);
-   if (m_env->search(key, len, (void **)&dataEnv) == false) {
+   if (m_env->search(key, (int)len, (void **)&dataEnv) == false) {
       if (m_num >= KEYVALUE_MAXNUM)
          return NULL;
       dataEnv = &(m_data[m_num]);
       *dataEnv = (char *)malloc(MMDAGENT_MAXBUFLEN);
-      m_env->add(key, len, (void *)dataEnv);
+      m_env->add(key, (int)len, (void *)dataEnv);
       m_num++;
    }
    memcpy(*dataEnv, buf, MMDAGENT_MAXBUFLEN);

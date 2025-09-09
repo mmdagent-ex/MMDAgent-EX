@@ -279,7 +279,7 @@ bool PMDModel::parse(const unsigned char *data, unsigned long size, BulletPhysic
 
    /* end of base format */
    /* check for remaining data */
-   if ((unsigned long) data - (unsigned long) start >= size) {
+   if ((uintptr_t) data - (uintptr_t) start >= size) {
       /* no extension data remains */
       m_numRigidBody = 0;
       m_numConstraint = 0;
@@ -348,7 +348,7 @@ bool PMDModel::parse(const unsigned char *data, unsigned long size, BulletPhysic
       }
 
       /* check for remaining data */
-      if ((unsigned long) data - (unsigned long) start >= size) {
+      if ((uintptr_t) data - (uintptr_t) start >= size) {
          /* no rigid body / constraint data exist */
          m_numRigidBody = 0;
          m_numConstraint = 0;
@@ -400,11 +400,11 @@ bool PMDModel::parse(const unsigned char *data, unsigned long size, BulletPhysic
    /* build name->entity index for fast lookup */
    for (j = 0; j < m_numBone; j++) {
       name = m_boneList[j].getName();
-      if (name) m_name2bone.add(name, strlen(name), &(m_boneList[j]));
+      if (name) m_name2bone.add(name, (int)strlen(name), &(m_boneList[j]));
    }
    for (j = 0; j < m_numFace; j++) {
       name = m_faceList[j].getName();
-      if (name) m_name2face.add(name, strlen(name), &(m_faceList[j]));
+      if (name) m_name2face.add(name, (int)strlen(name), &(m_faceList[j]));
    }
 
    return ret;
@@ -858,7 +858,7 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
                   // override the name of the bone with the newly given name
                   m_boneList[numBone].setName(s);
                   // add mapping from the new name to the bone
-                  m_name2bone.add(s, MMDFiles_strlen(s), &(m_boneList[numBone]));
+                  m_name2bone.add(s, (int)MMDFiles_strlen(s), &(m_boneList[numBone]));
                }
                if (PMX257format == false)
                   free(s);
@@ -1632,23 +1632,23 @@ bool PMDModel::parseExtCsv(const char *file, const char *dir)
    /* make name index */
    for (unsigned short j = 0; j < m_numBoneMorph; j++) {
       char *name = m_boneMorphList[j].getName();
-      if (name) m_name2bonemorph.add(name, strlen(name), &(m_boneMorphList[j]));
+      if (name) m_name2bonemorph.add(name, (int)strlen(name), &(m_boneMorphList[j]));
    }
    for (unsigned short j = 0; j < m_numVertexMorph; j++) {
       char *name = m_vertexMorphList[j].getName();
-      if (name) m_name2vertexmorph.add(name, strlen(name), &(m_vertexMorphList[j]));
+      if (name) m_name2vertexmorph.add(name, (int)strlen(name), &(m_vertexMorphList[j]));
    }
    for (unsigned short j = 0; j < m_numUVMorph; j++) {
       char *name = m_uvMorphList[j].getName();
-      if (name) m_name2uvmorph.add(name, strlen(name), &(m_uvMorphList[j]));
+      if (name) m_name2uvmorph.add(name, (int)strlen(name), &(m_uvMorphList[j]));
    }
    for (unsigned short j = 0; j < m_numMaterialMorph; j++) {
       char *name = m_materialMorphList[j].getName();
-      if (name) m_name2materialmorph.add(name, strlen(name), &(m_materialMorphList[j]));
+      if (name) m_name2materialmorph.add(name, (int)strlen(name), &(m_materialMorphList[j]));
    }
    for (unsigned short j = 0; j < m_numGroupMorph; j++) {
       char *name = m_groupMorphList[j].getName();
-      if (name) m_name2groupmorph.add(name, strlen(name), &(m_groupMorphList[j]));
+      if (name) m_name2groupmorph.add(name, (int)strlen(name), &(m_groupMorphList[j]));
    }
    /* serialize data */
    for (unsigned short j = 0; j < m_numVertexMorph; j++)

@@ -98,7 +98,7 @@ void PMDModel::renderModel(bool renderEdgeFlag)
       glEnable(GL_TEXTURE_2D);
       glClientActiveTexture(GL_TEXTURE1);
       glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-      glTexCoordPointer(2, GL_FLOAT, 0, (const GLvoid *)m_vboOffsetCoordForShadowMap);
+      glTexCoordPointer(2, GL_FLOAT, 0, (const GLvoid *)(uintptr_t)m_vboOffsetCoordForShadowMap);
       glActiveTexture(GL_TEXTURE0);
       glClientActiveTexture(GL_TEXTURE0);
    }
@@ -109,8 +109,8 @@ void PMDModel::renderModel(bool renderEdgeFlag)
    /* set lists */
    glEnableClientState(GL_VERTEX_ARRAY);
    glEnableClientState(GL_NORMAL_ARRAY);
-   glVertexPointer(3, GL_FLOAT, sizeof(btVector3), (const GLvoid *) m_vboOffsetVertex);
-   glNormalPointer(GL_FLOAT, sizeof(btVector3), (const GLvoid *) m_vboOffsetNormal);
+   glVertexPointer(3, GL_FLOAT, sizeof(btVector3), (const GLvoid *)(uintptr_t)m_vboOffsetVertex);
+   glNormalPointer(GL_FLOAT, sizeof(btVector3), (const GLvoid *)(uintptr_t)m_vboOffsetNormal);
    if (m_toon) {
       /* set toon texture coordinates to texture unit 1 */
       if (!m_selfShadowDrawing) {
@@ -118,7 +118,7 @@ void PMDModel::renderModel(bool renderEdgeFlag)
          glEnable(GL_TEXTURE_2D);
          glClientActiveTexture(GL_TEXTURE1);
          glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-         glTexCoordPointer(2, GL_FLOAT, 0, (const GLvoid *)m_vboOffsetToon);
+         glTexCoordPointer(2, GL_FLOAT, 0, (const GLvoid *)(uintptr_t)m_vboOffsetToon);
          glActiveTexture(GL_TEXTURE0);
          glClientActiveTexture(GL_TEXTURE0);
       }
@@ -403,13 +403,13 @@ void PMDModel::renderModel(bool renderEdgeFlag)
          glDisable(GL_LIGHTING);
          glEnableClientState(GL_VERTEX_ARRAY);
          glColor4f(m_edgeColor[0], m_edgeColor[1], m_edgeColor[2], m_edgeColor[3] * modelAlpha);
-         glVertexPointer(3, GL_FLOAT, sizeof(btVector3), (const GLvoid *)m_vboOffsetEdge);
+         glVertexPointer(3, GL_FLOAT, sizeof(btVector3), (const GLvoid *)(uintptr_t)m_vboOffsetEdge);
          glDrawElements(GL_TRIANGLES, numSurface, GL_INDICES, (const GLvoid *)((GLubyte *)NULL + surfaceOffset));
          glEnable(GL_LIGHTING);
       } else {
          glDisable(GL_LIGHTING);
          glEnableClientState(GL_VERTEX_ARRAY);
-         glVertexPointer(3, GL_FLOAT, sizeof(btVector3), (const GLvoid *)m_vboOffsetEdge);
+         glVertexPointer(3, GL_FLOAT, sizeof(btVector3), (const GLvoid *)(uintptr_t)m_vboOffsetEdge);
          for (i = 0; i < m_numMaterial; i++) {
             if (m_material[i].getEdgeFlag()) {
                col = m_material[i].getExtEdgeColor();
@@ -452,7 +452,7 @@ void PMDModel::renderForPlain()
    glDisable(GL_CULL_FACE);
    glBindBuffer(GL_ARRAY_BUFFER, m_vboBufDynamic);
    glEnableClientState(GL_VERTEX_ARRAY);
-   glVertexPointer(3, GL_FLOAT, sizeof(btVector3), (const GLvoid *)m_vboOffsetVertex);
+   glVertexPointer(3, GL_FLOAT, sizeof(btVector3), (const GLvoid *)(uintptr_t)m_vboOffsetVertex);
    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vboBufElement);
    glDrawElements(GL_TRIANGLES, m_numSurface, GL_INDICES, (const GLvoid *)((GLubyte *)NULL));
    glDisableClientState(GL_VERTEX_ARRAY);
@@ -484,7 +484,7 @@ void PMDModel::renderForShadow()
    glDisable(GL_CULL_FACE);
    glBindBuffer(GL_ARRAY_BUFFER, m_vboBufDynamic);
    glEnableClientState(GL_VERTEX_ARRAY);
-   glVertexPointer(3, GL_FLOAT, sizeof(btVector3), (const GLvoid *) m_vboOffsetVertex);
+   glVertexPointer(3, GL_FLOAT, sizeof(btVector3), (const GLvoid *)(uintptr_t)m_vboOffsetVertex);
    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vboBufElement);
    glDrawElements(GL_TRIANGLES, numSurface, GL_INDICES, (const GLvoid *)((GLubyte *)NULL + surfaceOffset));
    glDisableClientState(GL_VERTEX_ARRAY);
@@ -525,7 +525,7 @@ void PMDModel::renderForShadowMap()
    glDisable(GL_CULL_FACE);
    glBindBuffer(GL_ARRAY_BUFFER, m_vboBufDynamic);
    glEnableClientState(GL_VERTEX_ARRAY);
-   glVertexPointer(3, GL_FLOAT, sizeof(btVector3), (const GLvoid *)m_vboOffsetVertex);
+   glVertexPointer(3, GL_FLOAT, sizeof(btVector3), (const GLvoid *)(uintptr_t)m_vboOffsetVertex);
    glDrawElements(GL_TRIANGLES, m_numSurfaceForShadowMap, GL_INDICES, (const GLvoid *)0);
    glDisableClientState(GL_VERTEX_ARRAY);
    glBindBuffer(GL_ARRAY_BUFFER, 0);

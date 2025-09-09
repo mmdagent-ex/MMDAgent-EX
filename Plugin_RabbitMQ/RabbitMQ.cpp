@@ -462,7 +462,7 @@ void RabbitMQ::parse_received_data(char *buf, int len)
             decodedData.push_back(ch);
          }
 
-         int len = decodedData.size();
+         int len = (int)decodedData.size();
          char *buf = (char *)malloc(len);
          if (buf) {
             for (int i = 0; i < len; i++)

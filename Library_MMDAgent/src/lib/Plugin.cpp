@@ -140,7 +140,7 @@ bool DLLibrary_load(DLLibrary *d, const char *dir, const char *file)
    DLLibrary_clear(d);
 
    /* open */
-   int plen = sizeof(char) * (MMDAgent_strlen(dir) + 1 + MMDAgent_strlen(file) + 1);
+   size_t plen = sizeof(char) * (MMDAgent_strlen(dir) + 1 + MMDAgent_strlen(file) + 1);
    buf = (char *) malloc(plen);
    MMDAgent_snprintf(buf, plen, "%s%c%s", dir, MMDAGENT_DIRSEPARATOR, file);
    d->handle = MMDAgent_dlopen(buf);
@@ -384,7 +384,7 @@ bool Plugin::load(MMDAgent *mmdagent, int id, const char *dir)
             continue;
          strncpy(buf2, &(buf[7]), MMDAGENT_MAXBUFLEN - 1);
 #endif
-         i = MMDAgent_strlen(buf2) - 1;
+         i = (int)MMDAgent_strlen(buf2) - 1;
          while (i >= 0 && buf2[i] != '.') i--;
          if (i < 0)
             continue;

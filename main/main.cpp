@@ -1211,7 +1211,7 @@ int commonMainExec(int argc, char **argv)
    if (fp) {
       char readbuf[1024];
       if (fgets(readbuf, 1024, fp) != NULL) {
-         int len = strlen(readbuf) - 1;
+         int len = (int)strlen(readbuf) - 1;
          while (len >= 0 && (readbuf[len] == '\r' || readbuf[len] == '\n')) {
             readbuf[len] = '\0';
             len--;
@@ -1239,7 +1239,7 @@ int commonMainExec(int argc, char **argv)
 #if defined(_WIN32) && !defined(__MINGW32__)
 bool wTailMatch(const wchar_t *str1, const wchar_t *str2)
 {
-   int len1, len2;
+   size_t len1, len2;
 
    if (str1 == NULL || str2 == NULL)
       return false;
@@ -1310,7 +1310,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
          error = true;
          continue;
       }
-      result = WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)warg, -1, (LPSTR) argv[i], len, NULL, NULL);
+      result = WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)warg, -1, (LPSTR) argv[i], (int)len, NULL, NULL);
       if((size_t) result != len) {
          error = true;
          continue;

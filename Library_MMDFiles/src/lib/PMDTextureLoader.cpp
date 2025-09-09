@@ -61,7 +61,7 @@
 /* PMDTextureLoader_strcat: strcat using buffer size */
 static void PMDTextureLoader_strcat(char *buf, int size, const char *str)
 {
-   int i, j, len1, len2;
+   size_t i, j, len1, len2;
    char c;
 
    len1 = MMDFiles_strlen(buf);

@@ -131,7 +131,7 @@ bool MMDAgent_strtailmatch(const char *str1, const char *str2)
 }
 
 /* MMDAgent_strlen: strlen */
-int MMDAgent_strlen(const char *str)
+size_t MMDAgent_strlen(const char *str)
 {
    return MMDFiles_strlen(str);
 }
@@ -1117,14 +1117,14 @@ char *MMDAgent_tailpath(const char *file, int targettaillen)
    int i, len;
    int sizelist[MMDAGENT_MAXBUFLEN];
    int sizelistlen;
-   char size;
+   unsigned char size;
    int sumlen;
    char *tailstr = NULL;
 
    if (file == NULL)
       return NULL;
 
-   len = MMDAgent_strlen(file);
+   len = (int)MMDAgent_strlen(file);
 
    /* make dir separator index */
    sizelistlen = 0;
@@ -1310,13 +1310,13 @@ char *MMDAgent_langstr(const char *text, const char *lang)
 /* return code: 2 replaced, 1 for no value, 0 for no op, -1 for parse error, -2 for too long, -3 for invalid arguments */
 int MMDAgent_replaceEnvDup(const char *str, char *retbuf)
 {
-   int i, dst, len;
+   size_t i, dst, len;
    const char *p;
    unsigned char size = 1;
    char buff1[MMDAGENT_MAXBUFLEN];
    char buff2[MMDAGENT_MAXBUFLEN];
    char envname[MMDAGENT_MAXBUFLEN];
-   int copylen;
+   size_t copylen = 0;
    int ret = 0;
 
    if (str == NULL || retbuf == NULL) {
@@ -1338,11 +1338,12 @@ int MMDAgent_replaceEnvDup(const char *str, char *retbuf)
    strcpy(buff1, str);
 
    while ((p = MMDAgent_strstr(buff1, "%ENV{")) != NULL) {
-      dst = p - &(buff1[0]);
+      dst = (size_t)(p - &(buff1[0]));
       // copy from till p to buffer
       memcpy(buff2, buff1, dst);
       buff2[dst] = '\0';
       // get env name
+      envname[0] = '\0';
       for (i = dst + 5; i < len; i += size) {
          size = MMDAgent_getcharsize(&(buff1[i]));
          if (size == 0) {
@@ -1350,10 +1351,14 @@ int MMDAgent_replaceEnvDup(const char *str, char *retbuf)
             return -1;
          }
          if (size == 1 && buff1[i] == '}') {
-            copylen = i - (dst + 5);
-            if (copylen > 0)
+
+            if (i > dst + 5) {
+               copylen = i - (dst + 5);
                memcpy(&(envname[0]), &(buff1[dst + 5]), copylen);
-            envname[copylen] = '\0';
+               envname[copylen] = '\0';
+            } else {
+               envname[0] = '\0';
+            }
             break;
          }
       }
@@ -1364,8 +1369,8 @@ int MMDAgent_replaceEnvDup(const char *str, char *retbuf)
       // append env name to buffer
       const char *envstr = std::getenv(envname);
       if (envstr != NULL) {
-         int envlen = MMDAgent_strlen(envstr);
-         if (len - (copylen + 6) + envlen > MMDAGENT_MAXBUFLEN) {
+         size_t envlen = MMDAgent_strlen(envstr);
+         if (len + envlen > MMDAGENT_MAXBUFLEN + copylen + 6) {
             /* too long */
             return -2;
          }
@@ -1390,14 +1395,14 @@ int MMDAgent_replaceEnvDup(const char *str, char *retbuf)
 /* MMDAgent_strWrapDup: insert newline at certain len */
 char *MMDAgent_strWrapDup(const char *str, int len)
 {
-   int inLen = strlen(str);
-   int size = 0;
-   int numWrap = (inLen - 1) / len;
+   size_t inLen = strlen(str);
+   unsigned char size = 0;
+   int numWrap = ((int)inLen - 1) / len;
    char *s = (char *)malloc(inLen + numWrap + 1);
-   int bound = len;
+   size_t bound = len;
 
    char *out = s;
-   for (int i = 0; i < inLen; i += size) {
+   for (size_t i = 0; i < inLen; i += size) {
       size = MMDFiles_getcharsize(&(str[i]));
       if (i + size > bound) {
          *out++ = '\n';

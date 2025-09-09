@@ -616,7 +616,7 @@ public:
             buff2[m_len] = '\0';
             lp = MMDAgent_strtok(buff2, "\r\n", &lpsave);
             /* check if this message ends in this buffer */
-            tlen = MMDAgent_strlen(lp);
+            tlen = (int)MMDAgent_strlen(lp);
             if (buff[tlen] != '\n' && buff[tlen] != '\r') {
                // not terminated with "\r\n", means this token is not a full chunk
                // wait for next data
@@ -650,7 +650,7 @@ public:
                fprintf(m_fpLog, "%s %s\n", buf_timestamp, lp);
             }
             // shrink the buffer for one chunk and loop
-            slen = MMDAgent_strlen(lp);
+            slen = (int)MMDAgent_strlen(lp);
             while (buff[slen] == '\r' || buff[slen] == '\n') slen++;
             memmove(&(buff[0]), &(buff[slen]), SOCKET_MAXBUFLEN - (slen));
             m_len -= slen;
@@ -927,7 +927,7 @@ public:
                   // dequeue the log strings to pass to the other end
                   std::lock_guard<std::mutex> lock(m_stdmutex);
                   while (m_thread->dequeueBuffer(1, buff2, NULL) > 0) {
-                     ws->sendFrame(buff2, MMDAgent_strlen(buff2), Poco::Net::WebSocket::FRAME_TEXT);
+                     ws->sendFrame(buff2, (int)MMDAgent_strlen(buff2), Poco::Net::WebSocket::FRAME_TEXT);
                   }
                }
             } catch (const std::exception& e) {
@@ -1024,7 +1024,7 @@ public:
       return;
    }
 
-   void avatarUpdateMaxVol(float frame, float speak_max_vol)
+   void avatarUpdateMaxVol(float frame, int speak_max_vol)
    {
       int vmax, v;
 
@@ -1058,7 +1058,7 @@ public:
       m_maxVolUpdateFrame = PLUGIN_REMOTE_UPDATE_MAXVOL_FRAMES;
    }
 
-   void avatarUpdate(float frames, float speak_max_vol)
+   void avatarUpdate(float frames, int speak_max_vol)
    {
       for (int i = 0; i < PLUGIN_REMOTE_MAXCLIENT; i++) {
          if (m_avatar[i])

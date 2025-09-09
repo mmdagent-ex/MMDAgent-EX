@@ -111,9 +111,9 @@ EXPORT void extAppStart(MMDAgent *mmdagent)
       passStr = jsonObject->getValue<std::string>("pass");
 
       Poco::JSON::Array::Ptr connectionList = jsonObject->getArray("connection_list");
-      pluginNum = connectionList->size();
+      pluginNum = (int)connectionList->size();
       pluginList = (RabbitMQ **)malloc(sizeof(RabbitMQ *) * pluginNum);
-      for (size_t i = 0; i < pluginNum; i++) {
+      for (unsigned int i = 0; i < pluginNum; i++) {
          Poco::JSON::Object::Ptr connection = connectionList->getObject(i);
          nameStr = connection->getValue<std::string>("name");
          modeStr = connection->getValue<std::string>("mode");

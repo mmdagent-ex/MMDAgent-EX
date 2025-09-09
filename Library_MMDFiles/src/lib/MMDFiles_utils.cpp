@@ -201,7 +201,7 @@ bool MMDFiles_strequal(const char *str1, const char *str2)
 /* MMDFiles_strheadmatch: match head string */
 bool MMDFiles_strheadmatch(const char *str1, const char *str2)
 {
-   int len1, len2;
+   size_t len1, len2;
 
    if(str1 == NULL || str2 == NULL)
       return false;
@@ -220,7 +220,7 @@ bool MMDFiles_strheadmatch(const char *str1, const char *str2)
 /* MMDFiles_strtailmatch: match tail string */
 bool MMDFiles_strtailmatch(const char *str1, const char *str2)
 {
-   int len1, len2;
+   size_t len1, len2;
 
    if(str1 == NULL || str2 == NULL)
       return false;
@@ -237,7 +237,7 @@ bool MMDFiles_strtailmatch(const char *str1, const char *str2)
 }
 
 /* MMDFiles_strlen: strlen */
-int MMDFiles_strlen(const char *str)
+size_t MMDFiles_strlen(const char *str)
 {
    if(str == NULL)
       return 0;
@@ -375,7 +375,7 @@ static char *MMDFiles_strdup_with_conversion(const char *str, UINT from, UINT to
       return NULL;
    }
 
-   result = WideCharToMultiByte(to, 0, (LPCWSTR) wideCharStr, -1, (LPSTR) buff, size, NULL, NULL);
+   result = WideCharToMultiByte(to, 0, (LPCWSTR) wideCharStr, -1, (LPSTR) buff, (int)size, NULL, NULL);
    if((size_t) result != size) {
       free(wideCharStr);
       free(buff);
@@ -645,7 +645,7 @@ char *MMDFiles_strdup_from_widechar_to_application(const WCHAR *wstr)
    if (buff == NULL)
       return NULL;
 
-   result = WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)wstr, -1, (LPSTR)buff, size, NULL, NULL);
+   result = WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)wstr, -1, (LPSTR)buff, (int)size, NULL, NULL);
    if ((size_t)result != size) {
       free(buff);
       return NULL;
@@ -710,7 +710,8 @@ char *MMDFiles_pathdup_from_widechar_to_application(const WCHAR *str)
 /* MMDFiles_dirname: get directory name from path */
 char *MMDFiles_dirname(const char *file)
 {
-   int i, len, index = -1;
+   size_t i, len, index;
+   bool found = false;
    char size;
    char *dir;
 
@@ -718,11 +719,13 @@ char *MMDFiles_dirname(const char *file)
 
    for(i = 0; i < len; i += size) {
       size = MMDFiles_getcharsize(&file[i]);
-      if(size == 1 && MMDFiles_dirseparator(file[i]) == true)
+      if (size == 1 && MMDFiles_dirseparator(file[i]) == true) {
          index = i;
+         found = true;
+      }
    }
 
-   if(index >= 0) {
+   if(found) {
       dir = (char *) malloc(sizeof(char) * (index + 1));
       strncpy(dir, file, index);
       dir[index] = '\0';
@@ -736,7 +739,8 @@ char *MMDFiles_dirname(const char *file)
 /* MMDFiles_basename: get file name from path */
 char *MMDFiles_basename(const char *file)
 {
-   int i, len, index = -1;
+   size_t i, len, index;
+   bool found = false;
    char size;
    char *base;
 
@@ -744,11 +748,13 @@ char *MMDFiles_basename(const char *file)
 
    for(i = 0; i < len; i += size) {
       size = MMDFiles_getcharsize(&file[i]);
-      if(size == 1 && MMDFiles_dirseparator(file[i]) == true)
+      if (size == 1 && MMDFiles_dirseparator(file[i]) == true) {
          index = i;
+         found = true;
+      }
    }
 
-   if(index >= 0) {
+   if(found) {
       base = (char *) malloc(sizeof(char) * (len - index));
       strncpy(base, &file[index + 1], len - index - 1);
       base[len - index - 1] = '\0';

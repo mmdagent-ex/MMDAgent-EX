@@ -370,7 +370,7 @@ unsigned char *ZFile::newLoadEncFile(const char *file, size_t *len)
    data_buffer_len = data_enc_size + EVP_CIPHER_CTX_block_size(de);
    data = (unsigned char *)malloc(data_buffer_len);
    memset(data, 0x00, data_buffer_len);
-   if (EVP_DecryptUpdate(de, data, &p_len, data_enc, data_enc_size) == 0) {
+   if (EVP_DecryptUpdate(de, data, &p_len, data_enc, (int)data_enc_size) == 0) {
       // printf("failed to decrypt at EVP_DecryptUpdate\n");
       EVP_CIPHER_CTX_free(de);
       free(data);
@@ -549,7 +549,7 @@ long ZFile::tell()
 {
    m_err = 0;
 
-   return m_pos;
+   return (long)m_pos;
 }
 
 /* ZFile::rewind: reset the current point to start like frewind() */

@@ -229,7 +229,7 @@ void LogText::log(unsigned int flag, const char *format, ...)
    vsnprintf(buff, MMDAGENT_MAXBUFLEN, format, args);
    va_end(args);
    for (p = MMDAgent_strtok(buff, "\n", &save); p; p = MMDAgent_strtok(NULL, "\n", &save)) {
-      int i, len;
+      size_t i, len;
       char *c;
       unsigned char size;
 
@@ -318,7 +318,7 @@ void LogText::resetNarrowString()
 /* LogText::addCharToNarrowString: add char to narrow string */
 void LogText::addCharToNarrowString(char c)
 {
-   int len = MMDAgent_strlen(m_narrowString);
+   size_t len = MMDAgent_strlen(m_narrowString);
    if (len < MMDAGENT_MAXBUFLEN - 1) {
       m_narrowString[len] = c;
       m_narrowString[len + 1] = '\0';
@@ -330,7 +330,7 @@ void LogText::addCharToNarrowString(char c)
 /* LogText::backwardCharToNarrowString: backward char to narrow string */
 void LogText::backwardCharToNarrowString()
 {
-   int len = MMDAgent_strlen(m_narrowString);
+   size_t len = MMDAgent_strlen(m_narrowString);
    if (len > 0)
       m_narrowString[len - 1] = '\0';
    if (m_narrowString[0] == '\0')
@@ -366,7 +366,7 @@ void LogText::updateNarrow()
       m_drawElementNarrow->numIndices = 0;
    } else {
       m_narrowStringHasCase = false;
-      for (i = 1; i < MMDAgent_strlen(m_narrowString); i++) {
+      for (i = 1; i < (int)MMDAgent_strlen(m_narrowString); i++) {
          if (isupper(m_narrowString[i])) {
             m_narrowStringHasCase = true;
             break;

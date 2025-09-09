@@ -109,9 +109,9 @@ class FTGLTextureAtlas
 private:
    /* Node: element of an assigned region */
    typedef struct _Node {
-      int x;
-      int y;
-      int z;
+      size_t x;
+      size_t y;
+      size_t z;
       struct _Node *next;
    } Node;
    Node *m_nodes;         /* allocated nodes */
@@ -141,7 +141,7 @@ public:
    /* setRegion: store bitmap data onto texture */
    bool setRegion(size_t x, size_t y, size_t width, size_t height, const unsigned char * data, size_t stride);
 
-   /* getRegion: alocate a new region and return its location on texture, or -1 when the texture is full */
+   /* getRegion: alocate a new region and return its location on texture, or return false when the texture is full */
    bool getRegion(size_t width, size_t height, size_t *x, size_t *y);
 
    /* updateTexture: update the current texture data for OpenGL */
@@ -276,13 +276,13 @@ public:
    void disableOutlineMode();
 
    /* getTextDrawElements: get a set of rendering data for a text */
-   bool getTextDrawElements(const char *text, FTGLTextDrawElements *elem, unsigned int index, float x, float y, float linespace);
+   bool getTextDrawElements(const char *text, FTGLTextDrawElements *elem, size_t index, float x, float y, float linespace);
 
    /* FTGLTextureFont::getTextDrawElementsFixed: get a set of rendering data for a text width fixed width */
-   bool getTextDrawElementsFixed(const char *text, FTGLTextDrawElements *elem, unsigned int index, float x, float y, float linespace, float fixed_width, float scalefactor = 1.0f);
+   bool getTextDrawElementsFixed(const char *text, FTGLTextDrawElements *elem, size_t index, float x, float y, float linespace, float fixed_width, float scalefactor = 1.0f);
 
    /* getTextDrawElementsWithScale:get a set of rendering data for a text with scale */
-   bool getTextDrawElementsWithScale(const char *text, FTGLTextDrawElements *elem, unsigned int index, float x, float y, float linespace, float scalefactor);
+   bool getTextDrawElementsWithScale(const char *text, FTGLTextDrawElements *elem, size_t index, float x, float y, float linespace, float scalefactor);
 
    /* getTextureID: get charactor texture ID */
    GLuint getTextureID();

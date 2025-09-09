@@ -107,7 +107,7 @@ static bool error_config;
 /* extAppStart: load amodels and start thread */
 EXPORT void extAppStart(MMDAgent *mmdagent)
 {
-   int len;
+   size_t len;
    char dic[MMDAGENT_MAXBUFLEN];
    char *config;
 

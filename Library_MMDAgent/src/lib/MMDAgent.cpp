@@ -6748,7 +6748,7 @@ void MMDAgent::procOpenContentDirMessage()
 void MMDAgent::procOpenContentFileMessage()
 {
    char *contentFile = NULL;
-   int len;
+   size_t len;
 
    if (m_configDirName == NULL || m_configFileName == NULL)
       return;

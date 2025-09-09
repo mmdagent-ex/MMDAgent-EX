@@ -220,7 +220,7 @@ int Kafka::send(void *buf, size_t len)
       MMDAgent_snprintf(m_errstr, MMDAGENT_MAXBUFLEN, "failed to produce to topic %s partition %i: %s", rd_kafka_topic_name(m_rkt), m_partition, rd_kafka_err2str(err));
       ret = -1;
    } else {
-      ret = len;
+      ret = (int)len;
    }
 
    rd_kafka_poll(m_rk, 0);
@@ -265,7 +265,7 @@ int Kafka::receive(void *buf, size_t maxlen)
    /* return message to rdkafka */
    rd_kafka_message_destroy(rkmessage);
 
-   return strlen(buff);
+   return (int)strlen(buff);
 }
 
 // Kafka::getMode: get mode

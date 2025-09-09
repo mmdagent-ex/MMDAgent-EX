@@ -91,7 +91,7 @@ static bool enable_log;
 EXPORT void extAppStart(MMDAgent *mmdagent)
 {
    char *buf;
-   int len;
+   size_t len;
 
    if ((mid = mmdagent->getModuleId(PLUGINVIMANAGER_NAME)) == -1) {
       enable = false;
