@@ -55,11 +55,33 @@
 /* ----------------------------------------------------------------- */
 
 // Server-client connection handling class
+
+#if defined(_WIN32) && !defined(__CYGWIN32__)
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#define WINSOCK
+#else
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <unistd.h>
+#endif
+
+#ifdef WINSOCK
+typedef SOCKET socket_t;
+#define SOCKET_INVALID INVALID_SOCKET
+#else
+typedef int socket_t;
+#define SOCKET_INVALID -1
+#endif
+
 class ServerClient
 {
 private:
    bool m_socket_initialized;   // flag for socket initialization
-   int m_server_sd;              // server socket
+   socket_t m_server_sd;              // server socket
    char *m_hostname;             // client hostname
 
    // initialize
@@ -86,28 +108,28 @@ public:
    // return true when server has been started
    bool isServerStarted();
 
-   // server, accept from socket and return new connected socket, -1 on error
-   int acceptFrom();
+   // server, accept from socket and return new connected socket, SOCKET_INVALID on error
+   socket_t acceptFrom();
 
-   // client, make connection and return new socket, -1 on error
-   int makeConnection(const char *hostname, int port_num);
+   // client, make connection and return new socket, SOCKET_INVALID on error
+   socket_t makeConnection(const char *hostname, int port_num);
 
-   // close socket
-   int closeSocket(int sd);
+   // close socket, return 0 on success, -1 on error
+   int closeSocket(socket_t sd);
 
    // shutdown socket
-   void shutdown(int sd);
+   void shutdown(socket_t sd);
 
    // get client host name
    char *getClientHostName();
 
    // wait data
-   kStatus waitData(int *sd, int num, int *sd_ret);
+   kStatus waitData(socket_t *sd, int num, socket_t *sd_ret);
 
-   // send data
-   int send(int sd, const void *buf, size_t len);
+   // send data, -1 on error
+   int send(socket_t sd, const void *buf, size_t len);
 
-   // receive data
-   int recv(int sd, void *buf, size_t maxlen);
+   // receive data, -1 on error
+   int recv(socket_t sd, void *buf, size_t maxlen);
 
 };
