@@ -72,7 +72,7 @@ static const char* findAsciiString(const char *str, const char *c)
 /* checkVariableName: check variable name */
 static bool checkVariableName(const char *name)
 {
-   int i, len;
+   size_t i, len;
    const char *c;
    unsigned char size;
 
@@ -111,7 +111,7 @@ static int getTokenFromStringWithQuoters(const char *str, int *index, char *buff
       return 0;
    }
 
-   len = MMDAgent_strlen(str);
+   len = (int)MMDAgent_strlen(str);
    if (len <= 0) {
       buff[0] = '\0';
       return 0;
@@ -214,7 +214,7 @@ static int countArgs(const char *str, char separator)
    const char *c;
    unsigned char size;
 
-   len = MMDAgent_strlen(str);
+   len = (int)MMDAgent_strlen(str);
    if(len <= 0)
       return 0;
 
@@ -400,7 +400,7 @@ static unsigned int VIManager_SList_count(VIManager_SList *l)
 static VIManager_State *VIManager_SList_searchStateAndCreate(VIManager_SList *l, const char *label)
 {
    VIManager_State *s;
-   int len = MMDAgent_strlen(label);
+   int len = (int)MMDAgent_strlen(label);
 
    if (l->index.search(label, len, (void **)&s) == false) {
       s = (VIManager_State *)malloc(sizeof(VIManager_State));
@@ -416,7 +416,7 @@ static VIManager_State *VIManager_SList_findState(VIManager_SList *l, const char
 {
    VIManager_State *s;
 
-   if (l->index.search(label, MMDAgent_strlen(label), (void **)&s) == false)
+   if (l->index.search(label, (int)MMDAgent_strlen(label), (void **)&s) == false)
       return NULL;
    return s;
 }
@@ -537,11 +537,14 @@ static void VIManager_VList_clear(VIManager_VList *l)
 static VIManager_Variable *VIManager_VList_search(VIManager_VList *vlist, const char *name)
 {
    VIManager_Variable *v;
+   int len;
 
-   if (MMDAgent_strlen(name) <= 0)
+   len = (int)MMDAgent_strlen(name);
+
+   if (len <= 0)
       return NULL;
 
-   if (vlist->index.search(name, MMDAgent_strlen(name), (void **)&v) == false)
+   if (vlist->index.search(name, len, (void **)&v) == false)
       return NULL;
    return v;
 }
@@ -563,7 +566,7 @@ static void VIManager_VList_set(VIManager_VList *vlist, const char *name, const 
       v = (VIManager_Variable *)malloc(sizeof(VIManager_Variable));
       VIManager_Variable_initialize(v, name, value);
       /* set */
-      vlist->index.add(name, MMDAgent_strlen(name), v);
+      vlist->index.add(name, (int)MMDAgent_strlen(name), v);
    }
 }
 
@@ -609,7 +612,7 @@ void VIManager::substituteVariableAndCopy(const char *input, char *output)
    int braced_counter;
    VIManager_Variable *v;
 
-   len = MMDAgent_strlen(input);
+   len = (int)MMDAgent_strlen(input);
    if (len <= 0) {
       *output = '\0';
       return;
@@ -674,7 +677,7 @@ void VIManager::substituteVariableAndCopy(const char *input, char *output)
             m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s", cv + 1);
             if (MMDAgent_replaceEnvDup(cv + 1, replaced_str) >= 0) {
                m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: get \"%s\": \"%s\"", m_name, cv + 1, replaced_str);
-               vlen = MMDAgent_strlen(replaced_str);
+               vlen = (int)MMDAgent_strlen(replaced_str);
                memcpy(out, replaced_str, vlen);
                out += vlen;
             } else {
@@ -688,7 +691,7 @@ void VIManager::substituteVariableAndCopy(const char *input, char *output)
             const char *p = m_mmdagent->getKeyValue()->getString(cv + 2, NULL);
             if (p) {
                m_mmdagent->sendLogString(m_id, MLOG_STATUS, "%s: get KeyValue of \"%s\": \"%s\"", m_name, cv + 2, p);
-               vlen = MMDAgent_strlen(p);
+               vlen = (int)MMDAgent_strlen(p);
                memcpy(out, p, vlen);
                out += vlen;
             } else {
@@ -700,7 +703,7 @@ void VIManager::substituteVariableAndCopy(const char *input, char *output)
             out = cv;
             /* overwrite with its value */
             if (v != NULL) {
-               vlen = MMDAgent_strlen(v->value);
+               vlen = (int)MMDAgent_strlen(v->value);
                memcpy(out, v->value, vlen);
                out += vlen;
             }
@@ -794,7 +797,7 @@ bool VIManager::checkVariableTest(const char *vstr, bool *result)
    /* substitute variables in pattern */
    substituteVariableAndCopy(vstr, buff);
 
-   len = MMDAgent_strlen(buff);
+   len = (int)MMDAgent_strlen(buff);
    for (int i = 0; i < len - 1; i++) {
       if (buff[i] == '!' && buff[i + 1] == '=') {
          buff[i] = buff[i + 1] = '\0';
@@ -896,7 +899,7 @@ bool VIManager::assignVariableByEquation(const char *va)
          return false;
       s = 1;
       if (buffn[1] == '{') {
-         len = MMDAgent_strlen(buffn);
+         len = (int)MMDAgent_strlen(buffn);
          if (buffn[len - 1] != '}')
             return false;
          buffn[len - 1] = '\0';
@@ -976,7 +979,7 @@ bool VIManager::loadFSTFile(ZFileKey *key, const char *file, unsigned int *arc_c
    last_state_label[0] = '\0';
    while (zf->gets(buff, MMDAGENT_MAXBUFLEN - 3) != NULL) { /* string + \r + \n + \0 */
       /* remove final \n and \r */
-      len = MMDAgent_strlen(buff);
+      len = (int)MMDAgent_strlen(buff);
       while (len > 0 && (buff[len - 1] == '\n' || buff[len - 1] == '\r'))
          buff[--len] = '\0';
       /* skip head spaces and tabs */

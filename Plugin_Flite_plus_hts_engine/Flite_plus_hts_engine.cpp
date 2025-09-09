@@ -189,9 +189,9 @@ void Flite_plus_hts_engine::getPhonemeSequence(char *str, int strlen)
 
    size = m_label_size;
    feature = m_label_data;
-   nstate = HTS_Engine_get_nstate(&m_engine);
-   fperiod = HTS_Engine_get_fperiod(&m_engine);
-   sampling_frequency = HTS_Engine_get_sampling_frequency(&m_engine);
+   nstate = (int)HTS_Engine_get_nstate(&m_engine);
+   fperiod = (int)HTS_Engine_get_fperiod(&m_engine);
+   sampling_frequency = (int)HTS_Engine_get_sampling_frequency(&m_engine);
 
    if (size <= 2)
       return;
@@ -214,7 +214,7 @@ void Flite_plus_hts_engine::getPhonemeSequence(char *str, int strlen)
             str[len++] = *ch;
          }
       } else {
-         sublen = MMDAgent_strlen(feature[i]);
+         sublen = (int)MMDAgent_strlen(feature[i]);
          for (j = 0; j < sublen; j++) {
             if (len >= maxlen) return;
             str[len++] = feature[i][j];
@@ -222,10 +222,10 @@ void Flite_plus_hts_engine::getPhonemeSequence(char *str, int strlen)
       }
       /* get ms */
       for (j = 0, k = 0; j < nstate; j++)
-         k += (HTS_Engine_get_state_duration(&m_engine, i * nstate + j) * fperiod * 1000) / sampling_frequency;
+         k += ((int)HTS_Engine_get_state_duration(&m_engine, i * nstate + j) * fperiod * 1000) / sampling_frequency;
       if (strlen - len - 1 <= 0) return;
       MMDAgent_snprintf(&str[len], strlen - len - 1, ",%d", k);
-      len = MMDAgent_strlen(str);
+      len = (int)MMDAgent_strlen(str);
    }
 }
 

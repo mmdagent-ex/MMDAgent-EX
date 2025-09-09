@@ -186,12 +186,13 @@ bool FTGLTextureAtlas::setRegion(size_t x, size_t y, size_t width, size_t height
    return true;
 }
 
-/* FTGLTextureAtlas::getRegion: alocate a new region and return its location on texture, or -1 when the texture is full */
+/* FTGLTextureAtlas::getRegion: alocate a new region and return its location on texture, or return false when the texture is full */
 bool FTGLTextureAtlas::getRegion(size_t width, size_t height, size_t *x, size_t *y)
 {
-   int tmpY, left, bestHeight = INT_MAX, bestWidth = INT_MAX;
+   size_t tmpY, left, bestHeight = SIZE_MAX, bestWidth = SIZE_MAX;
    Node *node, *bestNode = NULL, *curr, *next, *temp, *prev, *bestNodePrev = NULL;
-   int shrink;
+   size_t shrink;
+   bool err = false;
 
    for (curr = m_nodes, prev = NULL; curr != NULL; prev = curr, curr = curr->next) {
       /* find fitting room for a square region */
@@ -199,18 +200,19 @@ bool FTGLTextureAtlas::getRegion(size_t width, size_t height, size_t *x, size_t 
          continue;
       tmpY = curr->y;
       left = width;
+      err = false;
       for (temp = curr; left > 0 && temp != NULL; temp = temp->next) {
          if (temp->y > tmpY)
             tmpY = temp->y;
          if (tmpY + height + 1 > m_height) {
-            tmpY = -1;
+            err = true;
             break;
          }
          left -= temp->z;
       }
-      if(tmpY < 0)
+      if(err)
          continue;
-      if (tmpY + (int) height < bestHeight || (tmpY + (int) height == bestHeight && curr->z < bestWidth)) {
+      if (tmpY + height < bestHeight || (tmpY + height == bestHeight && curr->z < bestWidth)) {
          bestNode = curr;
          bestHeight = tmpY + height;
          bestWidth = curr->z;
@@ -220,11 +222,8 @@ bool FTGLTextureAtlas::getRegion(size_t width, size_t height, size_t *x, size_t 
       }
    }
 
-   if (bestNode == NULL) {
-      *x = -1;
-      *y = -1;
+   if (bestNode == NULL)
       return false;
-   }
 
    node = (Node *) malloc(sizeof(Node));
    node->x = (*x);
@@ -245,11 +244,14 @@ bool FTGLTextureAtlas::getRegion(size_t width, size_t height, size_t *x, size_t 
 
    /* shrink till last */
    for (curr = node; curr != NULL && curr->next != NULL;) {
-      if (curr->next->x >= curr->x + curr->z) break;
+      if (curr->next->x >= curr->x + curr->z)
+         break;
       shrink = curr->x + curr->z - curr->next->x;
       curr->next->x += shrink;
-      curr->next->z -= shrink;
-      if (curr->next->z > 0) break;
+      if (curr->next->z > shrink) {
+         curr->next->z -= shrink;
+         break;
+      }
       /* erase */
       next = curr->next;
       curr->next = curr->next->next;
@@ -310,10 +312,10 @@ void FTGLTextureAtlas::updateTexture()
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexImage2D(GL_TEXTURE_2D, 0, internalformat, m_width, m_height, 0, format, type, m_data);
+      glTexImage2D(GL_TEXTURE_2D, 0, internalformat, (GLsizei)m_width, (GLsizei)m_height, 0, format, type, m_data);
    } else {
       glBindTexture(GL_TEXTURE_2D, m_id);
-      glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, format, type, m_data);
+      glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, (GLsizei)m_width, (GLsizei)m_height, format, type, m_data);
    }
 
    glDisable(GL_TEXTURE_2D);
@@ -465,7 +467,7 @@ static bool loadFace(FT_Library *library, const char *filename, const float size
    }
 
    /* set char size */
-   error = FT_Set_Char_Size(*face, (int)(size * 64), 0, 72 * hres, 72);
+   error = FT_Set_Char_Size(*face, (int)(size * 64), 0, (FT_UInt)(72 * hres), 72);
    if (error) {
       FT_Done_Face(*face);
       FT_Done_FreeType(*library);
@@ -842,13 +844,13 @@ void FTGLTextureFont::disableOutlineMode()
 }
 
 /* FTGLTextureFont::getTextDrawElements: get a set of rendering data for a text */
-bool FTGLTextureFont::getTextDrawElements(const char *text, FTGLTextDrawElements *elem, unsigned int index, float x, float y, float linespace)
+bool FTGLTextureFont::getTextDrawElements(const char *text, FTGLTextDrawElements *elem, size_t index, float x, float y, float linespace)
 {
    return getTextDrawElementsWithScale(text, elem, index, x, y, linespace, 1.0f);
 }
 
 /* FTGLTextureFont::getTextDrawElementsFixed: get a set of rendering data for a text width fixed width */
-bool FTGLTextureFont::getTextDrawElementsFixed(const char *text, FTGLTextDrawElements *elem, unsigned int index, float x, float y, float linespace, float fixed_width, float scalefactor)
+bool FTGLTextureFont::getTextDrawElementsFixed(const char *text, FTGLTextDrawElements *elem, size_t index, float x, float y, float linespace, float fixed_width, float scalefactor)
 {
    bool ret;
 
@@ -864,7 +866,7 @@ bool FTGLTextureFont::getTextDrawElementsFixed(const char *text, FTGLTextDrawEle
 }
 
 /* FTGLTextureFont::getTextDrawElementsWithScale: get a set of rendering data for a text with scale */
-bool FTGLTextureFont::getTextDrawElementsWithScale(const char *text, FTGLTextDrawElements *elem, unsigned int index, float x, float y, float linespace, float scalefactor)
+bool FTGLTextureFont::getTextDrawElementsWithScale(const char *text, FTGLTextDrawElements *elem, size_t index, float x, float y, float linespace, float scalefactor)
 {
    std::vector<int> utf32;
    char *textbuf;
@@ -884,7 +886,7 @@ bool FTGLTextureFont::getTextDrawElementsWithScale(const char *text, FTGLTextDra
 
    if (text == NULL) {
       elem->textLen = index;
-      elem->numIndices = 6 * elem->textLen;
+      elem->numIndices = (unsigned int)(6 * elem->textLen);
       if (elem->numIndices == 0) {
          elem->width = 0;
          elem->height = 0;
@@ -914,7 +916,7 @@ bool FTGLTextureFont::getTextDrawElementsWithScale(const char *text, FTGLTextDra
 
    if(utf32.empty()) {
       elem->textLen = index;
-      elem->numIndices = 6 * elem->textLen;
+      elem->numIndices = (unsigned int)(6 * elem->textLen);
       if (elem->numIndices == 0) {
          elem->width = 0;
          elem->height = 0;
@@ -994,12 +996,12 @@ bool FTGLTextureFont::getTextDrawElementsWithScale(const char *text, FTGLTextDra
       elem->vertices[j * 12 + 9] = (GLfloat)x1;
       elem->vertices[j * 12 + 10] = (GLfloat)y0;
       elem->vertices[j * 12 + 11] = (GLfloat)0;
-      elem->indices[j * 6] = j * 4;
-      elem->indices[j * 6 + 1] = j * 4 + 1;
-      elem->indices[j * 6 + 2] = j * 4 + 2;
-      elem->indices[j * 6 + 3] = j * 4;
-      elem->indices[j * 6 + 4] = j * 4 + 2;
-      elem->indices[j * 6 + 5] = j * 4 + 3;
+      elem->indices[j * 6] = (GLindices)(j * 4);
+      elem->indices[j * 6 + 1] = (GLindices)(j * 4 + 1);
+      elem->indices[j * 6 + 2] = (GLindices)(j * 4 + 2);
+      elem->indices[j * 6 + 3] = (GLindices)(j * 4);
+      elem->indices[j * 6 + 4] = (GLindices)(j * 4 + 2);
+      elem->indices[j * 6 + 5] = (GLindices)(j * 4 + 3);
       elem->texcoords[j * 8] = s0;
       elem->texcoords[j * 8 + 1] = t0;
       elem->texcoords[j * 8 + 2] = s0;
@@ -1039,7 +1041,7 @@ bool FTGLTextureFont::getTextDrawElementsWithScale(const char *text, FTGLTextDra
 
    totallen = index + num;
    elem->textLen = totallen;
-   elem->numIndices = 6 * totallen;
+   elem->numIndices = (unsigned int)(6 * totallen);
 
    free(buff);
 

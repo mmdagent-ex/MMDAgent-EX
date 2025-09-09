@@ -264,7 +264,7 @@ bool FileBrowser::openDir(const char *directory)
             break;
          }
          /* check the file status */
-         int plen = MMDAgent_strlen(dir) + 1 + MMDAgent_strlen(buf) + 1;
+         size_t plen = MMDAgent_strlen(dir) + 1 + MMDAgent_strlen(buf) + 1;
          p = (char *)malloc(plen);
          MMDAgent_snprintf(p, plen, "%s%c%s", dir, MMDAGENT_DIRSEPARATOR, buf);
          attr = MMDAgent_stat(p);
@@ -326,7 +326,7 @@ void FileBrowser::closeDir()
 bool FileBrowser::upDir()
 {
    char *dir;
-   int len;
+   size_t len;
 
    len = MMDAgent_strlen(m_current);
 
@@ -704,7 +704,7 @@ void FileBrowser::execItem(int choice)
       /* do nothing */
    } else {
       /* open */
-      int plen = MMDAgent_strlen(m_current) + 1 + MMDAgent_strlen(currentItem) + 1;
+      size_t plen = MMDAgent_strlen(m_current) + 1 + MMDAgent_strlen(currentItem) + 1;
       p = (char *)malloc(plen);
       if (MMDAgent_strlen(m_current) == 1 && MMDFiles_dirseparator(m_current[0]) == true)
          MMDAgent_snprintf(p, plen, "%s%s", m_current, currentItem);

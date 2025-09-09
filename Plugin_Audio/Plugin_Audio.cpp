@@ -126,28 +126,30 @@ EXPORT void extProcMessage(MMDAgent *mmdagent, const char *type, const char *arg
       } else if(MMDAgent_strequal(type, MMDAGENT_EVENT_DRAGANDDROP)) {
          buf = MMDAgent_strdup(args);
          p = MMDAgent_strtok(buf, "|", &q);
-         if(MMDAgent_strtailmatch(p, ".mp3") || MMDAgent_strtailmatch(p, ".MP3") || MMDAgent_strtailmatch(p, ".wav") || MMDAgent_strtailmatch(p, ".WAV")) {
+         if(p && (MMDAgent_strtailmatch(p, ".mp3") || MMDAgent_strtailmatch(p, ".MP3") || MMDAgent_strtailmatch(p, ".wav") || MMDAgent_strtailmatch(p, ".WAV"))) {
             /* if there is a motion file which have the same name, store it */
             mmdagent->sendLogString(mid, MLOG_MESSAGE_CAPTURED, "%s|%s", type, args);
             if(drop_motion != NULL)
                free(drop_motion);
             drop_motion = MMDAgent_strdup(p);
-            i = MMDAgent_strlen(drop_motion);
-            drop_motion[i - 4] = '.';
-            drop_motion[i - 3] = 'v';
-            drop_motion[i - 2] = 'm';
-            drop_motion[i - 1] = 'd';
-            if (MMDAgent_exist(drop_motion) == false) {
-               free(drop_motion);
-               drop_motion = NULL;
+            size_t len = MMDAgent_strlen(drop_motion);
+            if (len >= 4) {
+               drop_motion[len - 4] = '.';
+               drop_motion[len - 3] = 'v';
+               drop_motion[len - 2] = 'm';
+               drop_motion[len - 1] = 'd';
+               if (MMDAgent_exist(drop_motion) == false) {
+                  free(drop_motion);
+                  drop_motion = NULL;
+               }
+               /* start mp3 */
+               audio_manager.stop(PLUGINAUDIO_DEFAULTALIAS);
+               size_t plen = sizeof(char) * (strlen(PLUGINAUDIO_DEFAULTALIAS) + 1 + strlen(p) + 1);
+               q = (char *)malloc(plen);
+               MMDAgent_snprintf(q, plen, "%s|%s", PLUGINAUDIO_DEFAULTALIAS, p);
+               audio_manager.play(q);
+               free(q);
             }
-            /* start mp3 */
-            audio_manager.stop(PLUGINAUDIO_DEFAULTALIAS);
-            int plen = sizeof(char) * (strlen(PLUGINAUDIO_DEFAULTALIAS) + 1 + strlen(p) + 1);
-            q = (char *) malloc(plen);
-            MMDAgent_snprintf(q, plen, "%s|%s", PLUGINAUDIO_DEFAULTALIAS, p);
-            audio_manager.play(q);
-            free(q);
          }
          if(buf)
             free(buf);

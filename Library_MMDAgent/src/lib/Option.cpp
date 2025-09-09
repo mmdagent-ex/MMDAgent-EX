@@ -191,7 +191,7 @@ bool Option::load(const char *file, ZFileKey *key, char **errstr)
    ZFile *zf;
    char readbuf[MMDAGENT_MAXBUFLEN];
    char buf[MMDAGENT_MAXBUFLEN];
-   int len;
+   size_t len;
    char *p1;
    int ivec2[2];
    float fvec3[3];
@@ -233,6 +233,7 @@ bool Option::load(const char *file, ZFileKey *key, char **errstr)
       }
 
       len = MMDAgent_strlen(buf);
+      if (len <= 0) continue;
       p1 = &(buf[len - 1]);
       while (p1 >= &(buf[0]) && (*p1 == '\n' || *p1 == '\r' || *p1 == '\t' || *p1 == ' ')) {
          *p1 = L'\0';

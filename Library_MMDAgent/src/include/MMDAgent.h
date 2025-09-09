@@ -877,8 +877,8 @@ class LogToFile {
 private:
    FILE *m_fp;
    char *m_dirName;
-   int m_totalSize;
-   int m_maxSize;
+   size_t m_totalSize;
+   size_t m_maxSize;
    bool m_recording;
 
    /* initialize: initialize LogToFile */

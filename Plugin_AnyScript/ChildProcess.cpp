@@ -480,7 +480,7 @@ void ChildProcess::writeToProcess(const char *buf)
 #ifdef CHILDPROCESS_WIN32
    DWORD len = 0;
    size_t textlen = MMDAgent_strlen(buf);
-   WriteFile(m_hWriteToChild, (LPVOID)buf, textlen, &len, NULL);
+   WriteFile(m_hWriteToChild, (LPVOID)buf, (DWORD)textlen, &len, NULL);
    //FlushFileBuffers(m_hWriteToChild);
 #endif /* CHILDPROCESS_WIN32 */
 #ifdef CHILDPROCESS_UNIX

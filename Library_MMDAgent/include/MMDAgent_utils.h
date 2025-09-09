@@ -89,7 +89,7 @@ bool MMDAgent_strheadmatch(const char *str1, const char *str2);
 bool MMDAgent_strtailmatch(const char *str1, const char *str2);
 
 /* MMDAgent_strlen: strlen */
-int MMDAgent_strlen(const char *str);
+size_t MMDAgent_strlen(const char *str);
 
 /* MMDAgent_strdup: strdup */
 char *MMDAgent_strdup(const char *str);
