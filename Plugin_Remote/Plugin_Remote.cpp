@@ -178,7 +178,7 @@ private:
    int m_validClientNum;      // number of valid clients
    char *m_clientHostName[PLUGIN_REMOTE_MAXCLIENT];    // client host names
    bool m_processing[PLUGIN_REMOTE_MAXCLIENT];         // true when a client is connected and message transfer is undergo
-   int m_sd[PLUGIN_REMOTE_MAXCLIENT];                  // socket to clients
+   socket_t m_sd[PLUGIN_REMOTE_MAXCLIENT];                  // socket to clients
    int m_portNum;             // port number
    int m_portNumListen;
    char *m_serverHostName;    // server host name
@@ -220,7 +220,7 @@ private:
       for (i = 0; i < PLUGIN_REMOTE_MAXCLIENT; i++) {
          m_clientHostName[i] = NULL;
          m_processing[i] = false;
-         m_sd[i] = -1;
+         m_sd[i] = SOCKET_INVALID;
          m_avatar[i] = NULL;
       }
       m_portNum = PLUGIN_REMOTE_DEFAULT_PORT;
@@ -295,7 +295,7 @@ private:
    }
 
    // add client
-   int addClient(int sd)
+   int addClient(socket_t sd)
    {
       int i;
       int c;
@@ -395,7 +395,7 @@ private:
             m_clientHostName[c] = NULL;
          }
       }
-      m_sd[c] = -1;
+      m_sd[c] = SOCKET_INVALID;
       m_processing[c] = false;
       if (m_avatar[c]) {
          delete m_avatar[c];
@@ -475,7 +475,7 @@ public:
       for (i = 0; i < PLUGIN_REMOTE_MAXCLIENT; i++) {
          m_clientHostName[i] = NULL;
          m_processing[i] = false;
-         m_sd[i] = -1;
+         m_sd[i] = SOCKET_INVALID;
       }
       if (m_thread->isRunning() == false) {
          m_active = true;
@@ -764,13 +764,13 @@ public:
       int retry_count;
       bool connected;
       int ws_c = 0;
-      int sd;
+      socket_t sd;
 
       retry_count = 0;
       connected = false;
       while (is_active()) {
          sd = m_net->makeConnection(m_serverHostName, m_portNum);
-         if (sd >= 0) {
+         if (sd != SOCKET_INVALID) {
             connected = true;
             break;
          }
@@ -803,11 +803,11 @@ public:
    bool process()
    {
       int i;
-      int sd, rsd;
+      socket_t sd, rsd;
       int c;
       char buff[SOCKET_MAXBUFLEN];
       char buff2[SOCKET_MAXBUFLEN];
-      int valid_sd[PLUGIN_REMOTE_MAXCLIENT];
+      socket_t valid_sd[PLUGIN_REMOTE_MAXCLIENT];
       int valid_num;
       Poco::Net::Socket::SocketList readList;
       Poco::Net::Socket::SocketList writeList;
@@ -960,7 +960,7 @@ public:
             } else if (status == ServerClient::SOCKET_CONNECT) {
                // new connection arrives
                sd = m_net->acceptFrom();
-               if (sd == -1) {
+               if (sd == SOCKET_INVALID) {
                   sendLog(MLOG_ERROR, "error in accepting connection");
                   break;
                }
