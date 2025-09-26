@@ -19,6 +19,17 @@ cmake_minimum_required(VERSION 3.10)
 # project name
 project(MMDFILES)
 
+# Manually set OpenMP for macOS AppleClang
+if(APPLE AND CMAKE_C_COMPILER_ID STREQUAL "AppleClang")
+    message(STATUS "Configuring OpenMP manually for AppleClang on macOS")
+
+    set(OpenMP_C_FLAGS "-Xpreprocessor -fopenmp -I/opt/homebrew/opt/libomp/include")
+    set(OpenMP_C_LIB_NAMES "omp")
+    set(OpenMP_CXX_FLAGS "${OpenMP_C_FLAGS}")
+    set(OpenMP_CXX_LIB_NAMES "omp")
+    set(OpenMP_omp_LIBRARY "/opt/homebrew/opt/libomp/lib/libomp.dylib")
+endif()
+
 # packages required to build this project
 find_package(OpenMP REQUIRED)
 find_package(JPEG REQUIRED)

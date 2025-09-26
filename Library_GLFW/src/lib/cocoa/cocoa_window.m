@@ -50,6 +50,51 @@
 // Needed for _NSGetProgname
 #include <crt_externs.h>
 
+// ============================================
+// Compatibility shims for newer macOS SDK
+// ============================================
+#ifndef NSEventModifierFlagCommand
+#define NSEventModifierFlagCommand NSCommandKeyMask
+#endif
+#ifndef NSEventModifierFlagOption
+#define NSEventModifierFlagOption  NSAlternateKeyMask
+#endif
+#ifndef NSEventModifierFlagDeviceIndependentFlagsMask
+#define NSEventModifierFlagDeviceIndependentFlagsMask NSDeviceIndependentModifierFlagsMask
+#endif
+#ifndef NSEventMaskAny
+#define NSEventMaskAny NSAnyEventMask
+#endif
+#ifndef NSWindowStyleMaskTitled
+#define NSWindowStyleMaskTitled NSTitledWindowMask
+#endif
+#ifndef NSWindowStyleMaskClosable
+#define NSWindowStyleMaskClosable NSClosableWindowMask
+#endif
+#ifndef NSWindowStyleMaskMiniaturizable
+#define NSWindowStyleMaskMiniaturizable NSMiniaturizableWindowMask
+#endif
+#ifndef NSWindowStyleMaskResizable
+#define NSWindowStyleMaskResizable NSResizableWindowMask
+#endif
+#ifndef NSWindowStyleMaskBorderless
+#define NSWindowStyleMaskBorderless NSBorderlessWindowMask
+#endif
+
+// Helper: point conversion without deprecated convertBaseToScreen:
+static inline NSPoint _WindowConvertBaseToScreen(NSWindow* w, NSPoint p) {
+    if ([w respondsToSelector:@selector(convertRectToScreen:)]) {
+        NSRect r = NSMakeRect(p.x, p.y, 0, 0);
+        NSRect rs = [w convertRectToScreen:r];
+        return rs.origin;
+    } else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        return [w convertBaseToScreen:p];
+#pragma clang diagnostic pop
+    }
+}
+
 #ifdef MMDAGENT
 #ifdef MODIFYCLASSNAME
 #define NAMECONNECTER(a,b) a##_##b
@@ -80,7 +125,7 @@
 // down the command key don't get sent to the key window.
 - (void)sendEvent:(NSEvent *)event
 {
-    if( [event type] == NSKeyUp && ( [event modifierFlags] & NSCommandKeyMask ) )
+    if( [event type] == NSKeyUp && ( [event modifierFlags] & NSEventModifierFlagCommand ) )
     {
         [[self keyWindow] sendEvent:event];
     }
@@ -90,13 +135,6 @@
     }
 }
 
-@end
-
-// Prior to Snow Leopard, we need to use this oddly-named semi-private API
-// to get the application menu working properly.  Need to be careful in
-// case it goes away in a future OS update.
-@interface NSApplication (NSAppleMenu)
-- (void)setAppleMenu:(NSMenu *)m;
 @end
 
 //========================================================================
@@ -127,14 +165,9 @@ static NSString *findAppName( void )
         }
     }
 
-    // Could do this only if we discover we're unbundled, but it should
-    // do no harm...
-    ProcessSerialNumber psn = { 0, kCurrentProcess };
-    TransformProcessType( &psn, kProcessTransformToForegroundApplication );
-
-    // Having the app in front of the terminal window is also generally
-    // handy.  There is an NSApplication API to do this, but...
-    SetFrontProcess( &psn );
+    // Activate the app without Carbon APIs
+    [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+    [NSApp activateIgnoringOtherApps:YES];
 
     char **progname = _NSGetProgname();
     if( progname && *progname )
@@ -184,7 +217,7 @@ static void setUpMenuBar( void )
     [[appMenu addItemWithTitle:@"Hide Others"
                        action:@selector(hideOtherApplications:)
                 keyEquivalent:@"h"]
-        setKeyEquivalentModifierMask:NSAlternateKeyMask | NSCommandKeyMask];
+        setKeyEquivalentModifierMask:(NSEventModifierFlagOption | NSEventModifierFlagCommand)];
     [appMenu addItemWithTitle:@"Show All"
                        action:@selector(unhideAllApplications:)
                 keyEquivalent:@""];
@@ -210,13 +243,6 @@ static void setUpMenuBar( void )
                           action:@selector(arrangeInFront:)
                    keyEquivalent:@""];
 
-    // At least guard the call to private API to avoid an exception if it
-    // goes away.  Hopefully that means the worst we'll break in future is to
-    // look ugly...
-    if( [NSApp respondsToSelector:@selector(setAppleMenu:)] )
-    {
-        [NSApp setAppleMenu:appMenu];
-    }
 }
 
 
@@ -363,7 +389,14 @@ static GLboolean initializeAppKit( void )
 
 - (void)handleURLEvent:(NSAppleEventDescriptor *)theEvent withReplyEvent:(NSAppleEventDescriptor *)replyEvent
 {
-  NSString *path = [[[theEvent paramDescriptorForKeyword:keyDirectObject] stringValue] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    NSString *raw = [[theEvent paramDescriptorForKeyword:keyDirectObject] stringValue];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    // Fallback for very old SDKs
+    NSString *path = [raw respondsToSelector:@selector(stringByRemovingPercentEncoding)]
+                   ? [raw stringByRemovingPercentEncoding]
+                   : [raw stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+#pragma clang diagnostic pop
 
   if (_glfwWin.urlSchemeCallback)
     _glfwWin.urlSchemeCallback([path UTF8String]);
@@ -636,7 +669,7 @@ static int convertMacKeyCode( unsigned int macKeyCode )
     {
         _glfwInputKey( code, GLFW_PRESS );
 
-        if( [event modifierFlags] & NSCommandKeyMask )
+        if( [event modifierFlags] & NSEventModifierFlagCommand )
         {
             if( !_glfwWin.sysKeysDisabled )
             {
@@ -658,7 +691,7 @@ static int convertMacKeyCode( unsigned int macKeyCode )
 
 - (void)flagsChanged:(NSEvent *)event
 {
-    unsigned int newModifierFlags = [event modifierFlags] | NSDeviceIndependentModifierFlagsMask;
+    unsigned int newModifierFlags = [event modifierFlags] | NSEventModifierFlagDeviceIndependentFlagsMask;
     int mode;
 
     if( newModifierFlags > _glfwWin.modifierFlags )
@@ -809,16 +842,16 @@ int  _glfwPlatformOpenWindow( int width, int height,
     unsigned int styleMask = 0;
     if( wndconfig->mode == GLFW_WINDOW )
     {
-        styleMask = NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask;
+        styleMask = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable;
 
         if( !wndconfig->windowNoResize )
         {
-            styleMask |= NSResizableWindowMask;
+            styleMask |= NSWindowStyleMaskResizable;
         }
     }
     else
     {
-        styleMask = NSBorderlessWindowMask;
+        styleMask = NSWindowStyleMaskBorderless;
     }
 
     _glfwWin.window = [[NSWindow alloc]
@@ -1041,15 +1074,24 @@ void _glfwPlatformSetWindowTitle( const char *title )
 #ifdef MMDAGENT
 void _glfwPlatformEnableFullScreen()
 {
-    if (!([_glfwWin.window styleMask] & NSWindowStyleMaskFullScreen)) {
-            [_glfwWin.window toggleFullScreen:nil];
+#ifdef NSWindowStyleMaskFullScreen
+    if (([win styleMask] & NSWindowStyleMaskFullScreen) == 0) {
+        [win toggleFullScreen:nil];
     }
+#else
+    [win toggleFullScreen:nil];
+#endif
 }
 void _glfwPlatformDisableFullScreen()
 {
-    if ([_glfwWin.window styleMask] & NSWindowStyleMaskFullScreen) {
-        [_glfwWin.window toggleFullScreen:nil];
+    NSWindow* win = (NSWindow*)_glfwWin.window;
+#ifdef NSWindowStyleMaskFullScreen
+    if (([win styleMask] & NSWindowStyleMaskFullScreen) != 0) {
+        [win toggleFullScreen:nil];
     }
+#else
+    [win toggleFullScreen:nil];
+#endif
 }
 void _glfwPlatformGetRenderingSize( int *width, int *height)
 {
@@ -1221,11 +1263,10 @@ void _glfwPlatformPollEvents( void )
 
     do
     {
-        event = [NSApp nextEventMatchingMask:NSAnyEventMask
+        event = [NSApp nextEventMatchingMask:NSEventMaskAny
                                    untilDate:[NSDate distantPast]
                                       inMode:NSDefaultRunLoopMode
                                      dequeue:YES];
-
         if( event )
         {
             [NSApp sendEvent:event];
@@ -1247,7 +1288,7 @@ void _glfwPlatformWaitEvents( void )
     // I wanted to pass NO to dequeue:, and rely on PollEvents to
     // dequeue and send.  For reasons not at all clear to me, passing
     // NO to dequeue: causes this method never to return.
-    NSEvent *event = [NSApp nextEventMatchingMask:NSAnyEventMask
+    NSEvent *event = [NSApp nextEventMatchingMask:NSEventMaskAny
                                         untilDate:[NSDate distantFuture]
                                            inMode:NSDefaultRunLoopMode
                                           dequeue:YES];
@@ -1264,7 +1305,8 @@ void _glfwPlatformWaitEvents( void )
 void _glfwPlatformHideMouseCursor( void )
 {
     [NSCursor hide];
-    CGAssociateMouseAndMouseCursorPosition( false );
+    // deprecated
+    // CGAssociateMouseAndMouseCursorPosition( false );
 }
 
 
@@ -1275,7 +1317,8 @@ void _glfwPlatformHideMouseCursor( void )
 void _glfwPlatformShowMouseCursor( void )
 {
     [NSCursor unhide];
-    CGAssociateMouseAndMouseCursorPosition( true );
+    // deprecated
+    // CGAssociateMouseAndMouseCursorPosition( true );
 }
 
 
@@ -1297,7 +1340,7 @@ void _glfwPlatformSetMouseCursorPos( int x, int y )
     else
     {
         NSPoint localPoint = NSMakePoint( x, _glfwWin.height - y - 1 );
-        NSPoint globalPoint = [_glfwWin.window convertBaseToScreen:localPoint];
+        NSPoint globalPoint = _WindowConvertBaseToScreen(_glfwWin.window, localPoint);
         CGPoint mainScreenOrigin = CGDisplayBounds( CGMainDisplayID() ).origin;
         double mainScreenHeight = CGDisplayBounds( CGMainDisplayID() ).size.height;
         CGPoint targetPoint = CGPointMake( globalPoint.x - mainScreenOrigin.x,
