@@ -498,7 +498,11 @@ void *MMDAgent_dlopen(const char *file)
    if (wpath == NULL)
       return NULL;
 
-   d = (void *) LoadLibraryExW(wpath, NULL, 0);
+   d = (void *) LoadLibraryExW(wpath, NULL,
+      LOAD_LIBRARY_SEARCH_DEFAULT_DIRS |
+      LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR |
+      LOAD_LIBRARY_SEARCH_USER_DIRS
+   );
    free(wpath);
 #else
    char *path = MMDAgent_pathdup_from_application_to_system_locale(file);

@@ -1288,7 +1288,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 #else
    PathCombineW(wbuf2, wbuf, L"DLLs");
 #endif
-   SetDllDirectoryW(wbuf2);
+   AddDllDirectory(wbuf2);
 
    argv = (char **) malloc(sizeof(char *) * argc);
    for(i = 0; i < argc; i++) {
