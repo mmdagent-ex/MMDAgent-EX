@@ -1074,6 +1074,7 @@ void _glfwPlatformSetWindowTitle( const char *title )
 #ifdef MMDAGENT
 void _glfwPlatformEnableFullScreen()
 {
+    NSWindow* win = (NSWindow*)_glfwWin.window;
 #ifdef NSWindowStyleMaskFullScreen
     if (([win styleMask] & NSWindowStyleMaskFullScreen) == 0) {
         [win toggleFullScreen:nil];

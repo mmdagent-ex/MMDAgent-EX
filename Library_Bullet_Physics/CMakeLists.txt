@@ -177,6 +177,9 @@ if(APPLE)
     target_compile_options(BulletPhysics PRIVATE
         ${OPT_ARCH_FLAG}
         -ffast-math
+        -fno-finite-math-only
+        -Wno-deprecated-declarations
+        -Wno-deprecated-register
     )
 else()
     target_compile_options(BulletPhysics PRIVATE
