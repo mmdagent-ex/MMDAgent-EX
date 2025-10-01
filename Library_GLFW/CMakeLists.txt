@@ -16,6 +16,11 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+# tell system to prefer GLVND than legacy OpenGL library
+if(POLICY CMP0072)
+  cmake_policy(SET CMP0072 NEW)
+endif()
+
 # project name
 project(GLFW)
 
