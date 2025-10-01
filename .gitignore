@@ -27,6 +27,8 @@ main/Release/main.res
 __pycache__
 *.recipe
 *.FileListAbsolute.txt
+main/x64/Release/main.res
+
 Release/MMDAgent-EX.exe
 Release/MMDAgent-EX
 build

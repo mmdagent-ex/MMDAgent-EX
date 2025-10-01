@@ -13,8 +13,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          lfs: 'true'
+          fetch-depth: 0
 
+      - name: Clean external deps dir
+        shell: pwsh
+        run: |
+          if (Test-Path external\win) { Remove-Item external\win -Recurse -Force }
+          New-Item -ItemType Directory -Force -Path external\win | Out-Null
+
+      - name: Download & expand Windows deps (from latest Release)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $asset = "MMDAgent-EX-deps_win.zip"
+          gh release download --repo "$env:GITHUB_REPOSITORY" --latest --pattern $asset
+          Expand-Archive -Path $asset -DestinationPath "." -Force
+          Write-Host "Extracted files:"
+          Get-ChildItem -Recurse .\external\win | ForEach-Object { $_.FullName }
       - name: Add MSBUILD to PATH on Windows
         uses: microsoft/setup-msbuild@v2
 
