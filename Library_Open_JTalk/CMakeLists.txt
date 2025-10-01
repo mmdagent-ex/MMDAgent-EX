@@ -133,6 +133,7 @@ target_compile_definitions(OPEN_JTALK PRIVATE
 # compiler options for private build
 target_compile_options(OPEN_JTALK PRIVATE
     -Wno-deprecated-declarations
+    -Wno-deprecated-register
 )
 
 if(APPLE)

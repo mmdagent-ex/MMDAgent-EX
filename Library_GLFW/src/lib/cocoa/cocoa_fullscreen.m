@@ -33,17 +33,19 @@
 // Check whether the display mode should be included in enumeration
 //========================================================================
 
-static BOOL modeIsGood( NSDictionary *mode )
+static BOOL modeIsGood(CFDictionaryRef mode)
 {
+    NSDictionary *dict = (__bridge NSDictionary *)mode;
+
     // This is a bit controversial, if you've got something other than an
     // LCD computer monitor as an output device you might not want these
     // checks.  You might also want to reject modes which are interlaced,
     // or TV out.  There is no one-size-fits-all policy that can work here.
     // This seems like a decent compromise, but certain applications may
     // wish to patch this...
-    return [[mode objectForKey:(id)kCGDisplayBitsPerPixel] intValue] >= 15 &&
-           [mode objectForKey:(id)kCGDisplayModeIsSafeForHardware] != nil &&
-           [mode objectForKey:(id)kCGDisplayModeIsStretched] == nil;
+    return [[dict objectForKey:(id)kCGDisplayBitsPerPixel] intValue] >= 15 &&
+           [dict objectForKey:(id)kCGDisplayModeIsSafeForHardware] != nil &&
+           [dict objectForKey:(id)kCGDisplayModeIsStretched] == nil;
 }
 
 
@@ -51,11 +53,13 @@ static BOOL modeIsGood( NSDictionary *mode )
 // Convert Core Graphics display mode to GLFW video mode
 //========================================================================
 
-static GLFWvidmode vidmodeFromCGDisplayMode( NSDictionary *mode )
+static GLFWvidmode vidmodeFromCGDisplayMode(CFDictionaryRef mode)
 {
-    unsigned int width = [[mode objectForKey:(id)kCGDisplayWidth] unsignedIntValue];
-    unsigned int height = [[mode objectForKey:(id)kCGDisplayHeight] unsignedIntValue];
-    unsigned int bps = [[mode objectForKey:(id)kCGDisplayBitsPerSample] unsignedIntValue];
+    NSDictionary *dict = (__bridge NSDictionary *)mode;
+
+    unsigned int width = [dict[(id)kCGDisplayWidth] unsignedIntValue];
+    unsigned int height = [dict[(id)kCGDisplayHeight] unsignedIntValue];
+    unsigned int bps = [dict[(id)kCGDisplayBitsPerSample] unsignedIntValue];
 
     GLFWvidmode result;
     result.Width = width;
@@ -77,18 +81,22 @@ static GLFWvidmode vidmodeFromCGDisplayMode( NSDictionary *mode )
 
 int _glfwPlatformGetVideoModes( GLFWvidmode *list, int maxcount )
 {
-    NSArray *modes = (NSArray *)CGDisplayAvailableModes( CGMainDisplayID() );
+    CFArrayRef modes = CGDisplayAvailableModes(CGMainDisplayID());
+    CFIndex n = CFArrayGetCount(modes);
 
-    unsigned int i, j = 0, n = [modes count];
-    for( i = 0; i < n && j < (unsigned)maxcount; i++ )
+    int j = 0;
+    for (CFIndex i = 0; i < n && j < maxcount; ++i)
     {
-        NSDictionary *mode = [modes objectAtIndex:i];
-        if( modeIsGood( mode ) )
+        CFDictionaryRef mode = (CFDictionaryRef)CFArrayGetValueAtIndex(modes, i);
+
+        // modeIsGood が NSDictionary* を受けるなら、次の行の __bridge で橋渡し:
+        // if (modeIsGood((__bridge NSDictionary *)mode)) { ... }
+        // 可能なら modeIsGood も CFDictionaryRef 受けに変更するのが綺麗。
+        if (modeIsGood(mode))
         {
-            list[j++] = vidmodeFromCGDisplayMode( mode );
+            list[j++] = vidmodeFromCGDisplayMode(mode); // ← CFDictionaryRef を渡す
         }
     }
-
     return j;
 }
 
