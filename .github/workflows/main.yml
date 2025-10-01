@@ -26,7 +26,10 @@ jobs:
         run: |
           $ErrorActionPreference = "Stop"
           $asset = "MMDAgent-EX-deps_win.zip"
-          gh release download --repo "$env:GITHUB_REPOSITORY" --latest --pattern $asset
+          $tag = gh api repos/$env:GITHUB_REPOSITORY/releases/latest --jq .tag_name
+          if (-not $tag) { throw "Latest release not found." }
+          Write-Host "Latest tag: $tag"
+          gh release download $tag --repo "$env:GITHUB_REPOSITORY" --pattern $asset --clobber
           Expand-Archive -Path $asset -DestinationPath "." -Force
           Write-Host "Extracted files:"
           Get-ChildItem -Recurse .\external\win | ForEach-Object { $_.FullName }
