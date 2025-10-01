@@ -23,6 +23,8 @@ jobs:
 
       - name: Download & expand Windows deps (from latest Release)
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           $ErrorActionPreference = "Stop"
           $asset = "MMDAgent-EX-deps_win.zip"
