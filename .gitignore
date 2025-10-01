@@ -44,3 +44,8 @@ Release/DLLs
 Release/DLLs64
 
 MMDAgent-EX-deps_win.zip
+
+*.bin
+*.dll
+*.lib
+
