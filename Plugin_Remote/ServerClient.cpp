@@ -206,7 +206,8 @@ bool ServerClient::readyAsServer(int portnum)
 #endif
   /* create socket */
 #ifdef WINSOCK
-   if((m_server_sd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP) == INVALID_SOCKET)) {
+   m_server_sd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+   if (m_server_sd == INVALID_SOCKET) {
       m_server_sd = SOCKET_INVALID;
       reset();
       return false;
