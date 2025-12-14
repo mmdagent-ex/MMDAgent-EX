@@ -75,6 +75,12 @@ void Stage::initialize()
    }
    m_frameTextureNum = 0;
 
+   for (int i = 0; i < MMDAGENT_STAGE_OVERLAY_TEXTURE_MAX; i++) {
+      m_overlayTextures[i].texture = NULL;
+      m_overlayTextures[i].alias = NULL;
+   }
+   m_overlayTextureNum = 0;
+
    m_frameIndices[0] = 0;
    m_frameIndices[1] = 1;
    m_frameIndices[2] = 2;
@@ -102,6 +108,12 @@ void Stage::clear()
          delete m_frameTextures[i].texture;
       if (m_frameTextures[i].alias)
          free(m_frameTextures[i].alias);
+   }
+   for (int i = 0; i < m_overlayTextureNum; i++) {
+      if (m_overlayTextures[i].texture)
+         delete m_overlayTextures[i].texture;
+      if (m_overlayTextures[i].alias)
+         free(m_overlayTextures[i].alias);
    }
    initialize();
 }
@@ -374,11 +386,155 @@ bool Stage::deleteAllFrameTexture()
    return true;
 }
 
+/* Stage::addOverlayTexture: add overlay texture */
+bool Stage::addOverlayTexture(const char *alias, const char *file, float width_rate, float height_rate, const char *orientation, float padding_rate)
+{
+   PMDTexture *tex;
+   bool ret;
+   int i;
+
+   if (alias == NULL || file == NULL || orientation == NULL)
+      return false;
+
+   /* check name */
+   for (i = 0; i < m_overlayTextureNum; i++) {
+      if (MMDAgent_strequal(m_overlayTextures[i].alias, alias))
+         break;
+   }
+   if (i < m_overlayTextureNum) {
+      /* found, replace */
+      delete m_overlayTextures[i].texture;
+      free(m_overlayTextures[i].alias);
+   } else {
+      /* not found, assign new */
+      if (m_overlayTextureNum >= MMDAGENT_STAGE_OVERLAY_TEXTURE_MAX)
+         return false;
+      i = m_overlayTextureNum++;
+   }
+
+   /* load texture from file */
+   tex = new PMDTexture();
+   glActiveTexture(GL_TEXTURE0);
+   glClientActiveTexture(GL_TEXTURE0);
+   glEnable(GL_TEXTURE_2D);
+   ret = tex->loadImage(file);
+   glDisable(GL_TEXTURE_2D);
+   if (ret == false) {
+      delete tex;
+      return false;
+   }
+
+   /* assign */
+   if (width_rate == 0.0f)
+      width_rate = 1.0f;
+   if (height_rate == 0.0f)
+      height_rate = 1.0f;
+   m_overlayTextures[i].texture = tex;
+   m_overlayTextures[i].alias = MMDAgent_strdup(alias);
+   m_overlayTextures[i].width_rate = width_rate;
+   m_overlayTextures[i].height_rate = height_rate;
+   m_overlayTextures[i].padding_rate = padding_rate;
+   m_overlayTextures[i].orientation_left = (MMDAgent_strequal(orientation, "LEFT_TOP") || MMDAgent_strequal(orientation, "TOP_LEFT") || MMDAgent_strequal(orientation, "LEFT_BOTTOM") || MMDAgent_strequal(orientation, "BOTTOM_LEFT")) ? true : false;
+   m_overlayTextures[i].orientation_bottom = (MMDAgent_strequal(orientation, "RIGHT_BOTTOM") || MMDAgent_strequal(orientation, "BOTTOM_RIGHT") || MMDAgent_strequal(orientation, "LEFT_BOTTOM") || MMDAgent_strequal(orientation, "BOTTOM_LEFT")) ? true : false;
+   m_overlayTextures[i].orientation_center = MMDAgent_strequal(orientation, "CENTER");
+
+   calculateOverlayPosition(&(m_overlayTextures[i]));
+
+   return true;
+}
+
+/* Stage::deleteOverlayTexture: delete overlay texture */
+bool Stage::deleteOverlayTexture(const char *alias)
+{
+   int n;
+
+   if (alias == NULL)
+      return false;
+
+   /* check name */
+   for (n = 0; n < m_overlayTextureNum; n++) {
+      if (MMDAgent_strequal(m_overlayTextures[n].alias, alias))
+         break;
+   }
+   if (n >= m_overlayTextureNum) {
+      /* not found */
+      return false;
+   }
+
+   /* delete */
+   delete m_overlayTextures[n].texture;
+   free(m_overlayTextures[n].alias);
+   for (int i = n; i < m_overlayTextureNum - 1; i++) {
+      memcpy(&(m_overlayTextures[i]), &(m_overlayTextures[i + 1]), sizeof(OverlayTexture));
+   }
+   m_overlayTextureNum--;
+
+   return true;
+}
+
+/* Stage::deleteAllOverlayTexture: delete all overlay texture */
+bool Stage::deleteAllOverlayTexture()
+{
+   for (int i = 0; i < m_overlayTextureNum; i++) {
+      delete m_overlayTextures[i].texture;
+      free(m_overlayTextures[i].alias);
+   }
+   m_overlayTextureNum = 0;
+
+   return true;
+}
+
+/* Stage::calculateOverlayPosition; calculate overlay position */
+void Stage::calculateOverlayPosition(OverlayTexture *ot)
+{
+   if (m_width < 0 || m_height < 0)
+      return;
+
+   float aspect = (float)ot->texture->getHeight() / (float)ot->texture->getWidth();
+   float w1, h1, w2, h2, w, h;
+   w1 = ot->width_rate * m_width;
+   h1 = w1 * aspect;
+   h2 = ot->height_rate * m_height;
+   w2 = h2 / aspect;
+   if (w1 < w2) {
+      w = ot->width_rate;
+      h = h1 / m_height;
+   } else {
+      h = ot->height_rate;
+      w = w2 / m_width;
+   }
+   float x, y;
+   if (ot->orientation_center) {
+      x = (1.0f - w) * 0.5f;
+      y = (1.0f - h) * 0.5f;
+   } else {
+      float pad = ot->padding_rate;
+      x = ot->orientation_left ? pad : 1.0f - pad - w;
+      y = ot->orientation_bottom ? pad : 1.0f - pad - h;
+   }
+   x *= m_width;
+   y *= m_height;
+   w *= m_width;
+   h *= m_height;
+   ot->vertices[0] = x;
+   ot->vertices[1] = y + h;
+   ot->vertices[2] = 0;
+   ot->vertices[3] = x;
+   ot->vertices[4] = y;
+   ot->vertices[5] = 0;
+   ot->vertices[6] = x + w;
+   ot->vertices[7] = y;
+   ot->vertices[8] = 0;
+   ot->vertices[9] = x + w;
+   ot->vertices[10] = y + h;
+   ot->vertices[11] = 0;
+}
+
 
 /* Stage::hasFrameTexture: return TRUE if has frame texture */
 bool Stage::hasFrameTexture()
 {
-   if (m_frameTextureNum > 0)
+   if (m_frameTextureNum > 0 || m_overlayTextureNum > 0)
       return true;
    return false;
 }
@@ -386,7 +542,7 @@ bool Stage::hasFrameTexture()
 /* Stage::renderFrameTexture2D: render frame texture */
 void Stage::renderFrameTexture2D(float screenWidth, float screenHeight)
 {
-   if (m_frameTextureNum == 0)
+   if (m_frameTextureNum == 0 && m_overlayTextureNum == 0)
       return;
 
    /* detect screen size change */
@@ -407,6 +563,9 @@ void Stage::renderFrameTexture2D(float screenWidth, float screenHeight)
       m_frameVertices[9] = w;
       m_frameVertices[10] = h;
       m_frameVertices[11] = 0;
+      for (int i = 0; i < m_overlayTextureNum; i++) {
+         calculateOverlayPosition(&(m_overlayTextures[i]));
+      }
    }
 
    /* render */
@@ -417,6 +576,11 @@ void Stage::renderFrameTexture2D(float screenWidth, float screenHeight)
    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
    for (int i = 0; i < m_frameTextureNum; i++) {
       glBindTexture(GL_TEXTURE_2D, m_frameTextures[i].texture->getID());
+      glDrawElements(GL_TRIANGLES, 6, GL_INDICES, (const GLvoid *)m_frameIndices);
+   }
+   for (int i = 0; i < m_overlayTextureNum; i++) {
+      glVertexPointer(3, GL_FLOAT, 0, m_overlayTextures[i].vertices);
+      glBindTexture(GL_TEXTURE_2D, m_overlayTextures[i].texture->getID());
       glDrawElements(GL_TRIANGLES, 6, GL_INDICES, (const GLvoid *)m_frameIndices);
    }
    glDisableClientState(GL_TEXTURE_COORD_ARRAY);

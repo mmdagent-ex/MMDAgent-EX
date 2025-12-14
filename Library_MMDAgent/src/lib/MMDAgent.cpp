@@ -1257,6 +1257,40 @@ bool MMDAgent::deleteAllWindowFrame()
    return true;
 }
 
+/* MMDAgent::addWindowOverlay: add window overlay */
+bool MMDAgent::addWindowOverlay(const char *overlayAlias, const char *fileName, float width_rate, float height_rate, const char *orientation, float padding_rate)
+{
+   if (MMDAgent_exist(fileName) == false) {
+      sendLogString(m_moduleId, MLOG_ERROR, "addWindowOverlay: %s: not found: %s", overlayAlias, fileName);
+      return false;
+   }
+   if (m_stage->addOverlayTexture(overlayAlias, fileName, width_rate, height_rate, orientation, padding_rate) == false) {
+      sendLogString(m_moduleId, MLOG_ERROR, "addWindowOverlay: %s: failed to load or exceeds limit: %s", overlayAlias, fileName);
+      return false;
+   }
+   sendMessage(m_moduleId, MMDAGENT_EVENT_WINDOWFRAME_ADD, "%s", overlayAlias);
+   return true;
+}
+
+/* MMDAgent::deleteWindowOverlay: delete window overlay */
+bool MMDAgent::deleteWindowOverlay(const char *overlayAlias)
+{
+   if (m_stage->deleteOverlayTexture(overlayAlias) == false) {
+      sendLogString(m_moduleId, MLOG_WARNING, "deleteWindowOverlay: overlay alias not exist: %s", overlayAlias);
+      return false;
+   }
+   sendMessage(m_moduleId, MMDAGENT_EVENT_WINDOWFRAME_DELETE, "%s", overlayAlias);
+   return true;
+}
+
+/* MMDAgent::deleteAllWindowOverlay: delete all window overlay */
+bool MMDAgent::deleteAllWindowOverlay()
+{
+   m_stage->deleteAllOverlayTexture();
+   /* don't send message */
+   return true;
+}
+
 /* MMDAgent::changeCamera: change camera setting */
 bool MMDAgent::changeCamera(const char *posOrVMD, const char *rot, const char *distance, const char *fovy, const char *time, const char *modelAlias, const char *boneName)
 {
@@ -5826,6 +5860,33 @@ void MMDAgent::procReceivedMessage(const char *type, const char *value)
          return;
       }
       deleteAllWindowFrame();
+   } else if (MMDAgent_strequal(type, MMDAGENT_COMMAND_WINDOWOVERLAY_ADD)) {
+      /* add or swap window overlay */
+      sendLogString(m_moduleId, MLOG_MESSAGE_CAPTURED, "%s|%s", type, value);
+      if (num != 6) {
+         sendLogString(m_moduleId, MLOG_ERROR, "%s: number of arguments should be 2.", type);
+         return;
+      }
+      fvec[0] = MMDAgent_str2float(argv[2]);
+      fvec[1] = MMDAgent_str2float(argv[3]);
+      fvec[2] = MMDAgent_str2float(argv[5]);
+      addWindowOverlay(argv[0], argv[1], fvec[0], fvec[1], argv[4], fvec[2]);
+   } else if (MMDAgent_strequal(type, MMDAGENT_COMMAND_WINDOWOVERLAY_DELETE)) {
+      /* delete window overlay */
+      sendLogString(m_moduleId, MLOG_MESSAGE_CAPTURED, "%s|%s", type, value);
+      if (num != 1) {
+         sendLogString(m_moduleId, MLOG_ERROR, "%s: number of arguments should be 1.", type);
+         return;
+      }
+      deleteWindowOverlay(argv[0]);
+   } else if (MMDAgent_strequal(type, MMDAGENT_COMMAND_WINDOWOVERLAY_DELETEALL)) {
+      /* delete window overlay */
+      sendLogString(m_moduleId, MLOG_MESSAGE_CAPTURED, "%s|%s", type, value);
+      if (num != 0) {
+         sendLogString(m_moduleId, MLOG_ERROR, "%s: number of arguments should be 0.", type);
+         return;
+      }
+      deleteAllWindowOverlay();
    } else if (MMDAgent_strequal(type, MMDAGENT_COMMAND_CAMERA)) {
       /* camera */
       sendLogString(m_moduleId, MLOG_MESSAGE_CAPTURED, "%s|%s", type, value);
