@@ -1268,7 +1268,7 @@ bool MMDAgent::addWindowOverlay(const char *overlayAlias, const char *fileName, 
       sendLogString(m_moduleId, MLOG_ERROR, "addWindowOverlay: %s: failed to load or exceeds limit: %s", overlayAlias, fileName);
       return false;
    }
-   sendMessage(m_moduleId, MMDAGENT_EVENT_WINDOWFRAME_ADD, "%s", overlayAlias);
+   sendMessage(m_moduleId, MMDAGENT_EVENT_WINDOWOVERLAY_ADD, "%s", overlayAlias);
    return true;
 }
 
@@ -1279,7 +1279,7 @@ bool MMDAgent::deleteWindowOverlay(const char *overlayAlias)
       sendLogString(m_moduleId, MLOG_WARNING, "deleteWindowOverlay: overlay alias not exist: %s", overlayAlias);
       return false;
    }
-   sendMessage(m_moduleId, MMDAGENT_EVENT_WINDOWFRAME_DELETE, "%s", overlayAlias);
+   sendMessage(m_moduleId, MMDAGENT_EVENT_WINDOWOVERLAY_DELETE, "%s", overlayAlias);
    return true;
 }
 
@@ -1288,6 +1288,28 @@ bool MMDAgent::deleteAllWindowOverlay()
 {
    m_stage->deleteAllOverlayTexture();
    /* don't send message */
+   return true;
+}
+
+/* MMDAgent::hideWindowOverlay: hide window overlay */
+bool MMDAgent::hideWindowOverlay(const char *overlayAlias)
+{
+   if (m_stage->hideOverlayTexture(overlayAlias) == false) {
+      sendLogString(m_moduleId, MLOG_WARNING, "hideWindowOverlay: overlay alias not exist: %s", overlayAlias);
+      return false;
+   }
+   sendMessage(m_moduleId, MMDAGENT_EVENT_WINDOWOVERLAY_HIDE, "%s", overlayAlias);
+   return true;
+}
+
+/* MMDAgent::showWindowOverlay: show window overlay */
+bool MMDAgent::showWindowOverlay(const char *overlayAlias)
+{
+   if (m_stage->showOverlayTexture(overlayAlias) == false) {
+      sendLogString(m_moduleId, MLOG_WARNING, "hideWindowOverlay: overlay alias not exist: %s", overlayAlias);
+      return false;
+   }
+   sendMessage(m_moduleId, MMDAGENT_EVENT_WINDOWOVERLAY_SHOW, "%s", overlayAlias);
    return true;
 }
 
@@ -5887,6 +5909,22 @@ void MMDAgent::procReceivedMessage(const char *type, const char *value)
          return;
       }
       deleteAllWindowOverlay();
+   } else if (MMDAgent_strequal(type, MMDAGENT_COMMAND_WINDOWOVERLAY_HIDE)) {
+      /* hide window overlay */
+      sendLogString(m_moduleId, MLOG_MESSAGE_CAPTURED, "%s|%s", type, value);
+      if (num != 1) {
+         sendLogString(m_moduleId, MLOG_ERROR, "%s: number of arguments should be 1.", type);
+         return;
+      }
+      hideWindowOverlay(argv[0]);
+   } else if (MMDAgent_strequal(type, MMDAGENT_COMMAND_WINDOWOVERLAY_SHOW)) {
+      /* show window overlay */
+      sendLogString(m_moduleId, MLOG_MESSAGE_CAPTURED, "%s|%s", type, value);
+      if (num != 1) {
+         sendLogString(m_moduleId, MLOG_ERROR, "%s: number of arguments should be 1.", type);
+         return;
+      }
+      showWindowOverlay(argv[0]);
    } else if (MMDAgent_strequal(type, MMDAGENT_COMMAND_CAMERA)) {
       /* camera */
       sendLogString(m_moduleId, MLOG_MESSAGE_CAPTURED, "%s|%s", type, value);

@@ -99,6 +99,9 @@ private:
       bool orientation_left;
       bool orientation_bottom;
       bool orientation_center;
+      float view_rate;
+      bool visible;
+      bool delete_when_invisible;
    };
    OverlayTexture m_overlayTextures[MMDAGENT_STAGE_OVERLAY_TEXTURE_MAX]; // list of overlay textures
    int m_overlayTextureNum;        // valid num of overlay textures
@@ -108,6 +111,12 @@ private:
 
    /* clear: free stage */
    void clear();
+
+   /* calculateOverlayPosition; calculate overlay position */
+   void calculateOverlayPosition(OverlayTexture *ot);
+
+   /* overlayUpdate: update overlay */
+   void overlayUpdate(double ellapsedFrame);
 
 public:
 
@@ -171,8 +180,11 @@ public:
    /* deleteAllOverlayTexture: delete all overlay texture */
    bool deleteAllOverlayTexture();
 
-   /* calculateOverlayPosition; calculate overlay position */
-   void calculateOverlayPosition(OverlayTexture *ot);
+   /* hideOverlayTexture: hide overlay texture */
+   bool hideOverlayTexture(const char *alias);
+
+   /* showOverlayTexture: show hided overlay texture */
+   bool showOverlayTexture(const char *alias);
 
    /* hasFrameTexture: return TRUE if has frame texture */
    bool hasFrameTexture();

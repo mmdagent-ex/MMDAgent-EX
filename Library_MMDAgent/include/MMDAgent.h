@@ -122,6 +122,8 @@
 #define MMDAGENT_COMMAND_WINDOWOVERLAY_ADD       "WINDOWOVERLAY_ADD"
 #define MMDAGENT_COMMAND_WINDOWOVERLAY_DELETE    "WINDOWOVERLAY_DELETE"
 #define MMDAGENT_COMMAND_WINDOWOVERLAY_DELETEALL "WINDOWOVERLAY_DELETEALL"
+#define MMDAGENT_COMMAND_WINDOWOVERLAY_HIDE      "WINDOWOVERLAY_HIDE"
+#define MMDAGENT_COMMAND_WINDOWOVERLAY_SHOW      "WINDOWOVERLAY_SHOW"
 #define MMDAGENT_COMMAND_LIGHTCOLOR       "LIGHTCOLOR"
 #define MMDAGENT_COMMAND_LIGHTDIRECTION   "LIGHTDIRECTION"
 #define MMDAGENT_COMMAND_LIPSYNCSTART     "LIPSYNC_START"
@@ -191,6 +193,8 @@
 #define MMDAGENT_EVENT_WINDOWFRAME_DELETE "WINDOWFRAME_EVENT_DELETE"
 #define MMDAGENT_EVENT_WINDOWOVERLAY_ADD    "WINDOWOVERLAY_EVENT_ADD"
 #define MMDAGENT_EVENT_WINDOWOVERLAY_DELETE "WINDOWOVERLAY_EVENT_DELETE"
+#define MMDAGENT_EVENT_WINDOWOVERLAY_HIDE   "WINDOWOVERLAY_EVENT_HIDE"
+#define MMDAGENT_EVENT_WINDOWOVERLAY_SHOW   "WINDOWOVERLAY_EVENT_SHOW"
 
 
 #define MMDAGENT_CURRENTTIME
@@ -470,6 +474,12 @@ private:
 
    /* deleteAllWindowOverlay: delete all window overlay */
    bool deleteAllWindowOverlay();
+
+   /* hideWindowOverlay: hide window overlay */
+   bool hideWindowOverlay(const char *overlayAlias);
+
+   /* showWindowOverlay: show window overlay */
+   bool showWindowOverlay(const char *overlayAlias);
 
    /* changeCamera: change camera setting */
    bool changeCamera(const char *pos, const char *rot, const char *distance, const char *fovy, const char *time, const char *modelalias, const char *bonename);
