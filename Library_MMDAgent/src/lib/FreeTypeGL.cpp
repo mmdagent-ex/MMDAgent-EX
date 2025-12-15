@@ -509,7 +509,7 @@ bool FTGLTextureFont::loadGlyph(unsigned long charcode)
    depth = m_atlas->getDepth();
 
    if (m_outlineMode) {
-      outlineType = OUTLINE_OUTER;
+      outlineType = OUTLINE_LINE;
       outlineThickness = m_outlineThickness[m_outlineUnit];
    } else {
       outlineType = OUTLINE_NONE;
@@ -524,10 +524,9 @@ bool FTGLTextureFont::loadGlyph(unsigned long charcode)
    else
       flags |= FT_LOAD_RENDER;
 
-   if (m_hinting == true)
+   if (m_hinting == false)
       flags |= FT_LOAD_NO_HINTING | FT_LOAD_NO_AUTOHINT;
-   else
-      flags |= FT_LOAD_FORCE_AUTOHINT;
+
    if (depth == 3) {
       FT_Library_SetLcdFilter(library, FT_LCD_FILTER_LIGHT);
       flags |= FT_LOAD_TARGET_LCD;
