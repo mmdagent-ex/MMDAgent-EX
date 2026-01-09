@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalDependencies>MMDFiles.lib;libpng.lib;Bullet_Physics.lib;winmm.lib;ws2_32.lib;opengl32.lib;glu32.lib;zlib.lib;glew.lib;MMDAgent.lib;JPEG.lib;GLFW.lib;FreeType.lib;PocoXMLmdd.lib;PocoUtilmdd.lib;PocoNetSSLmdd.lib;PocoNetmdd.lib;PocoJSONmdd.lib;PocoFoundationmdd.lib;PocoCryptomdd.lib;libeay32MDd.lib;ssleay32MDd.lib;PocoZipmdd.lib;crypt32.lib;Shlwapi.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\Library_Bullet_Physics\lib\$(Platform)\$(Configuration);..\Library_MMDFiles\lib\$(Platform)\$(Configuration);..\Library_zlib\lib\$(Platform)\$(Configuration);..\Library_libpng\lib\$(Platform)\$(Configuration);..\Library_glew\lib\$(Platform)\$(Configuration);..\Library_MMDAgent\lib\$(Platform)\$(Configuration);..\Library_JPEG\lib\$(Platform)\$(Configuration);..\Library_GLFW\lib\$(Platform)\$(Configuration);..\Library_FreeType\lib\$(Platform)\$(Configuration);..\Library_Poco\$(Platform)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>/IGNORE:4099 %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup />
+</Project>

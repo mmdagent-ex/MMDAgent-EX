@@ -113,7 +113,7 @@ static void sendCaption(const char *args, int id, float x, float y)
    unsigned char size;
 
    /* remove comma and kuten (japanese period) */
-   len = MMDAgent_strlen(args);
+   len = (int)MMDAgent_strlen(args);
    c = args;
    j = 0;
    for (i = 0; i < len; i += size) {
@@ -237,7 +237,7 @@ static bool startJulius(MMDAgent *mmdagent, const char *conffile)
 
    /* user config file */
    MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s", mmdagent->getConfigFileName());
-   len = MMDAgent_strlen(buff);
+   len = (int)MMDAgent_strlen(buff);
    if (len > 4 && len < MMDAGENT_MAXBUFLEN - 2) {
       buff[len - 4] = '.';
       buff[len - 3] = 'j';
@@ -254,7 +254,7 @@ static bool startJulius(MMDAgent *mmdagent, const char *conffile)
 
    /* user dictionary */
    MMDAgent_snprintf(buff, MMDAGENT_MAXBUFLEN, "%s", mmdagent->getConfigFileName());
-   len = MMDAgent_strlen(buff);
+   len = (int)MMDAgent_strlen(buff);
    if (len > 4) {
       buff[len - 4] = '.';
       buff[len - 3] = 'd';

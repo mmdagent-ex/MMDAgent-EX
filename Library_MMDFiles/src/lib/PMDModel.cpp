@@ -334,7 +334,7 @@ PMDModel::~PMDModel()
 /* PMDModel::read: read from file */
 bool PMDModel::read(const char *file, BulletPhysics *bullet, SystemTexture *systex)
 {
-   int len;
+   size_t len;
    ZFile *zf;
    char *dir;
    char *extname;
@@ -439,7 +439,7 @@ PMDBone *PMDModel::getBone(const char *name)
    if (name == NULL)
       return NULL;
 
-   if (m_name2bone.search(name, strlen(name), (void **)&match) == true)
+   if (m_name2bone.search(name, (int)strlen(name), (void **)&match) == true)
       return match;
    else
       return NULL;
@@ -453,7 +453,7 @@ PMDFace *PMDModel::getFace(const char *name)
    if (name == NULL)
       return NULL;
 
-   if (m_name2face.search(name, strlen(name), (void **)&match) == true)
+   if (m_name2face.search(name, (int)strlen(name), (void **)&match) == true)
       return match;
    else
       return NULL;
@@ -467,7 +467,7 @@ PMDBoneMorph *PMDModel::getBoneMorph(const char *name)
    if (name == NULL)
       return NULL;
 
-   if (m_name2bonemorph.search(name, strlen(name), (void **)&match) == true)
+   if (m_name2bonemorph.search(name, (int)strlen(name), (void **)&match) == true)
       return match;
    else
       return NULL;
@@ -482,7 +482,7 @@ PMDVertexMorph *PMDModel::getVertexMorph(const char *name)
    if (name == NULL)
       return NULL;
 
-   if (m_name2vertexmorph.search(name, strlen(name), (void **)&match) == true)
+   if (m_name2vertexmorph.search(name, (int)strlen(name), (void **)&match) == true)
       return match;
    else
       return NULL;
@@ -496,7 +496,7 @@ PMDUVMorph *PMDModel::getUVMorph(const char *name)
    if (name == NULL)
       return NULL;
 
-   if (m_name2uvmorph.search(name, strlen(name), (void **)&match) == true)
+   if (m_name2uvmorph.search(name, (int)strlen(name), (void **)&match) == true)
       return match;
    else
       return NULL;
@@ -510,7 +510,7 @@ PMDMaterialMorph *PMDModel::getMaterialMorph(const char *name)
    if (name == NULL)
       return NULL;
 
-   if (m_name2materialmorph.search(name, strlen(name), (void **)&match) == true)
+   if (m_name2materialmorph.search(name, (int)strlen(name), (void **)&match) == true)
       return match;
    else
       return NULL;
@@ -524,7 +524,7 @@ PMDGroupMorph *PMDModel::getGroupMorph(const char *name)
    if (name == NULL)
       return NULL;
 
-   if (m_name2groupmorph.search(name, strlen(name), (void **)&match) == true)
+   if (m_name2groupmorph.search(name, (int)strlen(name), (void **)&match) == true)
       return match;
    else
       return NULL;

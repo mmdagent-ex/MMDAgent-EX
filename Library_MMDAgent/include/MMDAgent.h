@@ -119,6 +119,11 @@
 #define MMDAGENT_COMMAND_WINDOWFRAME_ADD       "WINDOWFRAME_ADD"
 #define MMDAGENT_COMMAND_WINDOWFRAME_DELETE    "WINDOWFRAME_DELETE"
 #define MMDAGENT_COMMAND_WINDOWFRAME_DELETEALL "WINDOWFRAME_DELETEALL"
+#define MMDAGENT_COMMAND_WINDOWOVERLAY_ADD       "WINDOWOVERLAY_ADD"
+#define MMDAGENT_COMMAND_WINDOWOVERLAY_DELETE    "WINDOWOVERLAY_DELETE"
+#define MMDAGENT_COMMAND_WINDOWOVERLAY_DELETEALL "WINDOWOVERLAY_DELETEALL"
+#define MMDAGENT_COMMAND_WINDOWOVERLAY_HIDE      "WINDOWOVERLAY_HIDE"
+#define MMDAGENT_COMMAND_WINDOWOVERLAY_SHOW      "WINDOWOVERLAY_SHOW"
 #define MMDAGENT_COMMAND_LIGHTCOLOR       "LIGHTCOLOR"
 #define MMDAGENT_COMMAND_LIGHTDIRECTION   "LIGHTDIRECTION"
 #define MMDAGENT_COMMAND_LIPSYNCSTART     "LIPSYNC_START"
@@ -186,6 +191,10 @@
 #define MMDAGENT_EVENT_CAPTION_STOP     "CAPTION_EVENT_STOP"
 #define MMDAGENT_EVENT_WINDOWFRAME_ADD    "WINDOWFRAME_EVENT_ADD"
 #define MMDAGENT_EVENT_WINDOWFRAME_DELETE "WINDOWFRAME_EVENT_DELETE"
+#define MMDAGENT_EVENT_WINDOWOVERLAY_ADD    "WINDOWOVERLAY_EVENT_ADD"
+#define MMDAGENT_EVENT_WINDOWOVERLAY_DELETE "WINDOWOVERLAY_EVENT_DELETE"
+#define MMDAGENT_EVENT_WINDOWOVERLAY_HIDE   "WINDOWOVERLAY_EVENT_HIDE"
+#define MMDAGENT_EVENT_WINDOWOVERLAY_SHOW   "WINDOWOVERLAY_EVENT_SHOW"
 
 
 #define MMDAGENT_CURRENTTIME
@@ -456,6 +465,21 @@ private:
 
    /* deleteAllWindowFrame: delete all window frame */
    bool deleteAllWindowFrame();
+
+   /* addWindowOverlay: add window overlay */
+   bool addWindowOverlay(const char *overlayAlias, const char *fileName, float width_rate, float height_rate, const char *orientation, float padding_rate);
+
+   /* deleteWindowOverlay: delete window overlay */
+   bool deleteWindowOverlay(const char *overlayAlias);
+
+   /* deleteAllWindowOverlay: delete all window overlay */
+   bool deleteAllWindowOverlay();
+
+   /* hideWindowOverlay: hide window overlay */
+   bool hideWindowOverlay(const char *overlayAlias);
+
+   /* showWindowOverlay: show window overlay */
+   bool showWindowOverlay(const char *overlayAlias);
 
    /* changeCamera: change camera setting */
    bool changeCamera(const char *pos, const char *rot, const char *distance, const char *fovy, const char *time, const char *modelalias, const char *bonename);
@@ -877,8 +901,8 @@ class LogToFile {
 private:
    FILE *m_fp;
    char *m_dirName;
-   int m_totalSize;
-   int m_maxSize;
+   size_t m_totalSize;
+   size_t m_maxSize;
    bool m_recording;
 
    /* initialize: initialize LogToFile */

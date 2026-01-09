@@ -1,26 +1,70 @@
 name: MSBuild
-on: [push]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
 jobs:
   build:
-    name: MSBuild
+    name: MSBuild (${{ matrix.platform }})
     runs-on: windows-2022
+    strategy:
+      matrix:
+        platform: [Win32, x64]
+
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        lfs: 'true'
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Add MSBUILD to PATH on Windows
-      uses: microsoft/setup-msbuild@v2
+      - name: Clean external deps dir
+        shell: pwsh
+        run: |
+          if (Test-Path external\win) { Remove-Item external\win -Recurse -Force }
+          New-Item -ItemType Directory -Force -Path external\win | Out-Null
 
-    - name: Build app for release on Windows
-      run: msbuild /p:Configuration=Release MMDAgent_vs2022.sln
+      - name: Download & expand Windows deps (from latest Release)
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $asset = "MMDAgent-EX-deps_win.zip"
+          $tag = gh api repos/$env:GITHUB_REPOSITORY/releases/latest --jq .tag_name
+          if (-not $tag) { throw "Latest release not found." }
+          Write-Host "Latest tag: $tag"
+          gh release download $tag --repo "$env:GITHUB_REPOSITORY" --pattern $asset --clobber
+          Expand-Archive -Path $asset -DestinationPath "." -Force
+          Write-Host "Extracted files:"
+          Get-ChildItem -Recurse .\external\win | ForEach-Object { $_.FullName }
+      - name: Add MSBUILD to PATH on Windows
+        uses: microsoft/setup-msbuild@v2
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: build-result-win32
-        path: |
-          Release/MMDAgent-EX.exe
-          Release/Plugins/*.dll
+      - name: Build app for release on Windows (${{ matrix.platform }})
+        run: msbuild /m /t:Build /p:Configuration=Release /p:Platform=${{ matrix.platform }} MMDAgent_vs2022.sln
 
+      - name: Set platform-specific env
+        shell: pwsh
+        run: |
+          if ('${{ matrix.platform }}' -eq 'Win32') {
+            echo "DLL_DIR=Release/DLLs"             >> $env:GITHUB_ENV
+            echo "ARTIFACT_NAME=build-result-win32" >> $env:GITHUB_ENV
+          } else {
+            echo "DLL_DIR=Release/DLLs64"           >> $env:GITHUB_ENV
+            echo "ARTIFACT_NAME=build-result-x64"   >> $env:GITHUB_ENV
+          }
+
+      - name: Upload artifact (${{ env.ARTIFACT_NAME }})
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: |
+            Release/MMDAgent-EX.exe
+            Release/Plugins/*.dll
+            ${{ env.DLL_DIR }}/
+          if-no-files-found: error
+          retention-days: 60

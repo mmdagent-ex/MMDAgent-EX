@@ -133,11 +133,13 @@ static int VIManager_EventQueue_dequeue(VIManager_EventQueue *q, char *type, cha
    }
    if (type != NULL)
       strcpy(type, q->head->type);
-   if (args != NULL)
-      if (q->head->args)
+   if (args != NULL) {
+      if (q->head->args) {
          strcpy(args, q->head->args);
-      else
+      } else {
          strcpy(args, "");
+      }
+   }
    tmp = q->head->next;
    VIManager_Event_clear(q->head);
    free(q->head);

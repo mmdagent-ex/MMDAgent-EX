@@ -207,7 +207,7 @@ bool TimeCaption::set(const char *string, double durationFrame)
    if (string) {
       /* text re-formatting */
       formatted_string = MMDAgent_strdup(string);
-      for (j = 0, i = 0; i < MMDAgent_strlen(string); i++) {
+      for (j = 0, i = 0; i < (int)MMDAgent_strlen(string); i++) {
          c = string[i];
          if (c == '_') {
             /* replace '_' to ' ' */
@@ -215,7 +215,7 @@ bool TimeCaption::set(const char *string, double durationFrame)
          }
          if (string[i] == '\\') {
             /* replace '\' + 'n' or 'r' to '\n' */
-            if (i + 1 < MMDAgent_strlen(string) && (string[i + 1] == 'r' || string[i + 1] == 'n')) {
+            if (i + 1 < (int)MMDAgent_strlen(string) && (string[i + 1] == 'r' || string[i + 1] == 'n')) {
                c = '\n';
                i++;
             }

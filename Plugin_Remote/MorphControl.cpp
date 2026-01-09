@@ -144,12 +144,12 @@ bool MorphControlSet::set(const char *shapeName, PMDFaceInterface *interface, fl
    if (m_index == NULL || interface == NULL)
       return false;
 
-   len = MMDAgent_strlen(shapeName);
+   len = (int)MMDAgent_strlen(shapeName);
    if (m_index->search(shapeName, len, (void **)&m) == true) {
       m->setTarget(value);
    } else {
       m = new MorphControl(interface, value);
-      m_index->add(shapeName, MMDAgent_strlen(shapeName), (void *)m);
+      m_index->add(shapeName, len, (void *)m);
    }
    return true;
 }
@@ -162,7 +162,7 @@ MorphControl *MorphControlSet::find(const char *shapeName)
    if (m_index == NULL)
       return NULL;
 
-   if (m_index->search(shapeName, MMDAgent_strlen(shapeName), (void **)&m) == true)
+   if (m_index->search(shapeName, (int)MMDAgent_strlen(shapeName), (void **)&m) == true)
       return m;
 
    return NULL;

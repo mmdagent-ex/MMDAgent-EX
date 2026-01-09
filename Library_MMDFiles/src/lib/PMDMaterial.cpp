@@ -221,7 +221,7 @@ void PMDMaterial::computeCenterVertex(btVector3 *vertices, INDICES *surfaces)
 /* PMDMaterial::loadTexture: load texture from file */
 bool PMDMaterial::loadTexture(char *textureFileString, PMDTextureLoader *textureLoader, const char *dir)
 {
-   int len;
+   size_t len;
    char *p;
    char buf[MMDFILES_MAXBUFLEN];
    bool ret = true;
@@ -230,7 +230,7 @@ bool PMDMaterial::loadTexture(char *textureFileString, PMDTextureLoader *texture
       p = strchr(textureFileString, '*');
       if (p) {
          /* has extra sphere map */
-         len = p - &(textureFileString[0]);
+         len = (size_t)(p - &(textureFileString[0]));
          MMDFiles_snprintf(buf, MMDFILES_MAXBUFLEN, "%s%c", dir, MMDFILES_DIRSEPARATOR);
          strncat(buf, textureFileString, len);
          m_texture = textureLoader->load(buf, textureFileString);

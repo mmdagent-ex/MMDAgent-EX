@@ -140,7 +140,7 @@ bool ShapeMap::load(const char *fileName, PMDModel *pmd, const char *dirName)
                if (f == NULL) {
                   f = new PMDFaceInterface(pmd, p2, 1.0f, false);
                   if (f->isValid())
-                     m_lipMorph->add(p1, MMDAgent_strlen(p1), (void *)f);
+                     m_lipMorph->add(p1, (int)MMDAgent_strlen(p1), (void *)f);
                   else
                      delete f;
                }
@@ -156,7 +156,7 @@ bool ShapeMap::load(const char *fileName, PMDModel *pmd, const char *dirName)
                   if (f == NULL) {
                      f = new PMDFaceInterface(pmd, p, 1.0f, false);
                      if (f->isValid())
-                        m_ignoreLipMorph->add(p, MMDAgent_strlen(p), (void *)f);
+                        m_ignoreLipMorph->add(p, (int)MMDAgent_strlen(p), (void *)f);
                      else
                         delete f;
                   }
@@ -172,7 +172,7 @@ bool ShapeMap::load(const char *fileName, PMDModel *pmd, const char *dirName)
                   for (token = MMDAgent_strtok(buf2, ",\r\n", &save); token; token = MMDAgent_strtok(NULL, ",\r\n", &save)) {
                      PMDBone *b = pmd->getBone(token);
                      if (b) {
-                        m_trackBone->add(p1, MMDAgent_strlen(p1), (void *)b);
+                        m_trackBone->add(p1, (int)MMDAgent_strlen(p1), (void *)b);
                         break;
                      }
                   }
@@ -197,7 +197,7 @@ bool ShapeMap::load(const char *fileName, PMDModel *pmd, const char *dirName)
                } else {
                   f = new PMDFaceInterface(pmd, p2, coef, thres);
                   if (f->isValid())
-                     m_auMorph->add(p1, MMDAgent_strlen(p1), (void *)f);
+                     m_auMorph->add(p1, (int)MMDAgent_strlen(p1), (void *)f);
                   else
                      delete f;
                }
@@ -206,7 +206,7 @@ bool ShapeMap::load(const char *fileName, PMDModel *pmd, const char *dirName)
                const char *p = getActionMotionFileName(p1);
                if (p == NULL) {
                   MMDAgent_snprintf(buf2, MMDAGENT_MAXBUFLEN, "%s%c%s", dirName, MMDFILES_DIRSEPARATOR, p2);
-                  m_actionMotion->add(p1, MMDAgent_strlen(p1), MMDAgent_strdup(buf2));
+                  m_actionMotion->add(p1, (int)MMDAgent_strlen(p1), MMDAgent_strdup(buf2));
                }
             } else if (MMDAgent_strheadmatch(p1, "EXBONE_")) {
                // ex bone
@@ -218,7 +218,7 @@ bool ShapeMap::load(const char *fileName, PMDModel *pmd, const char *dirName)
                   for (token = MMDAgent_strtok(buf2, ",\r\n", &save); token; token = MMDAgent_strtok(NULL, ",\r\n", &save)) {
                      PMDBone *b = pmd->getBone(token);
                      if (b) {
-                        m_exBone->add(p1, MMDAgent_strlen(p1), (void *)b);
+                        m_exBone->add(p1, (int)MMDAgent_strlen(p1), (void *)b);
                         break;
                      }
                   }
@@ -243,7 +243,7 @@ bool ShapeMap::load(const char *fileName, PMDModel *pmd, const char *dirName)
                } else {
                   f = new PMDFaceInterface(pmd, p2, coef, thres);
                   if (f->isValid())
-                     m_exMorph->add(p1, MMDAgent_strlen(p1), (void *)f);
+                     m_exMorph->add(p1, (int)MMDAgent_strlen(p1), (void *)f);
                   else
                      delete f;
                }
@@ -283,7 +283,7 @@ bool ShapeMap::load(const char *fileName, PMDModel *pmd, const char *dirName)
                } else {
                   f = new PMDFaceInterface(pmd, p2, coef, thres);
                   if (f->isValid())
-                     m_arKitMorph->add(p1, MMDAgent_strlen(p1), (void *)f);
+                     m_arKitMorph->add(p1, (int)MMDAgent_strlen(p1), (void *)f);
                   else
                      delete f;
                }
@@ -310,7 +310,7 @@ PMDFaceInterface *ShapeMap::getLipMorph(const char *lipEntryName)
       return NULL;
    if (m_lipMorph == NULL)
       return NULL;
-   if (m_lipMorph->search(lipEntryName, MMDAgent_strlen(lipEntryName), (void **)&data) == false)
+   if (m_lipMorph->search(lipEntryName, (int)MMDAgent_strlen(lipEntryName), (void **)&data) == false)
       return NULL;
    return (PMDFaceInterface *)data;
 }
@@ -324,7 +324,7 @@ PMDBone *ShapeMap::getTrackBone(const char *trackingBoneEntryName)
       return NULL;
    if (m_trackBone == NULL)
       return NULL;
-   if (m_trackBone->search(trackingBoneEntryName, MMDAgent_strlen(trackingBoneEntryName), (void **)&data) == false)
+   if (m_trackBone->search(trackingBoneEntryName, (int)MMDAgent_strlen(trackingBoneEntryName), (void **)&data) == false)
       return NULL;
    return (PMDBone *)data;
 }
@@ -338,7 +338,7 @@ PMDFaceInterface *ShapeMap::getAUMorph(const char *auName)
       return NULL;
    if (m_auMorph == NULL)
       return NULL;
-   if (m_auMorph->search(auName, MMDAgent_strlen(auName), (void **)&data) == false)
+   if (m_auMorph->search(auName, (int)MMDAgent_strlen(auName), (void **)&data) == false)
       return NULL;
    return (PMDFaceInterface *)data;
 }
@@ -352,7 +352,7 @@ PMDFaceInterface *ShapeMap::getARKitMorph(const char *shapeName)
       return NULL;
    if (m_arKitMorph == NULL)
       return NULL;
-   if (m_arKitMorph->search(shapeName, MMDAgent_strlen(shapeName), (void **)&data) == false)
+   if (m_arKitMorph->search(shapeName, (int)MMDAgent_strlen(shapeName), (void **)&data) == false)
       return NULL;
    return (PMDFaceInterface *)data;
 }
@@ -366,7 +366,7 @@ const char *ShapeMap::getActionMotionFileName(const char *actionName)
       return NULL;
    if (m_actionMotion == NULL)
       return NULL;
-   if (m_actionMotion->search(actionName, MMDAgent_strlen(actionName), (void **)&data) == false)
+   if (m_actionMotion->search(actionName, (int)MMDAgent_strlen(actionName), (void **)&data) == false)
       return NULL;
    return (const char *)data;
 }
@@ -380,7 +380,7 @@ PMDBone *ShapeMap::getExBone(const char *boneEntryName)
       return NULL;
    if (m_exBone == NULL)
       return NULL;
-   if (m_exBone->search(boneEntryName, MMDAgent_strlen(boneEntryName), (void **)&data) == false)
+   if (m_exBone->search(boneEntryName, (int)MMDAgent_strlen(boneEntryName), (void **)&data) == false)
       return NULL;
    return (PMDBone *)data;
 }
@@ -394,7 +394,7 @@ PMDFaceInterface *ShapeMap::getExMorph(const char *morphEntryName)
       return NULL;
    if (m_exMorph == NULL)
       return NULL;
-   if (m_exMorph->search(morphEntryName, MMDAgent_strlen(morphEntryName), (void **)&data) == false)
+   if (m_exMorph->search(morphEntryName, (int)MMDAgent_strlen(morphEntryName), (void **)&data) == false)
       return NULL;
    return (PMDFaceInterface *)data;
 }
@@ -434,7 +434,7 @@ PMDFaceInterface *ShapeMap::getIgnoreLipMorph(const char *ignoreLipEntryName)
       return NULL;
    if (m_ignoreLipMorph == NULL)
       return NULL;
-   if (m_ignoreLipMorph->search(ignoreLipEntryName, MMDAgent_strlen(ignoreLipEntryName), (void **)&data) == false)
+   if (m_ignoreLipMorph->search(ignoreLipEntryName, (int)MMDAgent_strlen(ignoreLipEntryName), (void **)&data) == false)
       return NULL;
    return (PMDFaceInterface *)data;
 }

@@ -267,7 +267,8 @@ KeyValue *ContentManager::getContentInfoNew(const char *dir)
    char buff1[MMDAGENT_MAXBUFLEN];
    char buff2[MMDAGENT_MAXBUFLEN];
    KeyValue *prop;
-   int i, len, index = 0;
+   size_t i, len, index;
+   bool found = false;
    char size;
 
    prop = new KeyValue;
@@ -278,18 +279,20 @@ KeyValue *ContentManager::getContentInfoNew(const char *dir)
       MMDAgent_snprintf(buff2, MMDAGENT_MAXBUFLEN, "%s%c%s", buff1, MMDAGENT_DIRSEPARATOR, MMDAGENT_CONTENTINFOFILE);
       if (prop->load(buff2, NULL))
          break;
-      index = -1;
+      found = false;
       len = MMDFiles_strlen(buff1);
       for (i = 0; i < len; i += size) {
          size = MMDFiles_getcharsize(&buff1[i]);
-         if (size == 1 && MMDFiles_dirseparator(buff1[i]) == true)
+         if (size == 1 && MMDFiles_dirseparator(buff1[i]) == true) {
             index = i;
+            found = true;
+         }
       }
-      if (index >= 0)
+      if (found)
          buff1[index] = '\0';
-   } while (index >= 0);
+   } while (found);
 
-   if (index < 0) {
+   if (found == false) {
       delete prop;
       return NULL;
    }
@@ -1243,7 +1246,7 @@ void ContentManager::loadBanList(const char *systemDirName)
 {
    char buff[MMDAGENT_MAXBUFLEN];
    FILE *fp;
-   int len;
+   size_t len;
    char *p1;
    BanList *b, *btmp;
 

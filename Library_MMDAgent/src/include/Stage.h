@@ -57,6 +57,9 @@
 /* maximum number of frame textures */
 #define MMDAGENT_STAGE_FRAME_TEXTURE_MAX 30
 
+/* maximum number of overlay textures */
+#define MMDAGENT_STAGE_OVERLAY_TEXTURE_MAX 30
+
 /* Stage: stage */
 class Stage
 {
@@ -85,11 +88,35 @@ private:
    float m_width;                  // stored screen width
    float m_height;                 // stored screen height
 
+   /* overlay texture */
+   struct OverlayTexture {
+      PMDTexture *texture;  // texture image
+      char *alias;          // alias name
+      GLfloat vertices[12]; // vertex list
+      float width_rate;     // width rate
+      float height_rate;    // height rate
+      float padding_rate;   // padding rate
+      bool orientation_left;
+      bool orientation_bottom;
+      bool orientation_center;
+      float view_rate;
+      bool visible;
+      bool delete_when_invisible;
+   };
+   OverlayTexture m_overlayTextures[MMDAGENT_STAGE_OVERLAY_TEXTURE_MAX]; // list of overlay textures
+   int m_overlayTextureNum;        // valid num of overlay textures
+
    /* initialize: initialize stage */
    void initialize();
 
    /* clear: free stage */
    void clear();
+
+   /* calculateOverlayPosition; calculate overlay position */
+   void calculateOverlayPosition(OverlayTexture *ot);
+
+   /* overlayUpdate: update overlay */
+   void overlayUpdate(double ellapsedFrame);
 
 public:
 
@@ -143,6 +170,21 @@ public:
 
    /* deleteAllFrameTexture: delete all frame texture */
    bool deleteAllFrameTexture();
+
+   /* addOverlayTexture: add overlay texture */
+   bool addOverlayTexture(const char *alias, const char *file, float width_rate, float height_rate, const char *orientation, float padding_rate);
+
+   /* deleteOverlayTexture: delete overlay texture */
+   bool deleteOverlayTexture(const char *alias);
+
+   /* deleteAllOverlayTexture: delete all overlay texture */
+   bool deleteAllOverlayTexture();
+
+   /* hideOverlayTexture: hide overlay texture */
+   bool hideOverlayTexture(const char *alias);
+
+   /* showOverlayTexture: show hided overlay texture */
+   bool showOverlayTexture(const char *alias);
 
    /* hasFrameTexture: return TRUE if has frame texture */
    bool hasFrameTexture();

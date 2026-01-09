@@ -38,7 +38,6 @@ target_include_directories(Plugin_Kafka PRIVATE
     ../Library_GLFW/include
     ../Library_MMDFiles/include
     ../Library_MMDAgent/include
-    ../Library_librdkafka/include
     ${LIBRDKAFKA_INCLUDE_DIR}
 )
 

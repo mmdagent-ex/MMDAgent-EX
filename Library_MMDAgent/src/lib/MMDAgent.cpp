@@ -298,6 +298,45 @@ static char *prepareCacheDirDup(char *basename)
    return(cacheDirName);
 }
 
+static bool stdInputThreadRunning = false;
+static MMDAgent *mmdagent_for_stdin = NULL;
+
+static void assignStdInputInstance(MMDAgent *mmdagent)
+{
+   mmdagent_for_stdin = mmdagent;
+}
+
+/* thread main function receiving standard input and post them to message queue */
+static void stdInputReceivingThreadMain(void *param)
+{
+   char buff[MMDAGENT_MAXBUFLEN];
+   char *save, *type, *args;
+
+   stdInputThreadRunning = true;
+
+   mmdagent_for_stdin = (MMDAgent *)param;
+
+   mmdagent_for_stdin->sendLogString(0, MLOG_STATUS, "stdin thread started");
+
+   while (1) {
+      if (fgets(buff, MMDAGENT_MAXBUFLEN, stdin) == NULL) {
+         // EOF
+         break;
+      }
+      if (MMDAgent_strlen(buff) > 0) {
+         type = MMDAgent_strtok(buff, "|\r\n", &save);
+         if (type) {
+            args = MMDAgent_strtok(NULL, "\r\n", &save);
+            mmdagent_for_stdin->sendMessage(0, type, "%s", args ? args : "");
+         }
+      }
+   }
+
+   stdInputThreadRunning = false;
+
+   mmdagent_for_stdin->sendLogString(0, MLOG_WARNING, "stdin thread exited");
+}
+
 /* MMDAgent::getNewModelId: return new model ID */
 int MMDAgent::getNewModelId()
 {
@@ -1215,6 +1254,62 @@ bool MMDAgent::deleteAllWindowFrame()
 {
    m_stage->deleteAllFrameTexture();
    /* don't send message */
+   return true;
+}
+
+/* MMDAgent::addWindowOverlay: add window overlay */
+bool MMDAgent::addWindowOverlay(const char *overlayAlias, const char *fileName, float width_rate, float height_rate, const char *orientation, float padding_rate)
+{
+   if (MMDAgent_exist(fileName) == false) {
+      sendLogString(m_moduleId, MLOG_ERROR, "addWindowOverlay: %s: not found: %s", overlayAlias, fileName);
+      return false;
+   }
+   if (m_stage->addOverlayTexture(overlayAlias, fileName, width_rate, height_rate, orientation, padding_rate) == false) {
+      sendLogString(m_moduleId, MLOG_ERROR, "addWindowOverlay: %s: failed to load or exceeds limit: %s", overlayAlias, fileName);
+      return false;
+   }
+   sendMessage(m_moduleId, MMDAGENT_EVENT_WINDOWOVERLAY_ADD, "%s", overlayAlias);
+   return true;
+}
+
+/* MMDAgent::deleteWindowOverlay: delete window overlay */
+bool MMDAgent::deleteWindowOverlay(const char *overlayAlias)
+{
+   if (m_stage->deleteOverlayTexture(overlayAlias) == false) {
+      sendLogString(m_moduleId, MLOG_WARNING, "deleteWindowOverlay: overlay alias not exist: %s", overlayAlias);
+      return false;
+   }
+   sendMessage(m_moduleId, MMDAGENT_EVENT_WINDOWOVERLAY_DELETE, "%s", overlayAlias);
+   return true;
+}
+
+/* MMDAgent::deleteAllWindowOverlay: delete all window overlay */
+bool MMDAgent::deleteAllWindowOverlay()
+{
+   m_stage->deleteAllOverlayTexture();
+   /* don't send message */
+   return true;
+}
+
+/* MMDAgent::hideWindowOverlay: hide window overlay */
+bool MMDAgent::hideWindowOverlay(const char *overlayAlias)
+{
+   if (m_stage->hideOverlayTexture(overlayAlias) == false) {
+      sendLogString(m_moduleId, MLOG_WARNING, "hideWindowOverlay: overlay alias not exist: %s", overlayAlias);
+      return false;
+   }
+   sendMessage(m_moduleId, MMDAGENT_EVENT_WINDOWOVERLAY_HIDE, "%s", overlayAlias);
+   return true;
+}
+
+/* MMDAgent::showWindowOverlay: show window overlay */
+bool MMDAgent::showWindowOverlay(const char *overlayAlias)
+{
+   if (m_stage->showOverlayTexture(overlayAlias) == false) {
+      sendLogString(m_moduleId, MLOG_WARNING, "hideWindowOverlay: overlay alias not exist: %s", overlayAlias);
+      return false;
+   }
+   sendMessage(m_moduleId, MMDAGENT_EVENT_WINDOWOVERLAY_SHOW, "%s", overlayAlias);
    return true;
 }
 
@@ -2443,6 +2538,16 @@ bool MMDAgent::setupWorld()
             return false;
          }
          sendLogString(m_moduleId, MLOG_STATUS, "transparent screen disabled");
+      }
+   }
+
+   if (m_option->getUseStdInOut() == true) {
+      if (stdInputThreadRunning == false) {
+         /* start standard input receiving thread */
+         if (glfwCreateThread(stdInputReceivingThreadMain, this) == -1)
+            sendLogString(m_moduleId, MLOG_ERROR, "failed to create standard input receiving thread");
+      } else {
+         assignStdInputInstance(this);
       }
    }
 
@@ -5417,6 +5522,18 @@ void MMDAgent::procReceivedMessage(const char *type, const char *value)
    if(MMDAgent_strlen(type) <= 0)
       return;
 
+   if (m_option->getUseStdInOut() == true) {
+      /* output message to stdout */
+      if (MMDAgent_strlen(type) > 0) {
+         if (MMDAgent_strlen(value) > 0) {
+            printf("%s|%s\n", type, value);
+         } else {
+            printf("%s\n", type);
+         }
+         fflush(stdout);
+      }
+   }
+
    if (m_plugin)
       m_plugin->execProcMessage(this, type, value);
 
@@ -5765,6 +5882,49 @@ void MMDAgent::procReceivedMessage(const char *type, const char *value)
          return;
       }
       deleteAllWindowFrame();
+   } else if (MMDAgent_strequal(type, MMDAGENT_COMMAND_WINDOWOVERLAY_ADD)) {
+      /* add or swap window overlay */
+      sendLogString(m_moduleId, MLOG_MESSAGE_CAPTURED, "%s|%s", type, value);
+      if (num != 6) {
+         sendLogString(m_moduleId, MLOG_ERROR, "%s: number of arguments should be 2.", type);
+         return;
+      }
+      fvec[0] = MMDAgent_str2float(argv[2]);
+      fvec[1] = MMDAgent_str2float(argv[3]);
+      fvec[2] = MMDAgent_str2float(argv[5]);
+      addWindowOverlay(argv[0], argv[1], fvec[0], fvec[1], argv[4], fvec[2]);
+   } else if (MMDAgent_strequal(type, MMDAGENT_COMMAND_WINDOWOVERLAY_DELETE)) {
+      /* delete window overlay */
+      sendLogString(m_moduleId, MLOG_MESSAGE_CAPTURED, "%s|%s", type, value);
+      if (num != 1) {
+         sendLogString(m_moduleId, MLOG_ERROR, "%s: number of arguments should be 1.", type);
+         return;
+      }
+      deleteWindowOverlay(argv[0]);
+   } else if (MMDAgent_strequal(type, MMDAGENT_COMMAND_WINDOWOVERLAY_DELETEALL)) {
+      /* delete window overlay */
+      sendLogString(m_moduleId, MLOG_MESSAGE_CAPTURED, "%s|%s", type, value);
+      if (num != 0) {
+         sendLogString(m_moduleId, MLOG_ERROR, "%s: number of arguments should be 0.", type);
+         return;
+      }
+      deleteAllWindowOverlay();
+   } else if (MMDAgent_strequal(type, MMDAGENT_COMMAND_WINDOWOVERLAY_HIDE)) {
+      /* hide window overlay */
+      sendLogString(m_moduleId, MLOG_MESSAGE_CAPTURED, "%s|%s", type, value);
+      if (num != 1) {
+         sendLogString(m_moduleId, MLOG_ERROR, "%s: number of arguments should be 1.", type);
+         return;
+      }
+      hideWindowOverlay(argv[0]);
+   } else if (MMDAgent_strequal(type, MMDAGENT_COMMAND_WINDOWOVERLAY_SHOW)) {
+      /* show window overlay */
+      sendLogString(m_moduleId, MLOG_MESSAGE_CAPTURED, "%s|%s", type, value);
+      if (num != 1) {
+         sendLogString(m_moduleId, MLOG_ERROR, "%s: number of arguments should be 1.", type);
+         return;
+      }
+      showWindowOverlay(argv[0]);
    } else if (MMDAgent_strequal(type, MMDAGENT_COMMAND_CAMERA)) {
       /* camera */
       sendLogString(m_moduleId, MLOG_MESSAGE_CAPTURED, "%s|%s", type, value);
@@ -6245,12 +6405,12 @@ void MMDAgent::procReceivedLogString(int id, unsigned int flag, const char *log,
    // compose log string
    modulename = getModuleName(id);
    if (modulename == NULL) {
-      printf("InternalError: unknown module id = %d\n", id);
+      sendLogString(m_moduleId, MLOG_ERROR, "InternalError: unknown module id = %d", id);
       return;
    }
    flagString = m_message->getFlagString(flag);
    if (flagString == NULL) {
-      printf("InternalError: unknown flag id = %d\n", flag);
+      sendLogString(m_moduleId, MLOG_ERROR, "InternalError: unknown flag id = %d", flag);
       return;
    }
 
@@ -6270,8 +6430,10 @@ void MMDAgent::procReceivedLogString(int id, unsigned int flag, const char *log,
       __android_log_print(ANDROID_LOG_VERBOSE, "MMDAgent", "%s: %s", modulename, log);
    }
 #else
-   // write to stdout
-   printf("%s", buf);
+   if (m_option->getUseStdInOut() == false) {
+      // write to stdout
+      printf("%s", buf);
+   }
 #endif /* __ANDROID__ */
 
    // write to log file
@@ -6685,7 +6847,7 @@ void MMDAgent::procOpenContentDirMessage()
 void MMDAgent::procOpenContentFileMessage()
 {
    char *contentFile = NULL;
-   int len;
+   size_t len;
 
    if (m_configDirName == NULL || m_configFileName == NULL)
       return;

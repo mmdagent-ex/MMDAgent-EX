@@ -5,9 +5,17 @@
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
@@ -111,7 +119,20 @@
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -123,18 +144,32 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\props\prop_library.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\props\prop_library.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\props\prop_library.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\props\prop_library.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)$(ProjectName)\lib\</OutDir>
+    <TargetName>Open_JTalk</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetName>Open_JTalk</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)$(ProjectName)\lib\</OutDir>
-    <TargetName>Open_JTalk_D</TargetName>
+    <TargetName>Open_JTalk</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <TargetName>Open_JTalk</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -148,9 +183,36 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
-    <Lib>
-      <OutputFile>lib\Open_JTalk_D.lib</OutputFile>
-    </Lib>
+    <Lib />
+    <PreBuildEvent>
+      <Command>copy src\text2mecab\text2mecab.h include\text2mecab.h;
+copy src\mecab\src\mecab.h include\mecab.h;
+copy src\mecab2njd\mecab2njd.h include\mecab2njd.h;
+copy src\njd\njd.h include\njd.h;
+copy src\njd_set_pronunciation\njd_set_pronunciation.h include\njd_set_pronunciation.h;
+copy src\njd_set_digit\njd_set_digit.h include\njd_set_digit.h;
+copy src\njd_set_accent_phrase\njd_set_accent_phrase.h include\njd_set_accent_phrase.h;
+copy src\njd_set_accent_type\njd_set_accent_type.h include\njd_set_accent_type.h;
+copy src\njd_set_unvoiced_vowel\njd_set_unvoiced_vowel.h include\njd_set_unvoiced_vowel.h;
+copy src\njd_set_long_vowel\njd_set_long_vowel.h include\njd_set_long_vowel.h;
+copy src\njd2jpcommon\njd2jpcommon.h include\njd2jpcommon.h;
+copy src\jpcommon\jpcommon.h include\jpcommon.h;
+</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;DIC_VERSION=102;MECAB_DEFAULT_RC="dummy";PACKAGE="open_jtalk";VERSION="1.02";MECAB_WITHOUT_SHARE_DIC;HAVE_WINDOWS_H;CHARSET_UTF_8;ASCII_HEADER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src\jpcommon;src\mecab\src;src\mecab2njd;src\njd;src\njd2jpcommon;src\njd_set_accent_phrase;src\njd_set_accent_type;src\njd_set_digit;src\njd_set_long_vowel;src\njd_set_pronunciation;src\njd_set_unvoiced_vowel;src\text2mecab;..\Library_hts_engine_API\include;</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib />
     <PreBuildEvent>
       <Command>copy src\text2mecab\text2mecab.h include\text2mecab.h;
 copy src\mecab\src\mecab.h include\mecab.h;
@@ -187,9 +249,44 @@ copy src\jpcommon\jpcommon.h include\jpcommon.h;
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
-    <Lib>
-      <OutputFile>lib\Open_JTalk.lib</OutputFile>
-    </Lib>
+    <Lib />
+    <PreBuildEvent>
+      <Command>copy src\text2mecab\text2mecab.h include\text2mecab.h;
+copy src\mecab\src\mecab.h include\mecab.h;
+copy src\mecab2njd\mecab2njd.h include\mecab2njd.h;
+copy src\njd\njd.h include\njd.h;
+copy src\njd_set_pronunciation\njd_set_pronunciation.h include\njd_set_pronunciation.h;
+copy src\njd_set_digit\njd_set_digit.h include\njd_set_digit.h;
+copy src\njd_set_accent_phrase\njd_set_accent_phrase.h include\njd_set_accent_phrase.h;
+copy src\njd_set_accent_type\njd_set_accent_type.h include\njd_set_accent_type.h;
+copy src\njd_set_unvoiced_vowel\njd_set_unvoiced_vowel.h include\njd_set_unvoiced_vowel.h;
+copy src\njd_set_long_vowel\njd_set_long_vowel.h include\njd_set_long_vowel.h;
+copy src\njd2jpcommon\njd2jpcommon.h include\njd2jpcommon.h;
+copy src\jpcommon\jpcommon.h include\jpcommon.h;
+</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;DIC_VERSION=102;MECAB_DEFAULT_RC="dummy";PACKAGE="open_jtalk";VERSION="1.02";MECAB_WITHOUT_SHARE_DIC;HAVE_WINDOWS_H;CHARSET_UTF_8;ASCII_HEADER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src\jpcommon;src\mecab\src;src\mecab2njd;src\njd;src\njd2jpcommon;src\njd_set_accent_phrase;src\njd_set_accent_type;src\njd_set_digit;src\njd_set_long_vowel;src\njd_set_pronunciation;src\njd_set_unvoiced_vowel;src\text2mecab;..\Library_hts_engine_API\include;</AdditionalIncludeDirectories>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib />
     <PreBuildEvent>
       <Command>copy src\text2mecab\text2mecab.h include\text2mecab.h;
 copy src\mecab\src\mecab.h include\mecab.h;

@@ -317,6 +317,9 @@
 #define OPTION_TRANSPARENTPIXMAP_STR "transparent_pixmap"
 #define OPTION_TRANSPARENTPIXMAP_DEF false
 
+#define OPTION_USESTDINOUT_STR "use_stdinout"
+#define OPTION_USESTDINOUT_DEF false
+
 /* Option: user options */
 class Option
 {
@@ -427,6 +430,9 @@ private:
    bool m_transparentWindow;
    float m_transparentColor[3];
    bool m_transparentPixmap;
+
+   /* use stdin/out for messaging */
+   bool m_useStdInOut;
 
    /* initialize: initialize options */
    void initialize();
@@ -759,5 +765,11 @@ public:
 
    /* setTransparentPixmap: set transparent pixmap */
    void setTransparentPixmap(bool b);
+
+   /* getUseStdInOut: get use of standard in and out for messaging */
+   bool getUseStdInOut();
+
+   /* setUseStdInOut: set use of standard in and out for messaging */
+   void setUseStdInOut(bool b);
 
 };

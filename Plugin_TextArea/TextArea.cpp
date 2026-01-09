@@ -346,7 +346,7 @@ void TextArea::setText(const char *text)
    if (is_image == false) {
       /* text */
       /* text re-formatting */
-      for (j = 0, i = 0; i < MMDAgent_strlen(p); i++) {
+      for (j = 0, i = 0; i < (int)MMDAgent_strlen(p); i++) {
          c = p[i];
          if (c == '_') {
             /* replace '_' to ' ' */
@@ -354,7 +354,7 @@ void TextArea::setText(const char *text)
          }
          if (p[i] == '\\') {
             /* replace '\' + 'n' or 'r' to '\n' */
-            if (i + 1 < MMDAgent_strlen(p) && (p[i + 1] == 'r' || p[i + 1] == 'n')) {
+            if (i + 1 < (int)MMDAgent_strlen(p) && (p[i + 1] == 'r' || p[i + 1] == 'n')) {
                c = '\n';
                i++;
             }

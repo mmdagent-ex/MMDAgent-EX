@@ -123,7 +123,7 @@ void VMD::addBoneMotion(const char *name)
    link->next = m_boneLink;
    m_boneLink = link;
 
-   m_name2bone.add(name, strlen(name), bmNew);
+   m_name2bone.add(name, (int)strlen(name), bmNew);
 }
 
 /* VMD::addFaceMotion: add new face motion to list */
@@ -142,7 +142,7 @@ void VMD::addFaceMotion(const char *name)
 
    link->next = m_faceLink;
    m_faceLink = link;
-   m_name2face.add(name, strlen(name), fmNew);
+   m_name2face.add(name, (int)strlen(name), fmNew);
 }
 
 /* VMD::getBoneMotion: find bone motion by name */
@@ -153,7 +153,7 @@ BoneMotion* VMD::getBoneMotion(const char *name)
    if (name == NULL)
       return NULL;
 
-   if (m_name2bone.search(name, strlen(name), (void **)&bm) == true)
+   if (m_name2bone.search(name, (int)strlen(name), (void **)&bm) == true)
       return bm;
 
    return NULL;
@@ -167,7 +167,7 @@ FaceMotion* VMD::getFaceMotion(const char *name)
    if(name == NULL)
       return NULL;
 
-   if (m_name2face.search(name, strlen(name), (void **)&fm) == true)
+   if (m_name2face.search(name, (int)strlen(name), (void **)&fm) == true)
       return fm;
 
    return NULL;
@@ -542,7 +542,7 @@ bool VMD::parse(const unsigned char *data, unsigned long size)
 
    data += sizeof(VMDFile_FaceFrame) * m_numTotalFaceKeyFrame;
 
-   if ((unsigned long) data - (unsigned long) start >= size) {
+   if ((uintptr_t)data - (uintptr_t)start >= size) {
       /* no further entry */
       return true;
    }
@@ -574,7 +574,7 @@ bool VMD::parse(const unsigned char *data, unsigned long size)
       }
       qsort(m_cameraMotion->keyFrameList, m_cameraMotion->numKeyFrame, sizeof(CameraKeyFrame), compareCameraKeyFrame);
    }
-   if ((unsigned long) data - (unsigned long) start >= size) {
+   if ((uintptr_t) data - (uintptr_t) start >= size) {
       /* no further entry */
       return true;
    }
@@ -583,7 +583,7 @@ bool VMD::parse(const unsigned char *data, unsigned long size)
    memcpy(&i, data, sizeof(unsigned int));
    data += sizeof(unsigned int);
    data += sizeof(VMDFile_LightFrame) * i;
-   if ((unsigned long) data - (unsigned long) start >= size) {
+   if ((uintptr_t) data - (uintptr_t) start >= size) {
       /* no further entry */
       return true;
    }
@@ -592,7 +592,7 @@ bool VMD::parse(const unsigned char *data, unsigned long size)
    memcpy(&i, data, sizeof(unsigned int));
    data += sizeof(unsigned int);
    data += sizeof(VMDFile_SelfShadowFrame) * i;
-   if ((unsigned long) data - (unsigned long) start >= size) {
+   if ((uintptr_t) data - (uintptr_t) start >= size) {
       /* no further entry */
       return true;
    }

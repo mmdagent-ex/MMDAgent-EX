@@ -594,7 +594,7 @@ bool PMDTexture::loadTGA(const char *fileName)
       uncompressed = (unsigned char *)malloc(datalen);
       src = body;
       dst = uncompressed;
-      while ((unsigned long) dst - (unsigned long) uncompressed < datalen) {
+      while ((uintptr_t) dst - (uintptr_t) uncompressed < datalen) {
          len = (*src & 0x7f) + 1;
          if (*src & 0x80) {
             src++;
@@ -812,7 +812,7 @@ bool PMDTexture::loadPNG(const char *fileName)
                for (int x = 0; x < (int)imageWidth; x++) {
                   if (x >= x1 && y >= y1 && x < x2 && y < y2) {
                      /* in region */
-                     s = (y - y1) * png_get_rowbytes(png_ptr, info_ptr) + (x - x1) * channels;
+                     s = (int)((y - y1) * png_get_rowbytes(png_ptr, info_ptr) + (x - x1) * channels);
                      switch (next_frame_dispose_op) {
                      case PNG_DISPOSE_OP_NONE:
                         /* keep last frame */
@@ -864,7 +864,7 @@ bool PMDTexture::loadPNG(const char *fileName)
          readbuf = NULL;
       }
    } else {
-      m_textureDataLen = png_get_rowbytes(png_ptr, info_ptr) * imageHeight;
+      m_textureDataLen = (unsigned int)(png_get_rowbytes(png_ptr, info_ptr) * imageHeight);
       if (assignTextureDataStorage(m_textureDataLen) == false) {
          png_destroy_read_struct(&png_ptr, NULL, NULL);
          fclose(fp);

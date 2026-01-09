@@ -59,33 +59,109 @@
 #include "MMDAgent.h"
 #include "ServerClient.h"
 
-#if defined(_WIN32) && !defined(__CYGWIN32__)
-#include <winsock2.h>
-#define WINSOCK
-#else
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <unistd.h>
-#endif
+// A small container to hold hostent and its dynamically allocated members
+struct hostent_box {
+   struct hostent h;
+   char **addr_list;        // array of pointers for h.h_addr_list
+   struct in_addr *addrs;   // contiguous array of IPv4 addresses
+   char *name_copy;         // copy of the hostname
+};
+
+/*
+ * Thread-safe replacement for gethostbyname (IPv4 only).
+ * On success, returns 0 and stores a pointer to a heap-allocated hostent in *out.
+ * The returned object must be freed with my_freehostent().
+ */
+static int my_gethostbyname_threadsafe(const char *name, struct hostent **out)
+{
+   if (!name || !out) return -1;
+   *out = NULL;
+
+   struct addrinfo hints = { 0 }, *res = NULL, *rp = NULL;
+   hints.ai_family = AF_INET;     // IPv4 only
+   hints.ai_socktype = SOCK_STREAM; // filter by stream sockets
+
+   int rc = getaddrinfo(name, NULL, &hints, &res);
+   if (rc != 0 || !res) return -2;
+
+   // Count the number of IPv4 addresses
+   size_t naddr = 0;
+   for (rp = res; rp; rp = rp->ai_next)
+      if (rp->ai_family == AF_INET) ++naddr;
+   if (naddr == 0) { freeaddrinfo(res); return -3; }
+
+   // Allocate the container
+   struct hostent_box *box = (struct hostent_box *)malloc(sizeof(*box));
+   if (!box) { freeaddrinfo(res); return -4; }
+   memset(box, 0, sizeof(*box));
+
+   box->addrs = (struct in_addr *)malloc(naddr * sizeof(struct in_addr));
+   box->addr_list = (char **)malloc((naddr + 1) * sizeof(char *));
+   box->name_copy = MMDAgent_strdup(name);
+
+   if (!box->addrs || !box->addr_list || !box->name_copy) {
+      free(box->name_copy);
+      free(box->addr_list);
+      free(box->addrs);
+      free(box);
+      freeaddrinfo(res);
+      return -5;
+   }
+
+   // Copy IPv4 addresses into the array
+   size_t i = 0;
+   for (rp = res; rp; rp = rp->ai_next) {
+      if (rp->ai_family != AF_INET) continue;
+      struct sockaddr_in *sin = (struct sockaddr_in *)rp->ai_addr;
+      box->addrs[i] = sin->sin_addr;           // copy value
+      box->addr_list[i] = (char *)&box->addrs[i]; // h_addr_list points here
+      ++i;
+   }
+   box->addr_list[i] = NULL; // terminate with NULL
+
+   // Fill hostent fields to mimic gethostbyname()
+   box->h.h_name = box->name_copy;
+   box->h.h_aliases = NULL;
+   box->h.h_addrtype = AF_INET;
+   box->h.h_length = (int)sizeof(struct in_addr);
+   box->h.h_addr_list = box->addr_list;
+
+   freeaddrinfo(res);
+
+   *out = &box->h; // return as hostent*
+   return 0;
+}
+
+/*
+ * Frees the hostent returned by my_gethostbyname_threadsafe().
+ * Safe to call with NULL.
+ */
+static void my_freehostent(struct hostent *h)
+{
+   if (!h) return;
+   // Convert back from hostent* to hostent_box*
+   struct hostent_box *box = (struct hostent_box *)((char *)h - offsetof(struct hostent_box, h));
+   free(box->name_copy);
+   free(box->addr_list);
+   free(box->addrs);
+   free(box);
+}
 
 void ServerClient::initialize()
 {
    m_socket_initialized = false;
-   m_server_sd = -1;
+   m_server_sd = SOCKET_INVALID;
    m_hostname = NULL;
 }
 
 void ServerClient::reset()
 {
-   if (m_server_sd != -1) {
+   if (m_server_sd != SOCKET_INVALID) {
       closeSocket(m_server_sd);
    }
    if (m_hostname != NULL)
       free(m_hostname);
-   m_server_sd = -1;
+   m_server_sd = SOCKET_INVALID;
    m_hostname = NULL;
 }
 
@@ -121,13 +197,18 @@ bool ServerClient::readyAsServer(int portnum)
    /* init winsock */
    if (m_socket_initialized == false) {
       WSADATA data;
-      WSAStartup(MAKEWORD(2,0), &data);
+      if (WSAStartup(MAKEWORD(2, 0), &data) != 0) {
+         reset();
+         return false;
+      }
       m_socket_initialized = true;
    }
 #endif
   /* create socket */
 #ifdef WINSOCK
-   if((m_server_sd = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, 0)) == INVALID_SOCKET) {
+   m_server_sd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+   if (m_server_sd == INVALID_SOCKET) {
+      m_server_sd = SOCKET_INVALID;
       reset();
       return false;
    }
@@ -167,12 +248,13 @@ bool ServerClient::readyAsServer(int portnum)
 // ServerClient::return true when server has been started
 bool ServerClient::isServerStarted()
 {
-   if (m_server_sd == -1)
+   if (m_server_sd == SOCKET_INVALID)
       return false;
    return true;
 }
 
-int ServerClient::acceptFrom()
+// server, accept from socket and return new connected socket, SOCKET_INVALID on error
+socket_t ServerClient::acceptFrom()
 {
    static struct sockaddr_in from;
 #ifdef HAVE_SOCKLEN_T
@@ -180,69 +262,94 @@ int ServerClient::acceptFrom()
 #else
    static int nbyte;
 #endif // HAVE_SOCKLEN_T
-   int asd;
+   socket_t asd;
 
-   if (m_server_sd == -1)
-      return -1;
+   if (m_server_sd == SOCKET_INVALID)
+      return SOCKET_INVALID;
 
    nbyte = sizeof(struct sockaddr_in);
    asd = accept(m_server_sd, (struct sockaddr *)&from, &nbyte);
-   if (asd < 0) {               /* error */
-      return -1;
+   if (asd == SOCKET_INVALID) {               /* error */
+      return SOCKET_INVALID;
    }
 
+   char buf[INET_ADDRSTRLEN];
    if (m_hostname != NULL)
       free(m_hostname);
-   m_hostname = MMDAgent_strdup(inet_ntoa(from.sin_addr));
+   if (inet_ntop(AF_INET, &from.sin_addr, buf, sizeof(buf))) {
+      m_hostname = MMDAgent_strdup(buf);
+   } else {
+      m_hostname = NULL;
+   }
 
    return asd;
 }
 
-int ServerClient::makeConnection(const char *hostname, int port_num)
+// client, make connection and return new socket, SOCKET_INVALID on error
+socket_t ServerClient::makeConnection(const char *hostname, int port_num)
 {
-   static struct hostent *hp;
-   static struct sockaddr_in	sin;
-   int sd;
+   struct hostent *hp;
+   struct sockaddr_in sin;
+   socket_t sd;
 
 #ifdef WINSOCK
    /* init winsock */
    if (m_socket_initialized == false) {
       WSADATA data;
-      WSAStartup(0x1010, &data);
+      if (WSAStartup(MAKEWORD(2, 0), &data) != 0) {
+         reset();
+         return SOCKET_INVALID;
+      }
       m_socket_initialized = true;
    }
 #endif
 
    /* host existence check */
-   if ((hp  = gethostbyname(hostname)) == NULL)
-      return -1;
+   if (my_gethostbyname_threadsafe(hostname, &hp) != 0) {
+      return SOCKET_INVALID;
+   }
+
    /* create socket */
 #ifdef WINSOCK
    if((sd = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
-      return -1;
+      return SOCKET_INVALID;
 #else  /* ~WINSOCK */
    if((sd = socket(PF_INET, SOCK_STREAM, 0)) < 0)
-      return -1;
+      return SOCKET_INVALID;
 #endif /* ~WINSOCK */
 
    /* try to connect */
    memset((char *)&sin, 0, sizeof(sin));
-   memcpy(&sin.sin_addr, hp->h_addr, hp->h_length);
+   memcpy(&sin.sin_addr, hp->h_addr_list[0], hp->h_length);
    sin.sin_family = hp->h_addrtype;
    sin.sin_port = htons((unsigned short)port_num);
-   if (connect(sd, (struct sockaddr *)&sin, sizeof(sin)) < 0) {
+#ifdef WINSOCK
+   if (connect(sd, (struct sockaddr *)&sin, sizeof(sin)) == SOCKET_ERROR) {
       /* fail */
-      return -1;
+      my_freehostent(hp);
+      return SOCKET_INVALID;
    }
+#else
+   if (connect(sd, (struct sockaddr *)&sin, sizeof(sin)) == -1) {
+      /* fail */
+      my_freehostent(hp);
+      return SOCKET_INVALID;
+   }
+#endif
+
+   my_freehostent(hp);
 
    return sd;
 }
 
-int ServerClient::closeSocket(int sd)
+// close socket, return 0 on success, -1 on error
+int ServerClient::closeSocket(socket_t sd)
 {
   int ret;
 #ifdef WINSOCK
   ret = closesocket(sd);
+  if (ret != 0)
+     ret = -1;
 #else
   ret = close(sd);
 #endif
@@ -254,16 +361,16 @@ char *ServerClient::getClientHostName()
    return m_hostname;
 }
 
-ServerClient::kStatus ServerClient::waitData(int *sd, int num, int *sd_ret)
+ServerClient::kStatus ServerClient::waitData(socket_t *sd, int num, socket_t *sd_ret)
 {
    fd_set rfds, wfds;
    int ret;
    int i;
-   int sdmax;
+   socket_t sdmax;
 
    FD_ZERO(&rfds);
    FD_ZERO(&wfds);
-   if (m_server_sd >= 0)
+   if (m_server_sd != SOCKET_INVALID)
       FD_SET(m_server_sd, &rfds);
    sdmax = m_server_sd;
    for (i = 0; i < num; i++) {
@@ -273,8 +380,13 @@ ServerClient::kStatus ServerClient::waitData(int *sd, int num, int *sd_ret)
          sdmax = sd[i];
    }
    ret = select(sdmax + 1, &rfds, &wfds, NULL, NULL);
+#ifdef WINSOCK
+   if (ret == SOCKET_ERROR)
+      return ServerClient::SOCKET_HASERROR;
+#else
    if (ret <= 0)
       return ServerClient::SOCKET_HASERROR;
+#endif
    if (m_server_sd >= 0 && FD_ISSET(m_server_sd, &rfds))
       return ServerClient::SOCKET_CONNECT;
    for (i = 0; i < num; i++) {
@@ -286,29 +398,34 @@ ServerClient::kStatus ServerClient::waitData(int *sd, int num, int *sd_ret)
    return ServerClient::SOCKET_WRITABLE;
 }
 
-int ServerClient::send(int sd, const void *buf, size_t len)
+int ServerClient::send(socket_t sd, const void *buf, size_t len)
 {
    int ret;
 #ifdef WINSOCK
-   ret = ::send(sd, (const char *)buf, len, 0);
+   ret = ::send(sd, (const char *)buf, (int)len, 0);
+   if (ret == SOCKET_ERROR)
+      ret = -1;
 #else
    ret = (int)::send(sd, buf, len, 0);
 #endif
    return ret;
 }
 
-int ServerClient::recv(int sd, void *buf, size_t maxlen)
+int ServerClient::recv(socket_t sd, void *buf, size_t maxlen)
 {
    int ret;
 #ifdef WINSOCK
-   ret = ::recv(sd, (char *)buf, maxlen, 0);
+   ret = ::recv(sd, (char *)buf, (int)maxlen, 0);
+   if (ret == SOCKET_ERROR)
+      ret = -1;
 #else
    ret = (int)::recv(sd, buf, maxlen, 0);
 #endif
    return ret;
 }
 
-void ServerClient::shutdown(int sd)
+// shutdown socket
+void ServerClient::shutdown(socket_t sd)
 {
 #ifdef WINSOCK
    ::shutdown(sd, SD_BOTH);

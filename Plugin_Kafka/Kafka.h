@@ -39,7 +39,13 @@
 /* POSSIBILITY OF SUCH DAMAGE.                                       */
 /* ----------------------------------------------------------------- */
 
+#if __has_include(<rdkafka.h>)
 #include <rdkafka.h>
+#elif __has_include(<librdkafka/rdkafka.h>)
+#include <librdkafka/rdkafka.h>
+#else
+#error "rdkafka.h not found"
+#endif
 
 // Server-client connection handling class
 class Kafka
