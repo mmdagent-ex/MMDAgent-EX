@@ -4,7 +4,8 @@
 [![ja](https://img.shields.io/badge/lang-ja-blue.svg)](README.ja.md)
 [![DOI](https://zenodo.org/badge/691418774.svg)](https://zenodo.org/doi/10.5281/zenodo.10427368)
 ---
-**A short demo (tap image to open video)**
+
+![banner](CG-CAs.png)
 
 [![Demo movie](http://img.youtube.com/vi/iu2gU2uHAcc/0.jpg)](https://www.youtube.com/watch?v=iu2gU2uHAcc)
 ---
@@ -17,25 +18,70 @@ MMDAgent was developed at Nagoya Institute of Technology since 2011 as an open-s
 
 MMDAgent-EX has its own OpenGL-based rendering engine compatible with MMD (MikuMikuDance), and can create interactive characters using 3D models and motion data in MMD format. It also includes speech recognition and synthesis engines developed at Nagoya Institute of Technology, such as Julius and Open JTalk, as well as an embedded FST-based state-transition primitive dialogue scripting feature, allowing you to build voice dialogue systems independently. Aside from the internal engines, it can be easily connected to other scripts like Python, so you can add another modules such as cloud-based speech recognition, speech synthesis engines, or large language models like ChatGPT with this system. Furthermore, it supports external control via socket connections, making it suitable for use as the input/output frontend for existing dialogue systems.
 
-## Documents
-
-All documents about installation, tests and tutorials are on the [official site](https://mmdagent-ex.dev/).
-
 ## Running Environments
 
 Windows / macOS / Linux / WSL
 
-## Tutorial
+## How to use
 
-There is a [tutorial doc](https://mmdagent-ex.dev/docs/build/) that guides you how to build and run MMDAgent-EX.
+[The official site](https://mmdagent-ex.dev/) contains tutorials, references and other docs.
 
-### Windows
+## CG Avatars
 
-There are win32 pre-built binaries for [each release](https://github.com/mmdagent-ex/MMDAgent-EX/releases), uploaded as `MMDAgent-EX-win32-vx.x.x.zip`.  You can download that of the latest version, and start from ["Running Examples" page](https://mmdagent-ex.dev/docs/run/), skipping the first build phase.
+Along with MMDAgent-EX, we are building fully tailored CG Avatars for academic research and use cases.  Some of them can be available on GitHub:
 
-### Other OS
+- [CG Avatar "Gene"](https://github.com/mmdagent-ex/gene)
+- [CG Avatar "Uka"](https://github.com/mmdagent-ex/uka)
 
-Please build MMDAgent-EX by your own.  The overall procedure is fully described in [the document's tutorial page](https://mmdagent-ex.dev/docs/build/)
+## Ways to contribute
+
+We welcome contributions from researchers, developers, and enthusiasts!
+
+- 🐞 Report bugs or unexpected behavior
+- 💡 Suggest features
+- 🛠 Pick up a defined task
+- 📊 Share experiment results
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to get started.
+
+---
+
+## Research & Use Cases
+
+If you’re using MMDAgent-EX in your work (e.g., research, demos, projects):
+
+- Let us know in **Issues → Use case thread**
+- We’re happy to list your project here
+
+Example usage:
+
+- [ISHIGURO Moonshot Project](https://avatar-ss.org/en/index.html)
+- [JST CREST uDialogue project](http://www.udialogue.org/)
+
+## Citation
+
+If you use MMDAgent-EX in academic work, please cite like this:
+
+**APA**
+
+```text
+Lee, A. (2023). MMDAgent-EX (Version 1.0.0) [Computer software]. https://doi.org/10.5281/zenodo.10427369
+```
+
+**BibTeX**
+
+```text
+@software{Lee_MMDAgent-EX_2023,
+  author = {Lee, Akinobu},
+  doi = {10.5281/zenodo.10427369},
+  license = {Apache-2.0},
+  month = dec,
+  title = {{MMDAgent-EX}},
+  url = {https://github.com/mmdagent-ex/MMDAgent-EX},
+  version = {1.0.0},
+  year = {2023}
+}
+```
 
 ## License
 
@@ -90,42 +136,9 @@ Disallowed usage of our software:
   - Ignoring guidelines set by the copyright holders.
   - Unauthorized redistribution, plagiarism, and impersonation of the original creators.
 
-## Links
-
-- [Official site](https://mmdagent-ex.dev/)
-- Related repositories:
-  - [Example content](https://github.com/mmdagent-ex/example)
-  - [CG Avatar Gene](https://github.com/mmdagent-ex/gene)
-  - [CG Avatar Uka](https://github.com/mmdagent-ex/uka)
-
 ## Contacts
 
-- Twitter/X [@MMDAgentEX](https://twitter.com/MMDAgentEX)（for announcements）
-- mmdagent-ex-official@lee-lab.org (for inquiries about research, development, and licensing)
 -  [Lee Laboratory, Nagoya Institute of Technology](https://www.slp.nitech.ac.jp/en/)
-
-## Citation
-
-**APA**
-
-```text
-Lee, A. (2023). MMDAgent-EX (Version 1.0.0) [Computer software]. https://doi.org/10.5281/zenodo.10427369
-```
-
-**BibTeX**
-
-```text
-@software{Lee_MMDAgent-EX_2023,
-  author = {Lee, Akinobu},
-  doi = {10.5281/zenodo.10427369},
-  license = {Apache-2.0},
-  month = dec,
-  title = {{MMDAgent-EX}},
-  url = {https://github.com/mmdagent-ex/MMDAgent-EX},
-  version = {1.0.0},
-  year = {2023}
-}
-```
 
 ## Acknowledgments
 

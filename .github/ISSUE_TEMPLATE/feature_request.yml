@@ -1,0 +1,42 @@
+name: "✨ Feature request"
+description: "Suggest an improvement or new feature."
+title: "[FEATURE]"
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the suggestion!
+        Help us understand the need and how to implement it.
+
+  - type: input
+    id: summary
+    attributes:
+      label: "🧠 Summary"
+      description: "A clear and concise description of the feature"
+      placeholder: "Short description"
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: "🔥 Motivation"
+      description: "Why is this useful? What problem does it solve?"
+      placeholder: "Describe the use case"
+
+  - type: textarea
+    id: design
+    attributes:
+      label: "⚙️ Proposed design / Implementation hints"
+      description: "If you have ideas on how to implement this, share them"
+
+  - type: dropdown
+    id: difficulty
+    attributes:
+      label: "🧩 Estimated difficulty"
+      options:
+        - "S (simple)"
+        - "M (medium)"
+        - "L (large)"
+      default: "M"

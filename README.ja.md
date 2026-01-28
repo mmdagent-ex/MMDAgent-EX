@@ -4,7 +4,8 @@
 [![ja](https://img.shields.io/badge/lang-ja-blue.svg)](README.ja.md)
 [![DOI](https://zenodo.org/badge/691418774.svg)](https://zenodo.org/doi/10.5281/zenodo.10427368)
 ---
-**A short demo (tap image to open video)**
+
+![banner](CG-CAs.png)
 
 [![Demo movie](http://img.youtube.com/vi/iu2gU2uHAcc/0.jpg)](https://www.youtube.com/watch?v=iu2gU2uHAcc)
 ---
@@ -16,11 +17,71 @@ MMDAgent は2011年に音声インタラクションの研究開発のための�
 
 MMDAgent-EX は MMD (MikuMikuDance) 互換の独自のOpenGLベースの描画エンジンを持ち、MMDの形式の3Dモデルとモーションを用いて対話キャラクターを構築することができます。Juliusや Open JTalk などの名工大で開発された音声認識・音声合成エンジンを持つほか、FSTベースの状態遷移型の原始的な対話スクリプト機能を内蔵しており、これ単体で音声対話システムを構築することが可能です。また、Python等のスクリプト言語と接続することができ、任意のクラウド音声認識・音声合成エンジンや ChatGPT 等の LLM をモジュールとして追加することができます。また、ソケット接続による外部制御にも対応していますので、既存の対話応答生成システムの入出力フロントエンドとして用いることもできます。
 
+## 実行環境
+
+Windows / macOS / Linux / WSL
+
 ## ドキュメント
 
-全てのドキュメントは [公式サイト](https://mmdagent-ex.dev/ja/) にあります。
+使い方やチュートリアルなど、全てのドキュメントは [公式サイト](https://mmdagent-ex.dev/ja/) にあります。
 
-> 注意：このレポジトリでは大きいモデルファイルをホストするために Git LFS (Large File Storage) を使っています。**clone前にGit LFSをインストールするか、 [GitHub Desktop](https://desktop.github.com/) などの LFS に対応した Git ツールを使って下さい**。詳しい手順は[公式サイト](https://mmdagent-ex.dev/ja/) をご覧ください。
+## CGアバター
+
+本ツールとともに高品位 CG アバターを制作しており、そのいくつかはGitHubで公開しています。動作テスト・学術研究・デモ・検証等にお使いいただけます。MMDAgent-EXと併せてご利用ください。
+
+- [CGアバター ジェネ / Gene](https://github.com/mmdagent-ex/gene)
+- [CGアバター うか / Uka](https://github.com/mmdagent-ex/uka)
+
+## コントリビューションについて
+
+不具合報告、改善提案、実験結果の共有などを歓迎します。実装以外の貢献（実験・検証・報告）も重要な貢献となります。
+
+- 🐞 再現可能な不具合（OS / ビルド条件 / ログがあると助かります）
+- 💡 機能追加・改善の要望（実装アイデアがあれば歓迎します）
+- 🛠 実装・実験などの着手できる作業
+
+👉 詳細は **CONTRIBUTING.ja.md** を参照してください。
+
+---
+
+## 利用事例・研究利用について
+
+MMDAgent-EX を研究・デモ・教育で利用されている場合、
+
+- Issue や Discussions で用途を共有いただけると嬉しいです
+- README 等での紹介を検討します
+
+研究用途での利用実績は、プロジェクトの継続的改善に役立ちます。
+
+利用例:
+
+- [ムーンショット石黒プロジェクト](https://avatar-ss.org/)
+- [JST CREST uDialogue project](http://www.udialogue.org/ja/)
+
+## 引用
+
+MMDAgent-EX を学術活動に利用した場合はぜひ引用してください。下記は引用形式の参考です。
+
+**APA**
+
+```text
+Lee, A. (2023). MMDAgent-EX (Version 1.0.0) [Computer software]. https://doi.org/10.5281/zenodo.10427369
+```
+
+**BibTeX**
+
+```text
+@software{Lee_MMDAgent-EX_2023,
+  author = {Lee, Akinobu},
+  doi = {10.5281/zenodo.10427369},
+  license = {Apache-2.0},
+  month = dec,
+  title = {{MMDAgent-EX}},
+  url = {https://github.com/mmdagent-ex/MMDAgent-EX},
+  version = {1.0.0},
+  year = {2023}
+}
+```
 
 ## ライセンス
 
@@ -75,18 +136,8 @@ MMDAgent-EX のコードは Apache License, Version 2.0 で提供されていま
   - 権利者が定めるガイドラインに従わない利用
   - 不当な二次配布・盗用・作者なりすまし
 
-## リンク
-
-- [オフィシャルサイト](https://mmdagent-ex.dev/ja/)
-- 関連レポジトリ:
-  - [Exampleコンテンツ](https://github.com/mmdagent-ex/example)
-  - [CGアバター ジェネ / Gene](https://github.com/mmdagent-ex/gene)
-  - [CGアバター うか / Uka](https://github.com/mmdagent-ex/uka)
-
 ## Contacts
 
-- Twitter/X [@MMDAgentEX](https://twitter.com/MMDAgentEX)（更新情報等お知らせ）
-- mmdagent-ex-official@lee-lab.org （研究・開発・許諾等ご相談）
 - 開発元：[名古屋工業大学 李 研究室](https://www.slp.nitech.ac.jp/)
 
 ## Acknowledgments
