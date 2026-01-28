@@ -47,6 +47,8 @@ A good PR includes:
 - Motivation / benefit
 - If applicable, **benchmark results**, logs, or screenshots
 
+You may write your PR description in either English or Japanese.
+
 ---
 
 ## 📢 Communication
