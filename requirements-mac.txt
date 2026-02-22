@@ -1,4 +1,3 @@
-poco
 glew
 libjpeg
 re2
