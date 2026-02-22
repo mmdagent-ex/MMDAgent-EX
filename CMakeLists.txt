@@ -67,7 +67,6 @@ if(APPLE)
     set(MMDAGENT_LINK_OPTIONS
         MMDAGENT
         -lstdc++
-        "-framework AGL"
         "-framework Cocoa"
         "-framework OpenGL"
         "-framework IOKit"
